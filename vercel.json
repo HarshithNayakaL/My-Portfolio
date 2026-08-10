@@ -9,7 +9,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!robots\\.txt|llms\\.txt|sitemap\\.xml|favicon\\.svg|og-image\\.png|og-image\\.svg|profile\\.jpg|google930d0c4b321815d5\\.html|fonts/|icons/|assets/).*)",
+      "source": "/((?!robots\\.txt|llms\\.txt|llms-full\\.txt|sitemap\\.xml|favicon\\.svg|og-image\\.png|og-image\\.svg|profile\\.jpg|google930d0c4b321815d5\\.html|fonts/|icons/|assets/).*)",
       "destination": "/index.html"
     }
   ],
@@ -19,7 +19,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'sha256-w3Gfnm+kaC7CbxVtkPuNIiZKD1wNM7KFjJnnJN7nnYI='; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.web3forms.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'sha256-MCXATBsOF7lKklDTciGqoH52Ayi2IaSeBCv0t5BQpJc='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://api.web3forms.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default; upgrade-insecure-requests"
         },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
@@ -33,6 +33,10 @@
     },
     {
       "source": "/llms.txt",
+      "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }]
+    },
+    {
+      "source": "/llms-full.txt",
       "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }]
     },
     {

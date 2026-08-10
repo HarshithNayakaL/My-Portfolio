@@ -231,8 +231,11 @@
     opacity: 1;
   }
 
-  /* Scroll-reveal: hidden until an IntersectionObserver adds `.is-in` */
-  .reveal {
+  /* Scroll-reveal: hidden until an IntersectionObserver adds `.is-in`.
+     Scoped to `.js` (set before first paint by the inline script in
+     index.html) so that if scripting never runs, the prerendered markup stays
+     visible instead of being a fully-populated page at opacity 0. */
+  :where(.js) .reveal {
     opacity: 0;
     will-change: opacity, transform;
   }

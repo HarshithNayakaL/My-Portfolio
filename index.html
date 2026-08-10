@@ -9,7 +9,15 @@
       // round-trip; kept CSP-strict via a script-src hash in vercel.json
       // instead of 'unsafe-inline'. If you edit this script, the hash in
       // vercel.json's CSP must be regenerated to match, or it'll be blocked.
+      // Regenerate with:
+      //   node -e "…crypto.createHash('sha256').update(SCRIPT_TEXT)…base64"
       (function () {
+        // Marks that scripting is live. Scroll-reveal starts at opacity:0 and
+        // is un-hidden by an IntersectionObserver; every route is prerendered
+        // to static HTML, so without this flag a visitor whose JS fails to run
+        // would get a fully-populated page rendered invisible. CSS hides
+        // reveals only under `.js`, so no-JS keeps the content on screen.
+        document.documentElement.classList.add("js");
         try {
           var t = localStorage.getItem("theme");
           if (!t)
@@ -237,87 +245,11 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Fallback for crawlers/agents that don't execute JavaScript, so the
-         core facts and links are still readable without rendering. -->
-    <noscript>
-      <h1>Harshith Nayaka L — AI Engineer, Full-Stack</h1>
-      <p>
-        Harshith Nayaka L is a full-stack AI Engineer based in Bengaluru,
-        India, building AI agents, RAG pipelines, and full-stack AI apps —
-        the model, the backend, and the interface around them. Currently AI
-        Workflow Engineer at DemandNXT, building production AI systems and
-        pipelines for marketing and creative operations. Public work
-        includes Maestro, a multi-model LLM orchestration engine, and
-        Cannon, a multi-agent assistant with query-level domain isolation,
-        both live and open-source.
-      </p>
-      <h2>Selected work</h2>
-      <ul>
-        <li>
-          <a href="/work/creative-ops-pipeline">Creative-Ops Pipeline</a> — a
-          multi-model content pipeline with tiered model routing,
-          schema-constrained generation, and QA gates.
-        </li>
-        <li>
-          <a href="/work/craftconnect">CraftConnect</a> — a multi-modal
-          assistant that lets artisans run an online storefront by talking and
-          showing; Gen AI Exchange Hackathon 2025 semi-finalist.
-        </li>
-        <li>
-          <a href="/work/maestro">Maestro</a> — a live, open-source multi-model
-          orchestration engine: a conductor routes one task across
-          thinker/worker/verifier roles over free LLMs and returns a single
-          verified answer with a full decision-log.
-        </li>
-        <li>
-          <a href="/work/cannon">Cannon</a> — a daily-driver multi-agent
-          personal assistant where each domain (fitness, work) is an
-          independent specialist with its own persona, tools, and retrieval
-          scope, isolation enforced at the query rather than by convention.
-        </li>
-        <li>
-          <a href="/work/replydesk">ReplyDesk</a> — a WhatsApp lead agent that
-          auto-replies to inbound messages in seconds, with a live operations
-          dashboard for the lead feed, pipeline, and response-time KPIs.
-        </li>
-        <li>
-          <a href="/work/nova-ai">Nova AI</a> — a deployed Llama 3.1 8B chat app
-          that keeps its API token server-side behind a serverless proxy.
-        </li>
-        <li>
-          <a href="/work/blogspace">BlogSpace</a> — a live full-stack blogging
-          platform with JWT auth, roles, and an admin panel.
-        </li>
-        <li>
-          <a href="/work/ai-notes">AI Notes</a> — a notes app running DeepSeek R1
-          locally through Ollama, so inference never leaves the machine.
-        </li>
-      </ul>
-      <h2>Published research</h2>
-      <p>
-        Harshith Nayaka L is an author of
-        <a href="https://www.doi.org/10.59256/ijrtmr.20250506023"
-          >“AI-Powered Note-Taking System: A Local Machine Learning Approach
-          DeepSeek R1 Integration”</a
-        >, published in the International Journal of Research Trends and
-        Multidisciplinary Research (IJRTMR), November–December 2025, pages
-        178–189. DOI:
-        <a href="https://www.doi.org/10.59256/ijrtmr.20250506023"
-          >10.59256/ijrtmr.20250506023</a
-        >. The paper covers the local-inference approach behind
-        the AI Notes project above — running a model on-device for
-        summarization, writing improvement, idea expansion, and keyword
-        extraction, reporting 87% user satisfaction on summarization with 1.9–3.8
-        second response times.
-      </p>
-      <h2>Contact</h2>
-      <p>
-        Email: <a href="mailto:harshith28124@gmail.com">harshith28124@gmail.com</a>
-        · <a href="https://github.com/HarshithNayakaL">GitHub</a>
-        ·
-        <a href="https://www.linkedin.com/in/harshith-nayaka-l-518b98348">LinkedIn</a>
-      </p>
-    </noscript>
+    <!-- Every route is prerendered to static HTML at build time (see
+         scripts/prerender.mjs), so the full page text is already in the
+         markup for crawlers that never execute JavaScript. The <noscript>
+         summary that used to live here has been removed: it now duplicates
+         that content and would put a second <h1> in the document. -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
