@@ -9,7 +9,7 @@ export type Project = {
   kicker?: string; // small context line
 };
 
-export const GITHUB = "https://github.com/Harshith29124";
+export const GITHUB = "https://github.com/HarshithNayakaL";
 export const LINKEDIN =
   "https://www.linkedin.com/in/harshith-nayaka-l-518b98348";
 export const EMAIL = "harshith28124@gmail.com";
@@ -39,7 +39,7 @@ export const projects: Project[] = [
     outcome:
       "A multi-modal assistant that lets artisans run an online storefront by talking and showing, not typing.",
     tags: ["Voice + Vision", "Gemini", "Google Cloud", "Product lead"],
-    links: [{ label: "GitHub", href: "https://github.com/Harshith29124/craftconnect" }],
+    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
     hasCaseStudy: true,
   },
   {
@@ -51,7 +51,7 @@ export const projects: Project[] = [
     tags: ["LLM orchestration", "Verifier gates", "FastAPI", "Decision-log"],
     links: [
       { label: "Live site", href: "https://maestro-psi-neon.vercel.app/" },
-      { label: "GitHub", href: "https://github.com/Harshith29124/Maestro" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
     ],
     hasCaseStudy: true,
   },
@@ -81,7 +81,7 @@ export const projects: Project[] = [
     links: [
       {
         label: "GitHub",
-        href: "https://github.com/Harshith29124/Whatsapp-Agent-Dashboard",
+        href: "https://github.com/HarshithNayakaL/Whatsapp-Agent-Dashboard",
       },
     ],
     hasCaseStudy: true,
@@ -94,7 +94,7 @@ export const projects: Project[] = [
       "A deployed chat app on Llama 3.1 8B that keeps the API token server-side behind a serverless proxy.",
     tags: ["Llama 3.1 8B", "Hugging Face", "Serverless proxy"],
     links: [
-      { label: "GitHub", href: "https://github.com/Harshith29124/CUSTOM-GPT" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
     ],
     hasCaseStudy: true,
   },
@@ -110,7 +110,7 @@ export const projects: Project[] = [
         label: "Live site",
         href: "https://tangerine-cupcake-145674.netlify.app/login",
       },
-      { label: "GitHub", href: "https://github.com/Harshith29124/blogspace-internship" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/blogspace-internship" },
     ],
     hasCaseStudy: true,
   },
@@ -121,7 +121,7 @@ export const projects: Project[] = [
     outcome:
       "A notes app running a local LLM through Ollama, so inference never leaves the machine.",
     tags: ["DeepSeek R1", "Ollama", "Local/self-hosted"],
-    links: [{ label: "GitHub", href: "https://github.com/Harshith29124/AI-Notes-App" }],
+    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/AI-Notes-App" }],
     hasCaseStudy: true,
   },
 ];

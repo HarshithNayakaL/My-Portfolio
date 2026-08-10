@@ -584,7 +584,7 @@ const maestro: CaseStudy = {
   ],
   links: [
     { label: "Live app", href: "https://maestro-psi-neon.vercel.app/" },
-    { label: "View on GitHub", href: "https://github.com/Harshith29124/Maestro" },
+    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
   ],
 };
 
@@ -789,7 +789,7 @@ const replydesk: CaseStudy = {
   links: [
     {
       label: "View on GitHub",
-      href: "https://github.com/Harshith29124/Whatsapp-Agent-Dashboard",
+      href: "https://github.com/HarshithNayakaL/Whatsapp-Agent-Dashboard",
     },
   ],
 };

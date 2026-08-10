@@ -26,7 +26,7 @@ Harshith Nayaka L specialises in the unglamorous part of applied AI — making s
 
 ## Profiles
 
-- [GitHub](https://github.com/Harshith29124): Source code for the projects above.
+- [GitHub](https://github.com/HarshithNayakaL): Source code for the projects above.
 - [LinkedIn](https://www.linkedin.com/in/harshith-nayaka-l-518b98348): Professional background and experience.
 
 ## Optional
