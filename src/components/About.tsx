@@ -68,11 +68,15 @@ export default function About() {
 
             <div className="mt-6 space-y-5 text-base leading-relaxed text-dim md:text-lg">
               <p>
-                I'm Harshith — an AI Engineer working full-stack: agents, RAG
-                pipelines, LLM apps, and the backends and interfaces around
-                them. At DemandNXT I go by AI Workflow Engineer, building
+                I'm Harshith — a full-stack AI Engineer based in Bengaluru,
+                India. I build AI agents, RAG pipelines, and full-stack AI
+                apps: the model, the backend, and the interface around them.
+                At DemandNXT I go by AI Workflow Engineer, building
                 production AI systems and pipelines for marketing and
-                creative operations.
+                creative operations. My public work includes Maestro, a
+                multi-model LLM orchestration engine, and Cannon, a
+                multi-agent assistant with query-level domain isolation —
+                both live and open-source.
               </p>
               <p>
                 I've been building with code since 2022. That isn't years of
