@@ -128,8 +128,15 @@ function jsonLdFor(path, seo) {
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
 }
 
+// Full ISO 8601 with an offset. A bare "2026-08-10" is a valid schema.org
+// Date but Google's ProfilePage parser rejected it as "Invalid datetime value
+// for dateModified", so it wants a datetime. Stamped at build time rather than
+// hardcoded, which is both correct-by-construction and stops the value going
+// stale the moment anything else on the page changes.
+const BUILD_TIME = new Date().toISOString().replace(/\.\d{3}Z$/, "+00:00");
+
 function applySeo(html, path, seo, appHtml) {
-  let out = html;
+  let out = html.replace("BUILD_TIMESTAMP", BUILD_TIME);
 
   out = out.replace(
     /<title>[\s\S]*?<\/title>/i,
