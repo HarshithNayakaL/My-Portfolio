@@ -31,4 +31,37 @@ declare module "react" {
   }
 }
 
+/**
+ * WebMCP imperative API.
+ * https://developer.chrome.com/docs/ai/webmcp/imperative-api
+ *
+ * Lives on `document`, not `navigator` — navigator.modelContext is deprecated
+ * as of Chrome 150. Typed loosely and optionally because the API is a
+ * proposal (Chrome status: Proposed, targeting M157) and absent everywhere
+ * today, so every call site must feature-detect.
+ */
+// This file is a module (it augments "react" above), so the DOM augmentation
+// has to go through `declare global` or it stays module-scoped and Document
+// never picks it up.
+declare global {
+  interface WebMcpToolDescriptor {
+    name: string;
+    description: string;
+    inputSchema: Record<string, unknown>;
+    execute: (params: Record<string, unknown>) => Promise<string> | string;
+    annotations?: { readOnlyHint?: boolean; untrustedContentHint?: boolean };
+  }
+
+  interface WebMcpModelContext {
+    registerTool(
+      tool: WebMcpToolDescriptor,
+      options?: { signal?: AbortSignal },
+    ): Promise<unknown>;
+  }
+
+  interface Document {
+    modelContext?: WebMcpModelContext;
+  }
+}
+
 export {};

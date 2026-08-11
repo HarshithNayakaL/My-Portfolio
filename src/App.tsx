@@ -4,6 +4,7 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import ScrollProgress from "./components/ScrollProgress";
 import Home from "./pages/Home";
+import { useWebMcpTools } from "./lib/useWebMcpTools";
 
 // Case study + legal live behind routes the landing page never needs up front,
 // so they are code-split — the initial bundle stays lean.
@@ -60,6 +61,9 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  // No-ops unless the browser implements WebMCP; see the hook for why.
+  useWebMcpTools();
+
   return (
     <>
       <ScrollManager />
