@@ -8,7 +8,7 @@ import App from "./App";
 // and one bundle for the build step to import.
 export { routeSeo, allRoutes, ORIGIN } from "./data/seo";
 export { caseStudies } from "./data/caseStudies";
-export { projects, NAME } from "./data/projects";
+export { projects, NAME, EMAIL, GITHUB, LINKEDIN } from "./data/projects";
 
 /**
  * Render one route to a complete HTML string for the build-time prerenderer.

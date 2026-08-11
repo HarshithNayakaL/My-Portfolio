@@ -19,8 +19,18 @@ import { fileURLToPath } from "node:url";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
 
-const { render, routeSeo, allRoutes, ORIGIN, caseStudies, projects, NAME } =
-  await import(join(ROOT, "dist-ssr/entry-server.js"));
+const {
+  render,
+  routeSeo,
+  allRoutes,
+  ORIGIN,
+  caseStudies,
+  projects,
+  NAME,
+  EMAIL,
+  GITHUB,
+  LINKEDIN,
+} = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const template = await readFile(join(DIST, "index.html"), "utf8");
 
@@ -253,10 +263,13 @@ const full = [
   ),
   "## Contact",
   "",
+  // Pulled from the shared constants rather than retyped: these were hardcoded
+  // here and silently went stale when the LinkedIn URL changed, so llms-full.txt
+  // kept shipping a dead profile link.
   `Site: ${ORIGIN}/`,
-  "Email: harshith28124@gmail.com",
-  "GitHub: https://github.com/HarshithNayakaL",
-  "LinkedIn: https://www.linkedin.com/in/harshith-nayaka-l-518b98348",
+  `Email: ${EMAIL}`,
+  `GitHub: ${GITHUB}`,
+  `LinkedIn: ${LINKEDIN}`,
   "",
 ].join("\n");
 
