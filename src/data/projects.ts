@@ -11,7 +11,7 @@ export type Project = {
 
 export const GITHUB = "https://github.com/HarshithNayakaL";
 export const LINKEDIN =
-  "https://www.linkedin.com/in/harshith-nayaka-l-518b98348";
+  "https://www.linkedin.com/in/harshithnayakal";
 export const EMAIL = "harshith28124@gmail.com";
 export const NAME = "Harshith Nayaka L";
 /** Submissions go through Web3Forms when a key is set; otherwise the form
