@@ -6,6 +6,7 @@ const PAPER_DOI = "https://www.doi.org/10.59256/ijrtmr.20250506023";
 const facts = [
   { k: "Role", v: "AI Engineer, Full-Stack" },
   { k: "Company", v: "DemandNXT" },
+  { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
 ];
 
@@ -68,9 +69,10 @@ export default function About() {
 
             <div className="mt-6 space-y-5 text-base leading-relaxed text-dim md:text-lg">
               <p>
-                I'm Harshith — a full-stack AI Engineer based in Bengaluru,
-                India. I build AI agents, RAG pipelines, and full-stack AI
-                apps: the model, the backend, and the interface around them.
+                I'm Harshith — a full-stack AI Engineer based in Bengaluru
+                (Bangalore), India. I build AI agents, RAG pipelines, and
+                full-stack AI apps: the model, the backend, and the interface
+                around them.
                 At DemandNXT I go by AI Workflow Engineer, building
                 production AI systems and pipelines for marketing and
                 creative operations. My public work includes Maestro, a
