@@ -33,17 +33,32 @@ const escapeAttr = (s) =>
 
 /** Replace the content attribute of a meta tag matched by name or property. */
 function setMeta(html, selector, value) {
-  const re = new RegExp(
-    `(<meta\\s+[^>]*${selector}\\s*=\\s*"[^"]*"[^>]*content\\s*=\\s*")[^"]*(")`,
-    "i",
-  );
-  if (re.test(html)) return html.replace(re, `$1${escapeAttr(value)}$2`);
-  // content-before-name ordering
-  const re2 = new RegExp(
-    `(<meta\\s+[^>]*content\\s*=\\s*")[^"]*("[^>]*${selector}\\s*=\\s*"[^"]*"[^>]*>)`,
-    "i",
-  );
-  return html.replace(re2, `$1${escapeAttr(value)}$2`);
+  // Walk the <meta> tags and rewrite content on the one carrying `selector`.
+  //
+  // This used to build one regex spanning the whole tag, which quietly never
+  // matched: `selector` already includes its value (name="description"), and
+  // the pattern then appended another \s*=\s*"..." after it, so it was looking
+  // for name="description"="...". Titles and canonicals had their own regexes
+  // and were fine, which is exactly why the failure was invisible — every
+  // route shipped the homepage's description and OG tags. Matching per tag and
+  // touching only `content` is both correct and much harder to get wrong.
+  const literal = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  let matched = false;
+  const out = html.replace(/<meta\b[^>]*>/gi, (tag) => {
+    if (matched || !new RegExp(literal, "i").test(tag)) return tag;
+    if (!/content\s*=\s*"/i.test(tag)) return tag;
+    matched = true;
+    return tag.replace(
+      /(content\s*=\s*")[^"]*(")/i,
+      `$1${escapeAttr(value)}$2`,
+    );
+  });
+  if (!matched) {
+    throw new Error(
+      `prerender: no <meta> tag matched ${selector} — index.html changed shape?`,
+    );
+  }
+  return out;
 }
 
 /** Route-specific structured data. The homepage keeps the full @graph
@@ -120,10 +135,7 @@ function applySeo(html, path, seo, appHtml) {
   out = setMeta(out, 'property="og:description"', seo.description);
   out = setMeta(out, 'property="og:url"', seo.canonical);
   out = setMeta(out, 'property="og:image:alt"', seo.title);
-  out = out.replace(
-    /(<meta\s+property="og:type"\s+content=")[^"]*(")/i,
-    `$1${seo.ogType}$2`,
-  );
+  out = setMeta(out, 'property="og:type"', seo.ogType);
   // Gemini's note: the social titles must match the page title exactly.
   out = setMeta(out, 'name="twitter:title"', seo.title);
   out = setMeta(out, 'name="twitter:description"', seo.description);
