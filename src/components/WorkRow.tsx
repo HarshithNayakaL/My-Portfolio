@@ -18,15 +18,6 @@ export default function WorkRow({ project }: { project: Project }) {
         aria-hidden
         className="pointer-events-none absolute inset-x-[-0.85rem] inset-y-1 rounded-[var(--radius-lg)] border border-transparent bg-elevated/0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:border-line group-hover:bg-elevated/45 group-focus-within:border-line group-focus-within:bg-elevated/45"
       />
-      {hasCaseStudy && (
-        <Link
-          to={`/work/${slug}`}
-          aria-label={`Open ${title} case study`}
-          className="absolute inset-0 z-0"
-          tabIndex={-1}
-        />
-      )}
-
       {/* left accent bar grows on hover/active */}
       <span
         aria-hidden
@@ -47,8 +38,23 @@ export default function WorkRow({ project }: { project: Project }) {
             )}
           </div>
 
+          {/* The title is the row's real link. It used to be plain text with a
+              transparent full-bleed <Link tabIndex={-1}> stacked over the row,
+              which meant the case study was unreachable by keyboard and had no
+              accessible name beyond an aria-label — and left the visible
+              "Case study →" affordance non-actionable. A stretched pseudo
+              element keeps the whole row clickable without the ghost overlay. */}
           <h3 className="mt-3 font-display text-[1.7rem] font-semibold leading-[1.1] tracking-tight text-ink transition-colors duration-300 group-hover:text-accent-ink md:text-4xl">
-            {title}
+            {hasCaseStudy ? (
+              <Link
+                to={`/work/${slug}`}
+                className="pointer-events-auto after:absolute after:inset-0 after:z-0 after:content-['']"
+              >
+                {title}
+              </Link>
+            ) : (
+              title
+            )}
           </h3>
 
           <p className="mt-3 max-w-xl text-pretty leading-relaxed text-dim md:text-lg xl:max-w-3xl">
@@ -84,7 +90,12 @@ export default function WorkRow({ project }: { project: Project }) {
               </a>
             ))}
             {hasCaseStudy && (
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
+              // Decorative: the title above is the actual link, so announcing
+              // this again would give screen readers a second, nameless one.
+              <span
+                aria-hidden
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink"
+              >
                 {inProgress ? "Preview" : "Case study"}
                 <ArrowRight
                   weight="bold"
