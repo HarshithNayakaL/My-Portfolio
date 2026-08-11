@@ -129,7 +129,19 @@ export default function Contact() {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} noValidate className="space-y-6">
+                /* WebMCP declarative tool (developer.chrome.com/docs/ai/webmcp).
+                   Lets an agent map a conversation onto these fields instead of
+                   guessing at the DOM. Deliberately no `toolautosubmit`: this
+                   sends a real message to a real inbox, so the agent fills the
+                   form and the person reviews and submits it. Plain unknown
+                   attributes in browsers without WebMCP, so it costs nothing. */
+                <form
+                  onSubmit={handleSubmit}
+                  noValidate
+                  className="space-y-6"
+                  toolname="draft_project_enquiry"
+                  tooldescription="Fill in the project enquiry form to contact Harshith Nayaka L about freelance or contract AI engineering work. Fills the fields only — the person reviews the message and submits it themselves."
+                >
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="relative">
                       <input
@@ -182,6 +194,7 @@ export default function Contact() {
                       name="company"
                       type="text"
                       placeholder="Company (optional)"
+                      toolparamdescription="Optional. The company or organisation the enquiry is on behalf of. Leave empty for a personal enquiry rather than guessing."
                       autoComplete="organization"
                       className={fieldBase}
                     />
@@ -197,6 +210,7 @@ export default function Contact() {
                       required
                       rows={4}
                       placeholder="Message"
+                      toolparamdescription="What the project is: the problem to solve, rough scope or timeline, and anything already built. Use the person's own words rather than embellishing."
                       className={`${fieldBase} resize-none`}
                     />
                     <label htmlFor="message" className={labelBase}>
