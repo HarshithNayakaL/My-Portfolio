@@ -113,6 +113,7 @@ function jsonLdFor(path, seo) {
       mainEntityOfPage: seo.canonical,
       url: seo.canonical,
       inLanguage: "en",
+      dateModified: BUILD_TIME,
       isPartOf: { "@id": `${ORIGIN}/#website` },
       about: cs.tech,
       keywords: (project?.tags ?? cs.tech).join(", "),

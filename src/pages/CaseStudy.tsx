@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ArrowUpRight, ArrowRight, Info } from "@phosphor-icons/react";
 import { getCaseStudy } from "../data/caseStudies";
-import { EMAIL } from "../data/projects";
+import { EMAIL, NAME } from "../data/projects";
 import PipelineDiagram from "../components/PipelineDiagram";
 import Reveal from "../components/Reveal";
 
@@ -46,6 +46,26 @@ export default function CaseStudy() {
           </h1>
           <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-dim md:text-xl">
             {study.outcome}
+          </p>
+
+          {/* Byline. Someone arriving here from a search has no idea who wrote
+              this — the Article schema names an author but nothing on the page
+              corroborated it. Google's guidance is to carry a byline wherever
+              a reader would reasonably ask "who wrote this?", which a case
+              study plainly is. */}
+          <p className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-dim">
+            <span>Written by</span>
+            <Link
+              to="/#about"
+              rel="author"
+              className="font-semibold text-ink underline decoration-line underline-offset-4 transition-colors hover:text-accent-ink"
+            >
+              {NAME}
+            </Link>
+            <span aria-hidden className="text-faint">
+              ·
+            </span>
+            <span>AI Engineer, Full-Stack — Bengaluru, India</span>
           </p>
 
           <dl className="mt-10 grid gap-px border-t border-line sm:grid-cols-2 lg:grid-cols-4">
