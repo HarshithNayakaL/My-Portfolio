@@ -117,6 +117,20 @@ function jsonLdFor(path, seo) {
       isPartOf: { "@id": `${ORIGIN}/#website` },
       about: cs.tech,
       keywords: (project?.tags ?? cs.tech).join(", "),
+      // Google's generative-AI guidance is explicit that images give a page
+      // surfaces beyond a plain link, so the screenshot is declared rather
+      // than left for a crawler to infer from the markup.
+      ...(cs.shot
+        ? {
+            image: {
+              "@type": "ImageObject",
+              url: `${ORIGIN}${cs.shot.src}`,
+              width: cs.shot.width,
+              height: cs.shot.height,
+              caption: cs.shot.alt,
+            },
+          }
+        : {}),
     });
     graph.unshift({
       "@type": "Person",

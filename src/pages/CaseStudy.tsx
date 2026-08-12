@@ -110,6 +110,35 @@ export default function CaseStudy() {
         </Reveal>
       </header>
 
+      {/* Screenshot of the running product, where one exists. Shown whole
+          rather than cropped to a banner: each image is already trimmed to the
+          region that carries the argument — Maestro's decision-log, Cannon's
+          per-domain agents — and cropping it again to a letterbox would hide
+          exactly that. width/height are the real intrinsic size, so the box is
+          reserved before the file arrives and nothing shifts. */}
+      {study.shot && (
+        <section className="shell pt-12 md:pt-16">
+          <Reveal>
+            <figure className="max-w-3xl">
+              <div className="elev overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface/50">
+                <img
+                  src={study.shot.src}
+                  width={study.shot.width}
+                  height={study.shot.height}
+                  alt={study.shot.alt}
+                  loading="lazy"
+                  decoding="async"
+                  className="block h-auto w-full"
+                />
+              </div>
+              <figcaption className="mt-3 font-mono text-[12px] text-faint">
+                {study.title}, running.
+              </figcaption>
+            </figure>
+          </Reveal>
+        </section>
+      )}
+
       {/* The problem */}
       <Section title="The problem" body={study.problem} />
 

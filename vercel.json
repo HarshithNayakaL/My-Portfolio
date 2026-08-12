@@ -15,7 +15,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!robots\\.txt|llms\\.txt|llms-full\\.txt|sitemap\\.xml|favicon\\.svg|og-image\\.png|og-image\\.svg|profile\\.jpg|BingSiteAuth\\.xml|2c57529720e86b07aa1e46b046b43e88\\.txt|google930d0c4b321815d5\\.html|fonts/|icons/|assets/).*)",
+      "source": "/((?!robots\\.txt|llms\\.txt|llms-full\\.txt|sitemap\\.xml|favicon\\.svg|og-image\\.png|og-image\\.svg|profile\\.jpg|shots/|BingSiteAuth\\.xml|2c57529720e86b07aa1e46b046b43e88\\.txt|google930d0c4b321815d5\\.html|fonts/|icons/|assets/).*)",
       "destination": "/index.html"
     }
   ],
@@ -63,6 +63,12 @@
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
         { "key": "Content-Type", "value": "font/woff2" }
+      ]
+    },
+    {
+      "source": "/shots/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {

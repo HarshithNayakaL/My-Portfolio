@@ -30,6 +30,10 @@ export type CaseStudy = {
   howItWorks: HowItWorksItem[];
   results: { label: string; body: string }[];
   tech: string[];
+  /** Real screenshot of the running product. Intrinsic size is the full
+   *  capture; the page frames a preview of it, but the served file is whole
+   *  so image search and AI surfaces get the entire thing. */
+  shot?: { src: string; width: number; height: number; alt: string };
   links: { label: string; href: string }[];
 };
 
@@ -303,6 +307,12 @@ const novaAi: CaseStudy = {
     "Vanilla JavaScript",
     "Vercel",
   ],
+  shot: {
+    src: "/shots/nova-ai.webp",
+    width: 1080,
+    height: 880,
+    alt: "Nova Studio chat interface with a model selector, conversation history sidebar and an assistant reply rendered in the chat pane.",
+  },
   links: [{ label: "View on GitHub", href: GITHUB }],
 };
 
@@ -582,6 +592,12 @@ const maestro: CaseStudy = {
     "Vercel / Railway",
     "n8n",
   ],
+  shot: {
+    src: "/shots/maestro.webp",
+    width: 1080,
+    height: 1309,
+    alt: "Maestro running a task: the orchestration timeline showing Conductor, Thinker, Worker, Verifier and Synthesizer stages, each labelled with the model that ran it and its token and latency cost, ending in a verified final answer.",
+  },
   links: [
     { label: "Live app", href: "https://maestro-psi-neon.vercel.app/" },
     { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
@@ -689,6 +705,12 @@ const cannon: CaseStudy = {
     "Vitest + Playwright",
     "GitHub Actions",
   ],
+  shot: {
+    src: "/shots/cannon.webp",
+    width: 1080,
+    height: 1180,
+    alt: "Cannon's dispatch view: five domain agents (Fitness, Work, Finance, Learning, Race Engineer) each listing its own tools and retrieval scope, above the provider fallback chain across Groq and Google models.",
+  },
   links: [
     { label: "Live app", href: "https://cannon-multi-agents.vercel.app" },
     {
