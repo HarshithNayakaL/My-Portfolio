@@ -808,6 +808,12 @@ const replydesk: CaseStudy = {
     "Vanilla JavaScript",
     "HTML / CSS",
   ],
+  shot: {
+    src: "/shots/replydesk.webp",
+    width: 1080,
+    height: 1310,
+    alt: "ReplyDesk's lead operations dashboard: KPI tiles for average response time, leads today, hot leads, after-hours answers and percentage auto-handled; an 8-second agent reply compared against a 29-hour typical manual reply; and a live lead feed showing inbound WhatsApp messages with the agent's reply, a lead score, and whether each was auto-handled or routed to the owner.",
+  },
   links: [
     {
       label: "View on GitHub",
