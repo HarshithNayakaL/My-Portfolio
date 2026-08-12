@@ -6,13 +6,13 @@
     <path d="M150 0 V630 M300 0 V630 M450 0 V630 M600 0 V630 M750 0 V630 M900 0 V630 M1050 0 V630"/>
   </g>
   <!-- eyebrow -->
-  <text x="80" y="150" fill="#B85C38" font-family="monospace" font-size="24" letter-spacing="6">AI ENGINEER</text>
-  <!-- headline -->
-  <text x="78" y="270" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="68" font-weight="700">I build AI systems that turn</text>
-  <text x="78" y="350" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="68" font-weight="700">manual work into <tspan fill="#B85C38">reliable</tspan></text>
-  <text x="78" y="430" fill="#B85C38" font-family="Poppins, Arial, sans-serif" font-size="68" font-weight="700">automation.</text>
+  <text x="80" y="150" fill="#B85C38" font-family="'DM Mono', monospace" font-size="24" letter-spacing="6">AI ENGINEER, FULL-STACK</text>
+  <!-- headline: mirrors the site's h1 -->
+  <text x="78" y="270" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="64" font-weight="700">I build AI systems —</text>
+  <text x="78" y="348" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="64" font-weight="700">agents, RAG, full-stack apps</text>
+  <text x="78" y="426" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="64" font-weight="700">— engineered for <tspan fill="#B85C38">production.</tspan></text>
   <!-- footer line -->
-  <text x="80" y="560" fill="#6C7280" font-family="monospace" font-size="22">harshith  ·  LLM pipelines  ·  multi-modal  ·  production-reliable</text>
+  <text x="80" y="560" fill="#6C7280" font-family="'DM Mono', monospace" font-size="22">Harshith Nayaka L  ·  Bengaluru, India  ·  AI agents  ·  RAG  ·  production systems</text>
   <!-- node mark -->
   <g transform="translate(1000,120)">
     <g stroke="#B85C38" stroke-width="2" opacity="0.6">
