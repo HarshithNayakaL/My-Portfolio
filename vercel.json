@@ -1,7 +1,6 @@
 {
   "redirects": [
     {
-      "_comment": "Root needs its own rule. /:path* redirected every deep path off the old host but left / itself answering 200, so the one URL most likely to be linked — the bare domain, which is what the LinkedIn post points at — was the one that never redirected.",
       "source": "/",
       "has": [{ "type": "host", "value": "my-portfolio-harshith.vercel.app" }],
       "destination": "https://harshith-nayaka-l-portfolio.vercel.app/",
