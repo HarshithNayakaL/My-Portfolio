@@ -12,8 +12,9 @@
  * "/", which every route inherited: that tells Google the case studies are
  * duplicates of the homepage rather than pages worth indexing.
  */
+import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -207,6 +208,34 @@ for (const path of allRoutes) {
   await mkdir(dirname(outFile), { recursive: true });
   await writeFile(outFile, html, "utf8");
   count++;
+}
+
+// -------------------------------------------------- screenshot cache safety
+
+/**
+ * Every screenshot is served with `Cache-Control: immutable, max-age=31536000`,
+ * which is a promise that the bytes at that URL will never change. That promise
+ * was broken once: two screenshots were swapped, corrected an hour later under
+ * the same filenames, and every browser that had loaded the page in between
+ * kept showing the wrong image — for a year, with no way to bust it.
+ *
+ * So the filename now carries a hash of the content, and this asserts the two
+ * agree. Editing an image without renaming it fails the build instead of
+ * silently shipping a file no cache will ever pick up.
+ */
+for (const cs of Object.values(caseStudies)) {
+  if (!cs.shot) continue;
+  const file = join(DIST, cs.shot.src.replace(/^\//, ""));
+  const bytes = await readFile(file);
+  const digest = createHash("sha256").update(bytes).digest("hex").slice(0, 8);
+  const [name, stamp, ext] = basename(file).split(".");
+  if (stamp !== digest || ext !== "webp") {
+    throw new Error(
+      `prerender: ${cs.shot.src} content hash is ${digest} — rename it to ` +
+        `${name}.${digest}.webp and update caseStudies.ts, or caches will ` +
+        `keep serving the old image forever.`,
+    );
+  }
 }
 
 // ------------------------------------------------------------ llms-full.txt

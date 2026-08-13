@@ -316,7 +316,7 @@ const novaAi: CaseStudy = {
     "Vercel",
   ],
   shot: {
-    src: "/shots/nova-ai.webp",
+    src: "/shots/nova-ai.3c42c39b.webp",
     width: 1080,
     height: 880,
     alt: "Nova Studio chat interface with a model selector, conversation history sidebar and an assistant reply rendered in the chat pane.",
@@ -607,10 +607,10 @@ const maestro: CaseStudy = {
     "n8n",
   ],
   shot: {
-    src: "/shots/maestro.webp",
+    src: "/shots/maestro.0a5f6953.webp",
     width: 1080,
-    height: 1309,
-    alt: "Maestro running a task: the orchestration timeline showing Conductor, Thinker, Worker, Verifier and Synthesizer stages, each labelled with the model that ran it and its token and latency cost, ending in a verified final answer.",
+    height: 1583,
+    alt: "Maestro's main screen: the task box with a question typed into it, the Conductor, Consensus and Single mode selector, an optional API key field, and below them the orchestration timeline — Conductor, Thinker, Worker and a passing Verifier — each labelled with the model that ran it and its token and latency cost.",
   },
   metaDescription:
     "Multi-model orchestration engine: a conductor routes one task across thinker, worker and verifier roles, returning a verified answer with a full decision-log.",
@@ -722,7 +722,7 @@ const cannon: CaseStudy = {
     "GitHub Actions",
   ],
   shot: {
-    src: "/shots/cannon.webp",
+    src: "/shots/cannon.63aeed47.webp",
     width: 1080,
     height: 1180,
     alt: "Cannon's dispatch view: a sidebar of domain desks (Dispatch, Fitness, Work, Finance, Learning, Race Engineer) beside an agent grid where each desk lists its own tool count and retrieval scope, plus a card inviting a new agent to be described and built.",
@@ -827,7 +827,7 @@ const replydesk: CaseStudy = {
     "HTML / CSS",
   ],
   shot: {
-    src: "/shots/replydesk.webp",
+    src: "/shots/replydesk.b0b90439.webp",
     width: 1080,
     height: 1310,
     alt: "ReplyDesk's lead operations dashboard: KPI tiles for average response time, leads today, hot leads, after-hours answers and percentage auto-handled; an 8-second agent reply compared against a 29-hour typical manual reply; and a live lead feed showing inbound WhatsApp messages with the agent's reply, a lead score, and whether each was auto-handled or routed to the owner.",
