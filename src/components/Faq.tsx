@@ -51,19 +51,28 @@ export default function Faq() {
           />
         </Reveal>
 
+        {/* Reveal carries the row styling rather than wrapping a second div.
+            A <dl> may group each <dt>/<dd> pair in one <div>, but not two
+            nested ones — with Reveal's own div on the outside this list was
+            dl > div > div > dt, which fails both the definition-list and
+            dlitem accessibility checks and, through them, the agent
+            accessibility tree. One div, styled by Reveal, is valid and keeps
+            the staggered reveal. */}
         <dl className="mt-14 max-w-3xl">
           {faqs.map((f, i) => (
-            <Reveal key={f.q} delay={(i % 3) * 0.06}>
-              <div className="border-t border-line py-8 first:border-t-0 first:pt-0">
-                <dt>
-                  <h3 className="text-lg font-semibold tracking-tight text-ink md:text-xl">
-                    {f.q}
-                  </h3>
-                </dt>
-                <dd className="mt-3 text-pretty text-base leading-relaxed text-dim md:text-lg">
-                  {f.a}
-                </dd>
-              </div>
+            <Reveal
+              key={f.q}
+              delay={(i % 3) * 0.06}
+              className="border-t border-line py-8 first:border-t-0 first:pt-0"
+            >
+              <dt>
+                <h3 className="text-lg font-semibold tracking-tight text-ink md:text-xl">
+                  {f.q}
+                </h3>
+              </dt>
+              <dd className="mt-3 text-pretty text-base leading-relaxed text-dim md:text-lg">
+                {f.a}
+              </dd>
             </Reveal>
           ))}
         </dl>

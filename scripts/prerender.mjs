@@ -33,7 +33,38 @@ const {
   LINKEDIN,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
-const template = await readFile(join(DIST, "index.html"), "utf8");
+let template = await readFile(join(DIST, "index.html"), "utf8");
+
+// ------------------------------------------------------- inline the stylesheet
+//
+// Vite emits <link rel="stylesheet">, which blocks the first render: the
+// browser cannot paint until that file has been requested, waited for and
+// parsed. On mobile PageSpeed measured 150ms for the request and ~450ms of
+// render-blocking, on top of a 480ms critical path, purely because the
+// stylesheet is a second round trip discovered only after the HTML arrives.
+//
+// The whole sheet is ~9KB compressed — under the ~14KB that fits in the first
+// congestion window — so inlining it costs one round trip's worth of bytes and
+// saves one round trip's worth of waiting. The page now paints from the HTML
+// response alone, with no external CSS on the critical path.
+//
+// Safe under the CSP because style-src already allows 'unsafe-inline' (the
+// prerendered markup carries style attributes). Nothing to hash.
+{
+  const link = template.match(
+    /<link\s+rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/i,
+  );
+  if (!link) {
+    throw new Error("prerender: no stylesheet <link> in index.html — did the build change?");
+  }
+  const css = await readFile(join(DIST, link[1].replace(/^\//, "")), "utf8");
+  // A literal </style> inside the CSS would close the element early. Vite has
+  // no reason to emit one, but assert rather than trust it.
+  if (/<\/style/i.test(css)) {
+    throw new Error("prerender: stylesheet contains </style — cannot inline safely");
+  }
+  template = template.replace(link[0], `<style>${css}</style>`);
+}
 
 const escapeAttr = (s) =>
   s

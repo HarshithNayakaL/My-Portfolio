@@ -155,7 +155,15 @@ export default function Legal() {
       <p className="mt-14 border-t border-line pt-6 text-sm text-faint">
         This is a plain-language summary for a personal site, not formal legal
         advice. For anything specific, email{" "}
-        <a href={`mailto:${EMAIL}`} className="font-medium text-accent-ink hover:text-ink">
+        {/* Underlined, not just tinted. Inside a paragraph the accent colour
+            alone is a 1.17:1 difference from the surrounding text, so anyone
+            who cannot separate those two hues has nothing marking this as a
+            link — the same reason WCAG asks for a non-colour cue in running
+            text. Links that sit on their own, like the nav, don't need it. */}
+        <a
+          href={`mailto:${EMAIL}`}
+          className="font-medium text-accent-ink underline decoration-line underline-offset-4 transition-colors hover:text-ink"
+        >
           {EMAIL}
         </a>
         .
