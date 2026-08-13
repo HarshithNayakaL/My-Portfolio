@@ -30,6 +30,10 @@ export type CaseStudy = {
   howItWorks: HowItWorksItem[];
   results: { label: string; body: string }[];
   tech: string[];
+  /** Search-result description, 120-160 characters. Written for the snippet
+   *  rather than reusing `outcome`: that is prose for the page and its length
+   *  swings from 99 to 213 characters, which search engines flag either way. */
+  metaDescription: string;
   /** Real screenshot of the running product. Intrinsic size is the full
    *  capture; the page frames a preview of it, but the served file is whole
    *  so image search and AI surfaces get the entire thing. */
@@ -134,6 +138,8 @@ const craftconnect: CaseStudy = {
     "Node.js",
     "Structured / schema-constrained output",
   ],
+  metaDescription:
+    "Multi-modal assistant letting artisans run an online storefront by talking and showing instead of typing. Gen AI Exchange Hackathon 2025 semi-finalist.",
   links: [{ label: "View on GitHub", href: GITHUB }],
 };
 
@@ -228,6 +234,8 @@ const creativeOps: CaseStudy = {
     "QA gates",
     "Structured logging",
   ],
+  metaDescription:
+    "Multi-model content pipeline turning a one-line brief into validated, on-brand output through tiered routing, schema-constrained generation and QA gates.",
   links: [],
 };
 
@@ -313,6 +321,8 @@ const novaAi: CaseStudy = {
     height: 880,
     alt: "Nova Studio chat interface with a model selector, conversation history sidebar and an assistant reply rendered in the chat pane.",
   },
+  metaDescription:
+    "Deployed LLM chat app with a conversation sidebar and model selector, keeping the provider API token server-side behind a serverless proxy.",
   links: [{ label: "View on GitHub", href: GITHUB }],
 };
 
@@ -394,6 +404,8 @@ const blogspace: CaseStudy = {
     "JWT + bcrypt",
     "Netlify + Render",
   ],
+  metaDescription:
+    "Full-stack blogging platform with JWT authentication, role-based access and an admin panel, built on React, Node and MongoDB, and live in production.",
   links: [
     { label: "Live site", href: "https://tangerine-cupcake-145674.netlify.app/login" },
     { label: "View on GitHub", href: GITHUB },
@@ -480,6 +492,8 @@ const aiNotes: CaseStudy = {
     "Vanilla JavaScript",
     "Browser storage",
   ],
+  metaDescription:
+    "Notes app running DeepSeek R1 locally through Ollama: summarisation and keyword extraction with inference that never leaves your own machine.",
   links: [
     { label: "View on GitHub", href: GITHUB },
     {
@@ -598,6 +612,8 @@ const maestro: CaseStudy = {
     height: 1309,
     alt: "Maestro running a task: the orchestration timeline showing Conductor, Thinker, Worker, Verifier and Synthesizer stages, each labelled with the model that ran it and its token and latency cost, ending in a verified final answer.",
   },
+  metaDescription:
+    "Multi-model orchestration engine: a conductor routes one task across thinker, worker and verifier roles, returning a verified answer with a full decision-log.",
   links: [
     { label: "Live app", href: "https://maestro-psi-neon.vercel.app/" },
     { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
@@ -711,6 +727,8 @@ const cannon: CaseStudy = {
     height: 1180,
     alt: "Cannon's dispatch view: a sidebar of domain desks (Dispatch, Fitness, Work, Finance, Learning, Race Engineer) beside an agent grid where each desk lists its own tool count and retrieval scope, plus a card inviting a new agent to be described and built.",
   },
+  metaDescription:
+    "Multi-agent assistant where every domain is an independent specialist with its own prompt, tools and retrieval scope, isolated at the query itself.",
   links: [
     { label: "Live app", href: "https://cannon-multi-agents.vercel.app" },
     {
@@ -814,6 +832,8 @@ const replydesk: CaseStudy = {
     height: 1310,
     alt: "ReplyDesk's lead operations dashboard: KPI tiles for average response time, leads today, hot leads, after-hours answers and percentage auto-handled; an 8-second agent reply compared against a 29-hour typical manual reply; and a live lead feed showing inbound WhatsApp messages with the agent's reply, a lead score, and whether each was auto-handled or routed to the owner.",
   },
+  metaDescription:
+    "WhatsApp lead agent answering every inbound message in about eight seconds, with a live dashboard for the lead feed, pipeline and response-time KPIs.",
   links: [
     {
       label: "View on GitHub",

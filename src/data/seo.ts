@@ -31,18 +31,20 @@ export const routeSeo: Record<string, RouteSeo> = {
   "/": {
     title: `${SITE_TITLE} | Bengaluru`,
     description:
-      "Harshith Nayaka L is a full-stack AI Engineer based in Bengaluru, building AI agents, RAG pipelines, LLM apps, and the production backends and interfaces around them. Currently AI Workflow Engineer at DemandNXT.",
+      "Full-stack AI Engineer in Bengaluru (Bangalore), India. I build AI agents, RAG pipelines and LLM apps, plus the backends and interfaces around them.",
     canonical: abs("/"),
     ogType: "profile",
   },
 };
 
 // Case studies: title/description derived from the case study data itself so
-// the two can never drift apart.
+// the two can never drift apart. Description comes from metaDescription, not
+// `outcome` — outcome is page prose and ranged from 99 to 213 characters,
+// which search engines flag as too short or too long at both ends.
 for (const [slug, cs] of Object.entries(caseStudies)) {
   routeSeo[`/work/${slug}`] = {
     title: `${cs.title} — ${cs.kicker} | ${NAME}`,
-    description: cs.outcome,
+    description: cs.metaDescription,
     canonical: abs(`/work/${slug}`),
     ogType: "article",
   };
@@ -52,16 +54,17 @@ const legal: Record<string, { title: string; description: string }> = {
   privacy: {
     title: "Privacy Policy",
     description:
-      "What this site collects (almost nothing), why, and your choices. No tracking, no advertising, no data sales.",
+      "Privacy policy for this portfolio: what the contact form collects, why, how long it is kept, and your choices. No tracking, advertising or data sales.",
   },
   terms: {
     title: "Terms of Use",
-    description: "Terms governing use of this portfolio site and its content.",
+    description:
+      "Terms of use for this portfolio site: how the content and code may be used, what is provided as-is, and the limits of any liability.",
   },
   cookies: {
     title: "Cookie Policy",
     description:
-      "This site uses no tracking or advertising cookies. The only stored value is your light/dark theme preference.",
+      "Cookie policy for this site: no tracking or advertising cookies are used. The only value stored is your light or dark theme preference.",
   },
 };
 
