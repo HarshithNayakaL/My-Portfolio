@@ -119,7 +119,13 @@ export default function CaseStudy() {
       {study.shot && (
         <section className="shell pt-12 md:pt-16">
           <Reveal>
-            <figure className="max-w-3xl">
+            {/* Capped at 720px — comfortably under the 1080px capture width, so
+                the image is always downscaled and never blown up past its own
+                resolution. Letting it fill the 1238px content column upscaled
+                it 1.15x, which read as soft, and made a tall capture swallow
+                the viewport. Small on a phone by necessity: these are desktop
+                interfaces, so the caption link is how you actually read one. */}
+            <figure className="max-w-[720px]">
               <div className="elev overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface/50">
                 <img
                   src={study.shot.src}
@@ -131,9 +137,17 @@ export default function CaseStudy() {
                   className="block h-auto w-full"
                 />
               </div>
-              <figcaption className="mt-3 font-mono text-[12px] text-faint">
-                {study.title}, running.
-              </figcaption>
+              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 font-mono text-[12px] text-faint">
+                <span>{study.title}, running.</span>
+                <a
+                  href={study.shot.src}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="underline decoration-line underline-offset-4 transition-colors hover:text-dim"
+                >
+                  Open full size
+                </a>
+                              </figcaption>
             </figure>
           </Reveal>
         </section>

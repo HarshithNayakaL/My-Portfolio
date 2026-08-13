@@ -709,7 +709,7 @@ const cannon: CaseStudy = {
     src: "/shots/cannon.webp",
     width: 1080,
     height: 1180,
-    alt: "Cannon's dispatch view: five domain agents (Fitness, Work, Finance, Learning, Race Engineer) each listing its own tools and retrieval scope, above the provider fallback chain across Groq and Google models.",
+    alt: "Cannon's dispatch view: a sidebar of domain desks (Dispatch, Fitness, Work, Finance, Learning, Race Engineer) beside an agent grid where each desk lists its own tool count and retrieval scope, plus a card inviting a new agent to be described and built.",
   },
   links: [
     { label: "Live app", href: "https://cannon-multi-agents.vercel.app" },
