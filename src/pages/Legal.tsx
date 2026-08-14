@@ -5,12 +5,12 @@ import { EMAIL, NAME } from "../data/projects";
 type Section = { h: string; p: string[] };
 type Doc = { title: string; updated: string; intro: string; sections: Section[] };
 
-const UPDATED = "June 2026";
+export const LEGAL_UPDATED = "June 2026";
 
-const docs: Record<string, Doc> = {
+export const legalDocs: Record<string, Doc> = {
   privacy: {
     title: "Privacy Policy",
-    updated: UPDATED,
+    updated: LEGAL_UPDATED,
     intro:
       "This is a personal portfolio site. It collects as little as possible and never sells your data. This policy explains what is collected, why, and your choices.",
     sections: [
@@ -57,7 +57,7 @@ const docs: Record<string, Doc> = {
   },
   terms: {
     title: "Terms of Use",
-    updated: UPDATED,
+    updated: LEGAL_UPDATED,
     intro:
       "By using this site you agree to these terms. It's a personal portfolio, provided for informational purposes.",
     sections: [
@@ -90,7 +90,7 @@ const docs: Record<string, Doc> = {
   },
   cookies: {
     title: "Cookie Policy",
-    updated: UPDATED,
+    updated: LEGAL_UPDATED,
     intro:
       "Short version: this site does not use tracking or advertising cookies, and there are no third-party analytics.",
     sections: [
@@ -116,7 +116,7 @@ const docs: Record<string, Doc> = {
 
 export default function Legal() {
   const { doc } = useParams();
-  const data = doc ? docs[doc] : undefined;
+  const data = doc ? legalDocs[doc] : undefined;
   if (!data) return <Navigate to="/" replace />;
 
   return (

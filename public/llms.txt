@@ -4,22 +4,24 @@
 
 Harshith Nayaka L specialises in the unglamorous part of applied AI — making systems behave the same way on the hundredth run as on the first. Core areas: AI agents and orchestration, retrieval-augmented generation (RAG), LLM integration, multi-modal pipelines (voice, vision, text), output reliability via schema-constrained generation, full-stack AI applications, backend engineering (FastAPI, Node, Postgres), local and cloud inference (Google Cloud AI, Hugging Face, Ollama), and workflow automation with n8n. Building with code since 2022; reached the semi-finals of the Gen AI Exchange Hackathon 2025 (a national event with 270,000+ developers, organised by Google Cloud).
 
+Every link below points at markdown. Each page on this site also serves a clean markdown version at its own URL with `index.md` appended, and declares it with `rel="alternate" type="text/markdown"`; the HTML page at the same address is the human version. Read `/llms-full.txt` instead if you would rather have every case study in a single fetch.
+
 ## Main pages
 
-- [Home](https://harshith-nayaka-l-portfolio.vercel.app/): Overview, selected work, capabilities, about, and contact.
-- [Full content](https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt): Every case study on this site inlined as one plain-text file — problem, architecture, pipeline, engineering decisions, results, and stack for all eight projects. Read this instead of crawling the pages individually.
-- [Contact](https://harshith-nayaka-l-portfolio.vercel.app/#contact): Send a project enquiry, or email harshith28124@gmail.com directly.
+- [Home](https://harshith-nayaka-l-portfolio.vercel.app/index.md): Overview, selected work, the questions people ask before starting a project, and how to get in touch.
+- [Full content](https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt): Every case study on this site inlined as one file — problem, architecture, pipeline, engineering decisions, results, and stack for all eight projects. Read this instead of fetching the pages individually.
+- [Contact](mailto:harshith28124@gmail.com): Email for a project enquiry, or use the form at https://harshith-nayaka-l-portfolio.vercel.app/#contact
 
 ## Case studies
 
-- [Creative-Ops Pipeline](https://harshith-nayaka-l-portfolio.vercel.app/work/creative-ops-pipeline): Flagship. A multi-model content pipeline that turns a one-line brief into validated, on-brand output using tiered model routing, schema-constrained generation, QA gates, and failure recovery.
-- [CraftConnect](https://harshith-nayaka-l-portfolio.vercel.app/work/craftconnect): Gen AI Exchange Hackathon 2025 semi-finalist. A multi-modal assistant letting artisans run an online storefront by talking and showing instead of typing, built on Gemini and Google Cloud.
-- [Maestro](https://harshith-nayaka-l-portfolio.vercel.app/work/maestro): A live, open-source multi-model orchestration engine. A conductor routes one task across thinker/worker/verifier roles over free LLMs and returns a single verified answer with a full, replayable decision-log. Live at https://maestro-psi-neon.vercel.app/
-- [Cannon](https://harshith-nayaka-l-portfolio.vercel.app/work/cannon): A daily-driver multi-agent personal assistant — each domain (fitness, work) is an independent specialist with its own persona, tools, and retrieval scope, isolation enforced at the query rather than by convention. Typed provider fallback (Groq→Gemini) makes the whole stack degrade gracefully, including in CI. Live at https://cannon-multi-agents.vercel.app
-- [ReplyDesk](https://harshith-nayaka-l-portfolio.vercel.app/work/replydesk): A WhatsApp lead agent that answers every inbound message in ~8 seconds, with a live operations dashboard for the lead feed, pipeline, and response-time KPIs.
-- [Nova AI](https://harshith-nayaka-l-portfolio.vercel.app/work/nova-ai): A deployed LLM chat app on Llama 3.1 8B that keeps the API token server-side behind a serverless proxy.
-- [BlogSpace](https://harshith-nayaka-l-portfolio.vercel.app/work/blogspace): A live full-stack blogging platform with JWT auth, role-based access, and an admin panel (React, Node, MongoDB).
-- [AI Notes](https://harshith-nayaka-l-portfolio.vercel.app/work/ai-notes): A notes app running DeepSeek R1 locally through Ollama, so inference never leaves the machine.
+- [Creative-Ops Pipeline](https://harshith-nayaka-l-portfolio.vercel.app/work/creative-ops-pipeline/index.md): Flagship. A multi-model content pipeline that turns a one-line brief into validated, on-brand output using tiered model routing, schema-constrained generation, QA gates, and failure recovery.
+- [CraftConnect](https://harshith-nayaka-l-portfolio.vercel.app/work/craftconnect/index.md): Gen AI Exchange Hackathon 2025 semi-finalist. A multi-modal assistant letting artisans run an online storefront by talking and showing instead of typing, built on Gemini and Google Cloud.
+- [Maestro](https://harshith-nayaka-l-portfolio.vercel.app/work/maestro/index.md): A live, open-source multi-model orchestration engine. A conductor routes one task across thinker/worker/verifier roles over free LLMs and returns a single verified answer with a full, replayable decision-log. Live at https://maestro-psi-neon.vercel.app/
+- [Cannon](https://harshith-nayaka-l-portfolio.vercel.app/work/cannon/index.md): A daily-driver multi-agent personal assistant — each domain (fitness, work) is an independent specialist with its own persona, tools, and retrieval scope, isolation enforced at the query rather than by convention. Typed provider fallback (Groq→Gemini) makes the whole stack degrade gracefully, including in CI. Live at https://cannon-multi-agents.vercel.app
+- [ReplyDesk](https://harshith-nayaka-l-portfolio.vercel.app/work/replydesk/index.md): A WhatsApp lead agent that answers every inbound message in ~8 seconds, with a live operations dashboard for the lead feed, pipeline, and response-time KPIs.
+- [Nova AI](https://harshith-nayaka-l-portfolio.vercel.app/work/nova-ai/index.md): A deployed LLM chat app on Llama 3.1 8B that keeps the API token server-side behind a serverless proxy. Live at https://custom-gpt-silk.vercel.app/
+- [BlogSpace](https://harshith-nayaka-l-portfolio.vercel.app/work/blogspace/index.md): A full-stack blogging platform with JWT auth, role-based access, and an admin panel (React, Node, MongoDB).
+- [AI Notes](https://harshith-nayaka-l-portfolio.vercel.app/work/ai-notes/index.md): A notes app running DeepSeek R1 locally through Ollama, so inference never leaves the machine.
 
 ## Published research
 
@@ -32,6 +34,6 @@ Harshith Nayaka L specialises in the unglamorous part of applied AI — making s
 
 ## Optional
 
-- [Privacy Policy](https://harshith-nayaka-l-portfolio.vercel.app/legal/privacy): What the contact form collects and how it is used.
-- [Terms of Use](https://harshith-nayaka-l-portfolio.vercel.app/legal/terms): Terms governing use of this site.
-- [Cookie Policy](https://harshith-nayaka-l-portfolio.vercel.app/legal/cookies): No tracking or advertising cookies are used.
+- [Privacy Policy](https://harshith-nayaka-l-portfolio.vercel.app/legal/privacy/index.md): What the contact form collects and how it is used.
+- [Terms of Use](https://harshith-nayaka-l-portfolio.vercel.app/legal/terms/index.md): Terms governing use of this site.
+- [Cookie Policy](https://harshith-nayaka-l-portfolio.vercel.app/legal/cookies/index.md): No tracking or advertising cookies are used.

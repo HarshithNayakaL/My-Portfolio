@@ -10,7 +10,7 @@ import Reveal from "./Reveal";
  * commitments, not facts, and inventing them would put promises on the site
  * that nobody made.
  */
-const faqs: { q: string; a: string }[] = [
+export const faqs: { q: string; a: string }[] = [
   {
     q: "What kind of work do you take on?",
     a: "AI systems that have to run unattended: multi-agent assistants, retrieval pipelines grounded in real data, LLM features inside an existing product, and the backends and interfaces around them. Also the automation layer when that is what the problem actually needs — n8n and integration pipelines rather than a model for its own sake.",

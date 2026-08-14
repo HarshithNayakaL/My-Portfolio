@@ -9,6 +9,10 @@ import App from "./App";
 export { routeSeo, allRoutes, ORIGIN } from "./data/seo";
 export { caseStudies } from "./data/caseStudies";
 export { projects, NAME, EMAIL, GITHUB, LINKEDIN } from "./data/projects";
+// Page copy the markdown versions are generated from. Re-exported rather than
+// retyped so /work/maestro/index.md and the rendered page can never disagree.
+export { faqs } from "./components/Faq";
+export { legalDocs, LEGAL_UPDATED } from "./pages/Legal";
 
 /**
  * Render one route to a complete HTML string for the build-time prerenderer.

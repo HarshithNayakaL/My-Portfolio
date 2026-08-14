@@ -31,6 +31,9 @@ const {
   EMAIL,
   GITHUB,
   LINKEDIN,
+  faqs,
+  legalDocs,
+  LEGAL_UPDATED,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 let template = await readFile(join(DIST, "index.html"), "utf8");
@@ -223,21 +226,149 @@ function applySeo(html, path, seo, appHtml) {
   return out;
 }
 
+// ------------------------------------------------------- markdown page bodies
+//
+// llms.txt v2 asks for a clean markdown version of any page an agent might
+// need, served at the page's own URL. Routes here have no file extension, so
+// the spec's rule for those applies: append index.md. /work/maestro therefore
+// answers at /work/maestro/index.md.
+//
+// These are generated from the same modules the React pages render from, so a
+// page and its markdown twin cannot drift apart.
+
+const mdPathFor = (path) =>
+  path === "/" ? "/index.md" : `${path.replace(/\/$/, "")}/index.md`;
+
+/** Case study body, with headings starting at `depth`. */
+function caseStudyBody(cs, depth) {
+  const h = "#".repeat(depth);
+  const L = [];
+  if (cs.meta?.length) {
+    L.push(cs.meta.map((m) => `- **${m.label}:** ${m.value}`).join("\n"), "");
+  }
+  if (cs.problem?.length) L.push(`${h} The problem`, "", cs.problem.join("\n\n"), "");
+  if (cs.build?.length) L.push(`${h} What I built`, "", cs.build.join("\n\n"), "");
+  if (cs.pipeline?.length) {
+    L.push(`${h} Pipeline`, "");
+    for (const stage of cs.pipeline) {
+      const nodes = stage.nodes
+        .map((n) => (n.detail ? `${n.label} (${n.detail})` : n.label))
+        .join(" → ");
+      L.push(`- **${stage.title}:** ${nodes}`);
+    }
+    L.push("");
+  }
+  if (cs.howItWorks?.length) {
+    L.push(`${h} The judgment calls`, "");
+    for (const item of cs.howItWorks) L.push(`**${item.title}**`, "", item.body, "");
+  }
+  if (cs.results?.length) {
+    L.push(`${h} What it changed`, "");
+    for (const r of cs.results) L.push(`**${r.label}:** ${r.body}`, "");
+  }
+  if (cs.tech?.length) L.push(`${h} Built with`, "", cs.tech.join(", "), "");
+  if (cs.links?.length) {
+    L.push(
+      `${h} Links`,
+      "",
+      cs.links.map((l) => `- [${l.label}](${l.href})`).join("\n"),
+      "",
+    );
+  }
+  return L;
+}
+
+function markdownFor(path, seo) {
+  const abs = (p) => `${ORIGIN}${p}`;
+  const slug = path.startsWith("/work/") ? path.slice("/work/".length) : null;
+
+  if (slug) {
+    const cs = caseStudies[slug];
+    return [
+      `# ${cs.title} — ${cs.kicker}`,
+      "",
+      `> ${cs.outcome}`,
+      "",
+      `Case study by ${NAME}, AI Engineer (Full-Stack), Bengaluru, India.`,
+      `Canonical page: ${seo.canonical}`,
+      "",
+      ...caseStudyBody(cs, 2),
+    ].join("\n");
+  }
+
+  if (path.startsWith("/legal/")) {
+    const doc = legalDocs[path.slice("/legal/".length)];
+    return [
+      `# ${doc.title}`,
+      "",
+      `> ${doc.intro}`,
+      "",
+      `Last updated: ${LEGAL_UPDATED}. Canonical page: ${seo.canonical}`,
+      "",
+      ...doc.sections.flatMap((s) => [`## ${s.h}`, "", ...s.p, ""]),
+      "This is a plain-language summary for a personal site, not formal legal advice.",
+      `For anything specific, email ${EMAIL}.`,
+      "",
+    ].join("\n");
+  }
+
+  // Homepage: the overview an agent should read first, with every onward link
+  // pointing at markdown rather than back into HTML.
+  return [
+    `# ${NAME} — AI Engineer, Full-Stack`,
+    "",
+    `> ${routeSeo["/"].description}`,
+    "",
+    `Canonical page: ${seo.canonical}`,
+    "",
+    "## Selected work",
+    "",
+    ...projects.map((p) => {
+      const md = p.hasCaseStudy ? abs(mdPathFor(`/work/${p.slug}`)) : null;
+      const links = p.links.map((l) => `[${l.label}](${l.href})`).join(" · ");
+      return (
+        `- **${p.title}**${p.kicker ? ` — ${p.kicker}` : ""}: ${p.outcome}` +
+        (md ? ` [Case study](${md}).` : "") +
+        (links ? ` ${links}` : "")
+      );
+    }),
+    "",
+    "## Questions worth asking",
+    "",
+    ...faqs.flatMap((f) => [`**${f.q}**`, "", f.a, ""]),
+    "## Elsewhere",
+    "",
+    `- [GitHub](${GITHUB})`,
+    `- [LinkedIn](${LINKEDIN})`,
+    `- Email: ${EMAIL}`,
+    `- [Every case study in one file](${abs("/llms-full.txt")})`,
+    "",
+  ].join("\n");
+}
+
 // ---------------------------------------------------------------- prerender
 
 let count = 0;
 for (const path of allRoutes) {
   const seo = routeSeo[path];
   const appHtml = await render(path);
-  const html = applySeo(template, path, seo, appHtml);
+  let html = applySeo(template, path, seo, appHtml);
 
-  const outFile =
-    path === "/"
-      ? join(DIST, "index.html")
-      : join(DIST, path.replace(/^\//, ""), "index.html");
+  // llms.txt v2 discovery: rel="alternate" type="text/markdown" points at this
+  // page's markdown twin, rel="describedby" at the llms.txt covering it. Both
+  // sit next to the canonical so anything already parsing <head> link
+  // relations finds them without a second pass.
+  const mdPath = mdPathFor(path);
+  html = html.replace(
+    /(<link\s+rel="canonical"[^>]*>)/i,
+    `$1<link rel="alternate" type="text/markdown" href="${ORIGIN}${mdPath}">` +
+      `<link rel="describedby" href="${ORIGIN}/llms.txt">`,
+  );
 
-  await mkdir(dirname(outFile), { recursive: true });
-  await writeFile(outFile, html, "utf8");
+  const dir = path === "/" ? DIST : join(DIST, path.replace(/^\//, ""));
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, "index.html"), html, "utf8");
+  await writeFile(join(dir, "index.md"), markdownFor(path, seo), "utf8");
   count++;
 }
 
@@ -271,65 +402,36 @@ for (const cs of Object.values(caseStudies)) {
 
 // ------------------------------------------------------------ llms-full.txt
 
-/** Flatten a case study into readable markdown — the full text an answer
- *  engine would otherwise have to execute JS to reach. */
+/** Flatten a case study for llms-full.txt. Shares caseStudyBody with the
+ *  per-page markdown so the two renderings can never describe a project
+ *  differently — only the heading depth and the preamble differ. */
 function caseStudyMarkdown(slug, cs) {
-  const L = [];
-  L.push(`## ${cs.title} — ${cs.kicker}`);
-  L.push("");
-  L.push(`URL: ${ORIGIN}/work/${slug}`);
-  L.push("");
-  L.push(`**Outcome:** ${cs.outcome}`);
-  L.push("");
-  if (cs.meta?.length) {
-    L.push(cs.meta.map((m) => `- **${m.label}:** ${m.value}`).join("\n"));
-    L.push("");
-  }
-  if (cs.problem?.length) {
-    L.push("### Problem", "", cs.problem.join("\n\n"), "");
-  }
-  if (cs.build?.length) {
-    L.push("### What I built", "", cs.build.join("\n\n"), "");
-  }
-  if (cs.pipeline?.length) {
-    L.push("### Pipeline", "");
-    for (const stage of cs.pipeline) {
-      const nodes = stage.nodes
-        .map((n) => (n.detail ? `${n.label} (${n.detail})` : n.label))
-        .join(" → ");
-      L.push(`- **${stage.title}:** ${nodes}`);
-    }
-    L.push("");
-  }
-  if (cs.howItWorks?.length) {
-    L.push("### How it works", "");
-    for (const item of cs.howItWorks) {
-      L.push(`**${item.title}**`, "", item.body, "");
-    }
-  }
-  if (cs.results?.length) {
-    L.push("### Results", "");
-    for (const r of cs.results) L.push(`**${r.label}:** ${r.body}`, "");
-  }
-  if (cs.tech?.length) {
-    L.push(`### Tech`, "", cs.tech.join(", "), "");
-  }
-  if (cs.links?.length) {
-    L.push(
-      "### Links",
-      "",
-      cs.links.map((l) => `- [${l.label}](${l.href})`).join("\n"),
-      "",
-    );
-  }
-  L.push("---", "");
-  return L.join("\n");
+  return [
+    `## ${cs.title} — ${cs.kicker}`,
+    "",
+    `URL: ${ORIGIN}/work/${slug}`,
+    `Markdown: ${ORIGIN}/work/${slug}/index.md`,
+    "",
+    `**Outcome:** ${cs.outcome}`,
+    "",
+    ...caseStudyBody(cs, 3),
+    "---",
+    "",
+  ].join("\n");
 }
 
 const llmsTxt = await readFile(join(ROOT, "public/llms.txt"), "utf8");
 // Reuse the H1 + summary blockquote + intro paragraph from llms.txt verbatim so
-// the two files can never describe the site differently.
-const header = llmsTxt.split("\n## ")[0].trimEnd();
+// the two files can never describe the site differently. Paragraphs that talk
+// about llms-full.txt are dropped: llms.txt points readers here, and copying
+// that pointer into this file leaves it telling you to read what you are
+// already reading.
+const header = llmsTxt
+  .split("\n## ")[0]
+  .trimEnd()
+  .split("\n\n")
+  .filter((block) => !block.includes("llms-full.txt"))
+  .join("\n\n");
 
 const full = [
   header.replace(
