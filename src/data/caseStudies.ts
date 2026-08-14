@@ -1,5 +1,3 @@
-import { GITHUB } from "./projects";
-
 export type PipelineNode = {
   id: string;
   label: string;
@@ -138,9 +136,15 @@ const craftconnect: CaseStudy = {
     "Node.js",
     "Structured / schema-constrained output",
   ],
+  shot: {
+    src: "/shots/craftconnect.7e7af1fa.webp",
+    width: 1440,
+    height: 900,
+    alt: "CraftConnect's assistant screen: the heading 'How can I help you today?' above a large microphone button, prompting the user to speak about their business, with a Type control beside it for switching to text and Marketplace, Resources and Community navigation across the top.",
+  },
   metaDescription:
     "Multi-modal assistant letting artisans run an online storefront by talking and showing instead of typing. Gen AI Exchange Hackathon 2025 semi-finalist.",
-  links: [{ label: "View on GitHub", href: GITHUB }],
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
 };
 
 const creativeOps: CaseStudy = {
@@ -323,7 +327,10 @@ const novaAi: CaseStudy = {
   },
   metaDescription:
     "Deployed LLM chat app with a conversation sidebar and model selector, keeping the provider API token server-side behind a serverless proxy.",
-  links: [{ label: "View on GitHub", href: GITHUB }],
+  links: [
+    { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
+    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
+  ],
 };
 
 const blogspace: CaseStudy = {
@@ -406,10 +413,7 @@ const blogspace: CaseStudy = {
   ],
   metaDescription:
     "Full-stack blogging platform with JWT authentication, role-based access and an admin panel, built on React, Node and MongoDB, and live in production.",
-  links: [
-    { label: "Live site", href: "https://tangerine-cupcake-145674.netlify.app/login" },
-    { label: "View on GitHub", href: GITHUB },
-  ],
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/blogspace-internship" }],
 };
 
 const aiNotes: CaseStudy = {
@@ -492,10 +496,16 @@ const aiNotes: CaseStudy = {
     "Vanilla JavaScript",
     "Browser storage",
   ],
+  shot: {
+    src: "/shots/ai-notes.f7ec4d0e.webp",
+    width: 1440,
+    height: 900,
+    alt: "AI Notes with one entry open: a catalog sidebar headed 'local archive · DeepSeek R1', the note in a ruled editor with Save, Delete and Ask Archive actions above it, an 'AI Offline' badge in the top corner, and 'stored on this device' in the sidebar footer.",
+  },
   metaDescription:
     "Notes app running DeepSeek R1 locally through Ollama: summarisation and keyword extraction with inference that never leaves your own machine.",
   links: [
-    { label: "View on GitHub", href: GITHUB },
+    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/AI-Notes-App" },
     {
       label: "Read the paper (DOI)",
       href: "https://www.doi.org/10.59256/ijrtmr.20250506023",

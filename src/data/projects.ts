@@ -94,6 +94,7 @@ export const projects: Project[] = [
       "A deployed chat app on Llama 3.1 8B that keeps the API token server-side behind a serverless proxy.",
     tags: ["Llama 3.1 8B", "Hugging Face", "Serverless proxy"],
     links: [
+      { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
     ],
     hasCaseStudy: true,
@@ -106,10 +107,6 @@ export const projects: Project[] = [
       "A full-stack blogging platform with JWT auth and an admin panel, live in production.",
     tags: ["React", "Node", "MongoDB", "JWT"],
     links: [
-      {
-        label: "Live site",
-        href: "https://tangerine-cupcake-145674.netlify.app/login",
-      },
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/blogspace-internship" },
     ],
     hasCaseStudy: true,
