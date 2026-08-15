@@ -245,88 +245,115 @@ const creativeOps: CaseStudy = {
 
 const novaAi: CaseStudy = {
   slug: "nova-ai",
-  title: "Nova AI",
-  kicker: "Deployed LLM chat app",
+  title: "Nova",
+  kicker: "Cost-tiered model routing",
   outcome:
-    "A live chat app on an open model that never exposes its API key to the browser, because the secret stays on the server where it belongs.",
+    "A chat app that reads every turn, scores how hard it is, and sends it to the smallest model that can carry it — stamping the lane, the reasoning and the cost onto every answer.",
   meta: [
     { label: "Type", value: "Deployed web app" },
-    { label: "Model", value: "Llama 3.1 8B (Hugging Face)" },
+    { label: "Roster", value: "gpt-oss-20b · qwen3.6-27b · gpt-oss-120b" },
+    { label: "Routing", value: "Signal scoring + arbiter model" },
     { label: "Role", value: "Solo build" },
   ],
   problem: [
-    "The fastest way to ship an LLM chat app is also the most common way to leak a key: call the model API straight from the frontend. It works in a demo and quietly hands your token to anyone who opens the network tab.",
-    "I wanted the simplest possible chat app that still did the one thing most quick builds get wrong, keep the credential server-side.",
+    "Every chat app sends one model everything. \"Translate this line\" and \"find the race condition in this worker pool and prove it\" land on the same endpoint, so you either overpay on the easy turns or underserve the hard ones. There is no third option when the roster is one model long.",
+    "The obvious fix — a router that starts cheap and climbs — is the trap. Score from zero upward and almost every turn clears the bar for the fast lane, because most prompts trip two or three keywords at most. You end up with a router that technically works and quietly answers everything badly.",
   ],
   build: [
-    "Nova AI is a lightweight chat interface running Meta's Llama 3.1 8B through the Hugging Face Inference API. The frontend never sees the token; every request goes through a small serverless function that holds the secret and proxies the call.",
-    "No framework, no build ceremony, deployed and live. The point was to prove the discipline, not to over-engineer it: a clean UI, a streaming response, and a credential that an attacker can't pull out of the client.",
+    "Nova scores each turn on four axes — reasoning, code, breadth and context — with deterministic keyword and pattern evidence that runs instantly and always runs. That produces a prior: a lane and a complexity reading between 0 and 100.",
+    "Then a small arbiter model reads the same turn alongside the prior and returns a lane, a complexity number and a one-line rationale as JSON. It is allowed to overrule the arithmetic, because a scorer cannot tell that \"explain CRDTs to someone who ships code, not papers\" is a drafting job rather than a research one.",
+    "Three lanes: gpt-oss-20b for lookups and rewrites, qwen3.6-27b for drafting and long context, gpt-oss-120b for reasoning, math and code review. Every answer is stamped with the lane it took, the complexity reading, the arbiter's rationale and what it cost, and the lane switch overrides routing entirely when you already know what you want.",
   ],
   pipeline: [
     {
-      title: "Client",
+      title: "Read",
       nodes: [
-        { id: "ui", label: "Chat UI", detail: "Plain JS, no key present", kind: "input" },
+        { id: "turn", label: "Turn + history", detail: "What the user just sent", kind: "input" },
       ],
     },
     {
-      title: "Proxy",
+      title: "Score",
       nodes: [
-        { id: "fn", label: "Serverless function", detail: "Holds the token, server-side", kind: "logic" },
+        { id: "signals", label: "Four axes", detail: "reasoning · code · breadth · context", kind: "logic" },
+        { id: "prior", label: "Complexity prior", detail: "0-100, deterministic", kind: "logic" },
       ],
     },
     {
-      title: "Model",
+      title: "Arbitrate",
       nodes: [
-        { id: "hf", label: "Hugging Face Inference", detail: "Llama 3.1 8B", kind: "model" },
+        { id: "arb", label: "Arbiter", detail: "gpt-oss-20b, JSON, 4s budget", kind: "model" },
+        { id: "rules", label: "Floor rules", detail: "Pushback never routes below L2", kind: "gate" },
       ],
     },
     {
-      title: "Return",
+      title: "Answer",
       nodes: [
-        { id: "resp", label: "Response to client", detail: "Token never leaves server", kind: "output" },
+        { id: "lane", label: "Lane model", detail: "20B, 27B or 120B", kind: "model" },
+      ],
+    },
+    {
+      title: "Show",
+      nodes: [
+        { id: "stamp", label: "Stamped answer", detail: "Lane, complexity, rationale, cost", kind: "output" },
       ],
     },
   ],
   howItWorks: [
     {
-      title: "The secret never reaches the browser",
-      body: "The API token lives only in the serverless function's environment. The client calls the proxy, the proxy calls the model. Open the network tab all you like, the credential isn't there.",
+      title: "The middle lane is the default, not the cheap one",
+      body: "A turn has to earn its way down to the fast lane by being demonstrably trivial, or up to the deep lane by being demonstrably hard. Climbing from zero would leave everything in the 20B model, which is the failure mode that makes routers feel worse than no router at all. Starting from the middle means the router only has to recognise the two extremes, which is the part it can actually do reliably.",
     },
     {
-      title: "A proxy, not a backend",
-      body: "There's no database, no auth, no server to babysit, just a single function that exists to keep one secret secret. The smallest piece of infrastructure that solves the actual problem.",
+      title: "The arbiter is allowed to be slow, wrong or absent",
+      body: "It gets a 4-second budget and a 120-token cap. If it times out, returns unparseable JSON, or names a lane that does not exist, the deterministic prior stands. If the routing endpoint itself fails, the browser falls back to its own copy of the scorer. Routing never blocks an answer — the worst case is a blunter decision, never a spinner.",
     },
     {
-      title: "Open model, on purpose",
-      body: "Running Llama via Hugging Face instead of a closed API keeps the app cheap and swappable. The proxy pattern means the model behind it can change without touching the client.",
+      title: "Keyword evidence has diminishing returns",
+      body: "Each axis scores as 100 × (1 − decay^hits), so the first match already counts for most of the signal and the fifth adds almost nothing. A flat per-hit score reads real prompts as trivial, because people write two clauses, not a checklist of trigger words.",
+    },
+    {
+      title: "Disagreement is a routing signal",
+      body: "\"That's wrong\", \"go deeper\", \"not what I asked\" — a turn that pushes back on the previous answer never routes below the middle lane, whatever the keywords say. The last answer was already judged insufficient; sending the follow-up somewhere smaller is the one move guaranteed to be wrong.",
+    },
+    {
+      title: "One coordinator changes the answer",
+      body: "\"Summarise this\" is trivial. \"Summarise this and list the open questions\" is two asks wearing the same opener, so the presence of a coordinator disqualifies a turn from the trivial shortcut. Cheap tests like this catch the cases where a scorer would otherwise be confidently wrong.",
+    },
+    {
+      title: "Routing costs about as much as a greeting",
+      body: "The arbiter runs on the cheapest lane, capped at 120 tokens with temperature zero and JSON-mode enforced. Paying a 120B model to decide which model to use would defeat the entire exercise.",
     },
   ],
   results: [
     {
-      label: "What it proves",
-      body: "The instinct that separates a demo from something shippable: never trust the client with a secret, even when the lazy path is right there.",
+      label: "What changed",
+      body: "Difficulty stopped being something the user has to declare. There is no model picker to get wrong, and no flat rate for turns that did not need it — but the decision is never hidden, because every answer shows the lane, the reading and the rationale that produced it.",
     },
     {
-      label: "Status",
-      body: "Built solo and deployed live. A deployed LLM chat app, not a production product, and it doesn't pretend to be more.",
+      label: "What it took to be safe",
+      body: "Three levels of fallback for one decision that is not allowed to fail: arbiter to prior, endpoint to browser-side scorer, automatic routing to a manual lane switch. The provider key stays in the serverless function throughout; the browser never holds a credential, and threads live in localStorage rather than on a server.",
+    },
+    {
+      label: "Honest scope",
+      body: "A deployed personal app, not a production service. There is no evaluation set proving the routing beats always-using-the-large-model, and the lane assignments are judgement rather than measurement. The architecture is the claim here, not a benchmark.",
     },
   ],
   tech: [
-    "Llama 3.1 8B",
-    "Hugging Face Inference API",
-    "Serverless proxy",
-    "Vanilla JavaScript",
-    "Vercel",
+    "gpt-oss-20b / 120b",
+    "qwen3.6-27b",
+    "Groq · Hugging Face routers",
+    "Vercel serverless",
+    "Streaming",
+    "Vanilla JS, no framework",
   ],
   shot: {
-    src: "/shots/nova-ai.3c42c39b.webp",
+    src: "/shots/nova-ai.bf8eb4ca.webp",
     width: 1080,
-    height: 880,
-    alt: "Nova Studio chat interface with a model selector, conversation history sidebar and an assistant reply rendered in the chat pane.",
+    height: 962,
+    alt: "Nova's opening screen: an AUTO / L1 / L2 / L3 lane switch above the heading \"One prompt in. The right model out.\", three coloured lane cards naming gpt-oss-20b, qwen3.6-27b and gpt-oss-120b with their per-million-token prices, and four example prompts each tagged with the lane they would route to.",
   },
   metaDescription:
-    "Deployed LLM chat app with a conversation sidebar and model selector, keeping the provider API token server-side behind a serverless proxy.",
+    "Chat app that scores every turn for difficulty and routes it across three model tiers, showing the lane, the reasoning and the cost on each answer.",
   links: [
     { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
     { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },

@@ -88,11 +88,11 @@ export const projects: Project[] = [
   },
   {
     slug: "nova-ai",
-    title: "Nova AI",
-    kicker: "Deployed LLM chat app",
+    title: "Nova",
+    kicker: "Cost-tiered model routing",
     outcome:
-      "A deployed chat app on Llama 3.1 8B that keeps the API token server-side behind a serverless proxy.",
-    tags: ["Llama 3.1 8B", "Hugging Face", "Serverless proxy"],
+      "A chat app that scores every turn for difficulty and sends it to the smallest model that can carry it \u2014 lane, reasoning and cost stamped on every answer.",
+    tags: ["Model routing", "Cost tiering", "Arbiter model", "Serverless"],
     links: [
       { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
