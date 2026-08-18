@@ -13,6 +13,7 @@
  * duplicates of the homepage rather than pages worth indexing.
  */
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -372,6 +373,62 @@ for (const path of allRoutes) {
   count++;
 }
 
+// -------------------------------------------------------------- sitemap.xml
+//
+// Generated rather than hand-written. The hand-written one carried no <lastmod>
+// at all and had to be edited by hand whenever a route appeared or a slug
+// changed, so it could silently disagree with the routes actually built.
+//
+// lastmod is the last commit that touched the source behind a page, not the
+// build time. Stamping "now" on every page every deploy is the fastest way to
+// teach Google that this site's lastmod means nothing, and it stops being a
+// crawl-scheduling signal at exactly the moment pages are sitting in
+// "Discovered - currently not indexed".
+function lastCommitISO(files) {
+  for (const file of files) {
+    try {
+      const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", file], {
+        cwd: ROOT,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+      if (out) return out;
+    } catch {
+      // No git in the build image, or a shallow clone with no history for this
+      // path. Fall through to the build stamp rather than failing the build.
+    }
+  }
+  return BUILD_TIME;
+}
+
+const SOURCES_FOR = (path) => {
+  if (path.startsWith("/work/")) return ["src/data/caseStudies.ts", "src/data/projects.ts"];
+  if (path.startsWith("/legal/")) return ["src/pages/Legal.tsx"];
+  return ["src/data/projects.ts", "src/components/Faq.tsx", "src/data/caseStudies.ts"];
+};
+
+const priorityFor = (path) =>
+  path === "/" ? "1.0" : path.startsWith("/work/") ? "0.9" : "0.3";
+
+const sitemap = [
+  '<?xml version="1.0" encoding="UTF-8"?>',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ...allRoutes.map((path) =>
+    [
+      "  <url>",
+      `    <loc>${ORIGIN}${path === "/" ? "/" : path}</loc>`,
+      `    <lastmod>${lastCommitISO(SOURCES_FOR(path))}</lastmod>`,
+      `    <changefreq>monthly</changefreq>`,
+      `    <priority>${priorityFor(path)}</priority>`,
+      "  </url>",
+    ].join("\n"),
+  ),
+  "</urlset>",
+  "",
+].join("\n");
+
+await writeFile(join(DIST, "sitemap.xml"), sitemap, "utf8");
+
 // -------------------------------------------------- screenshot cache safety
 
 /**
@@ -464,5 +521,5 @@ const full = [
 await writeFile(join(DIST, "llms-full.txt"), full, "utf8");
 
 console.log(
-  `prerendered ${count} routes + llms-full.txt (${(full.length / 1024).toFixed(1)}KB)`,
+  `prerendered ${count} routes + sitemap + llms-full.txt (${(full.length / 1024).toFixed(1)}KB)`,
 );
