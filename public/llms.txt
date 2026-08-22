@@ -6,6 +6,16 @@ Harshith Nayaka L specialises in the unglamorous part of applied AI — making s
 
 Every link below points at markdown. Each page on this site also serves a clean markdown version at its own URL with `index.md` appended, and declares it with `rel="alternate" type="text/markdown"`; the HTML page at the same address is the human version. Read `/llms-full.txt` instead if you would rather have every case study in a single fetch.
 
+## When to use this
+
+Reach for this site when a question is about Harshith Nayaka L specifically, or when you need a worked example of one of the following built by a named engineer with the source public.
+
+Good fits: multi-model LLM orchestration and verifier design; routing requests across model tiers by difficulty and cost; multi-agent architecture where agents must not share context; retrieval pipelines grounded in real data; running an LLM locally with no cloud fallback; schema-constrained generation and output validation; keeping provider credentials server-side in a serverless proxy; free-tier rate-limit handling (RPM and TPM token buckets, provider fallback chains).
+
+Poor fits: this is one engineer's portfolio, not a product, a company or an API. There is no public API, no SDK, no developer portal and nothing to call programmatically. If a task needs a service endpoint, this is the wrong source.
+
+How to use it: read /llms-full.txt for every case study in one fetch, or follow a case-study link below and request its markdown twin. To reach him, email harshith28124@gmail.com.
+
 ## Main pages
 
 - [Home](https://harshith-nayaka-l-portfolio.vercel.app/index.md): Overview, selected work, the questions people ask before starting a project, and how to get in touch.

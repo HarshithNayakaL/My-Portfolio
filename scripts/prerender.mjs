@@ -217,6 +217,32 @@ function applySeo(html, path, seo, appHtml) {
       /<script type="application\/ld\+json">[\s\S]*?<\/script>/i,
       `<script type="application/ld+json">${jsonLdFor(path, seo)}</script>`,
     );
+  } else {
+    // Append FAQPage to the homepage graph, built from the same `faqs` array
+    // the component renders, so the structured data cannot drift from the
+    // questions actually on the page.
+    //
+    // Google dropped FAQ rich results in May 2026, which is why the component
+    // itself carries no schema. This is not for rich results — agents parse
+    // FAQPage to answer "what does this person do" without reading the whole
+    // page, and the markup is accurate regardless of what Google renders.
+    out = out.replace(
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/i,
+      (_m, json) => {
+        const graph = JSON.parse(json);
+        graph["@graph"].push({
+          "@type": "FAQPage",
+          "@id": `${ORIGIN}/#faq`,
+          isPartOf: { "@id": `${ORIGIN}/#website` },
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        });
+        return `<script type="application/ld+json">${JSON.stringify(graph)}</script>`;
+      },
+    );
   }
 
   out = out.replace(
@@ -371,6 +397,55 @@ for (const path of allRoutes) {
   await writeFile(join(dir, "index.html"), html, "utf8");
   await writeFile(join(dir, "index.md"), markdownFor(path, seo), "utf8");
   count++;
+}
+
+// ------------------------------------------------------------------- 404
+//
+// Every unknown path used to return the homepage with HTTP 200. An agent
+// probing for /openapi.json, /.well-known/api-catalog or /developers got a
+// 126KB HTML page and a success status, so it concluded those resources
+// existed and were malformed — one soft-404 manufacturing several false
+// findings at once.
+//
+// Vercel serves 404.html with a real 404 status for any path the filesystem
+// does not resolve, which works because every real route is prerendered to
+// its own file. The SPA catch-all rewrite that used to swallow these is gone.
+//
+// This page is deliberately static: the client bundle is stripped out. With
+// it, React would boot, match the "*" route and redirect the visitor to the
+// homepage, turning a useful 404 into a bounce. It carries noindex for the
+// same reason a soft-404 is bad — nobody should index it — and points both
+// agents and people at the machine-readable indexes.
+{
+  const body = `<main class="shell" style="min-height:70vh;display:flex;flex-direction:column;justify-content:center;gap:1.25rem;padding-top:8rem;padding-bottom:6rem;max-width:44rem">
+<p style="font-family:var(--font-mono,monospace);font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-ink,#b4530a)">404</p>
+<h1 style="font-size:clamp(2rem,5vw,3rem);font-weight:600;letter-spacing:-.02em;line-height:1.05;margin:0">That page isn't here.</h1>
+<p style="font-size:1.05rem;line-height:1.6;color:var(--dim,#565b67);margin:0">The address may be mistyped, or the page may have moved. Everything this site publishes is listed below.</p>
+<ul style="list-style:none;padding:0;margin:.5rem 0 0;display:flex;flex-direction:column;gap:.6rem;font-size:1rem">
+<li><a href="/" style="color:var(--accent-ink,#b4530a)">Home</a> — selected work, capabilities and contact</li>
+<li><a href="/sitemap.xml" style="color:var(--accent-ink,#b4530a)">/sitemap.xml</a> — every page on this site</li>
+<li><a href="/llms.txt" style="color:var(--accent-ink,#b4530a)">/llms.txt</a> — the index written for agents</li>
+<li><a href="/llms-full.txt" style="color:var(--accent-ink,#b4530a)">/llms-full.txt</a> — every case study in one file</li>
+</ul>
+<p style="font-size:.9rem;color:var(--faint,#636978);margin:1rem 0 0">Each page also serves a markdown twin at the same address with <code>/index.md</code> appended.</p>
+</main>`;
+
+  let notFound = template
+    .replace(/<title>[\s\S]*?<\/title>/i, "<title>404 — page not found | " + NAME + "</title>")
+    .replace(/<script type="module"[^>]*><\/script>/i, "")
+    .replace(/<div id="root"><\/div>/, `<div id="root">${body}</div>`)
+    .replace("BUILD_TIMESTAMP", BUILD_TIME);
+  notFound = setMeta(notFound, 'name="robots"', "noindex, follow");
+  notFound = setMeta(notFound, 'name="description"', "Page not found. See /sitemap.xml for every page, or /llms.txt for the agent-readable index.");
+  // A canonical on a 404 would name a URL that does not exist.
+  notFound = notFound.replace(/<link\s+rel="canonical"[^>]*>/i, "");
+  // The homepage graph (ProfilePage, dateModified, ItemList) describes a page
+  // that this is not. Better no structured data than wrong structured data.
+  notFound = notFound.replace(
+    /<script type="application\/ld\+json">[\s\S]*?<\/script>/i,
+    "",
+  );
+  await writeFile(join(DIST, "404.html"), notFound, "utf8");
 }
 
 // -------------------------------------------------------------- sitemap.xml

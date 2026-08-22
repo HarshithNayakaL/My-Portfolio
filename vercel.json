@@ -24,12 +24,6 @@
       "permanent": true
     }
   ],
-  "rewrites": [
-    {
-      "source": "/((?!robots\\.txt|llms\\.txt|llms-full\\.txt|sitemap\\.xml|favicon\\.svg|og-image\\.png|og-image\\.svg|profile\\.jpg|shots/|BingSiteAuth\\.xml|2c57529720e86b07aa1e46b046b43e88\\.txt|google930d0c4b321815d5\\.html|fonts/|icons/|assets/|.*\\.md).*)",
-      "destination": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -110,6 +104,10 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex"
+        },
+        {
+          "key": "Vary",
+          "value": "Accept, Accept-Encoding"
         }
       ]
     },
