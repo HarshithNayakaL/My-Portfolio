@@ -19,6 +19,7 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 ## Main pages
 
 - [Home](https://harshith-nayaka-l-portfolio.vercel.app/index.md): Overview, selected work, the questions people ask before starting a project, and how to get in touch.
+- [Agent instructions](https://harshith-nayaka-l-portfolio.vercel.app/agents.md): What this site is a good source for, what it is not, and how to read it.
 - [Full content](https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt): Every case study on this site inlined as one file — problem, architecture, pipeline, engineering decisions, results, and stack for all eight projects. Read this instead of fetching the pages individually.
 - [Contact](mailto:harshith28124@gmail.com): Email for a project enquiry, or use the form at https://harshith-nayaka-l-portfolio.vercel.app/#contact
 

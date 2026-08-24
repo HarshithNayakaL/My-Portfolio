@@ -78,3 +78,7 @@ Sitemap: https://harshith-nayaka-l-portfolio.vercel.app/sitemap.xml
 # Not part of the robots.txt standard — a discovery hint for agents that look.
 # LLM-Content: https://harshith-nayaka-l-portfolio.vercel.app/llms.txt
 # LLM-Full-Content: https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt
+
+# Agent resource catalog (agenticresourcediscovery.org) and agent instructions.
+# Agentmap: https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ai-catalog.json
+# Agent-Instructions: https://harshith-nayaka-l-portfolio.vercel.app/agents.md

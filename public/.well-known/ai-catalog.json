@@ -1,0 +1,46 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Harshith Nayaka L",
+    "identifier": "harshith-nayaka-l-portfolio.vercel.app",
+    "description": "Personal portfolio of an AI engineer. Agent-readable documents only - this host publishes no API, MCP server or callable endpoint."
+  },
+  "entries": [
+    {
+      "identifier": "urn:harshith-nayaka-l:agents-md",
+      "displayName": "Agent instructions",
+      "type": "text/markdown",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/agents.md",
+      "description": "What this site is a good source for, what it is not, and how to read it."
+    },
+    {
+      "identifier": "urn:harshith-nayaka-l:llms-txt",
+      "displayName": "llms.txt index",
+      "type": "text/markdown",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/llms.txt",
+      "description": "llms.txt v2 index of every page, with a when-to-use section and links to the markdown twin of each page."
+    },
+    {
+      "identifier": "urn:harshith-nayaka-l:llms-full-txt",
+      "displayName": "Full case-study corpus",
+      "type": "text/markdown",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt",
+      "description": "Every case study on the site inlined into one document: problem, architecture, engineering decisions, results and stack."
+    },
+    {
+      "identifier": "urn:harshith-nayaka-l:homepage-md",
+      "displayName": "Homepage (markdown)",
+      "type": "text/markdown",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/index.md",
+      "description": "Markdown twin of the homepage. Every route serves one at <route>/index.md, and page routes honour Accept: text/markdown."
+    },
+    {
+      "identifier": "urn:harshith-nayaka-l:sitemap",
+      "displayName": "Sitemap",
+      "type": "application/xml",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/sitemap.xml",
+      "description": "All 12 indexable pages with lastmod dates."
+    }
+  ],
+  "collections": []
+}
