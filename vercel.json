@@ -60,6 +60,10 @@
         {
           "key": "Vary",
           "value": "Accept, Accept-Encoding"
+        },
+        {
+          "key": "Link",
+          "value": "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\""
         }
       ]
     },
@@ -69,6 +73,10 @@
         {
           "key": "Vary",
           "value": "Accept, Accept-Encoding"
+        },
+        {
+          "key": "Link",
+          "value": "</work/:slug/index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\""
         }
       ]
     },
@@ -78,6 +86,10 @@
         {
           "key": "Vary",
           "value": "Accept, Accept-Encoding"
+        },
+        {
+          "key": "Link",
+          "value": "</legal/:doc/index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\""
         }
       ]
     },
