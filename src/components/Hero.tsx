@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
 import Magnetic from "./Magnetic";
 import { scrollToSection } from "../lib/scrollToSection";
+import { NAME } from "../data/projects";
 
 // Headline split so each word rises on its own beat (CSS mask reveal).
 const HEAD_LEAD = "I build AI systems — agents, RAG, full-stack apps — engineered for".split(
@@ -21,8 +22,15 @@ export default function Hero() {
           className="anim-rise mb-9 flex flex-wrap items-center gap-x-4 gap-y-2"
           style={d(0)}
         >
+          {/* The name leads. This page has to rank for a person, and the name
+              was previously absent from the entire hero — the H1 states what
+              the work is, not who does it, and an engine reading the first
+              screen saw a service description with no subject. There are
+              several AI engineers named Harshith with portfolios; the ones
+              that surface put their name where a reader and a parser both
+              hit it first. */}
           <span className="text-base font-semibold tracking-tight text-ink">
-            AI Engineer, Full-Stack
+            {NAME} <span className="text-dim">— AI Engineer, Full-Stack</span>
           </span>
           <span className="h-4 w-px bg-line-strong" aria-hidden />
           <span className="text-[15px] font-medium text-dim">
