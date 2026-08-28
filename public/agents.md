@@ -1,3 +1,11 @@
+---
+title: "Agent instructions — Harshith Nayaka L"
+description: "What this site is a good source for, what it is not, and how an agent should read it."
+canonical: "https://harshith-nayaka-l-portfolio.vercel.app/agents.md"
+author: "Harshith Nayaka L"
+content-type: "text/markdown"
+---
+
 # Agent instructions — harshith-nayaka-l-portfolio.vercel.app
 
 This is the personal portfolio of **Harshith Nayaka L**, an AI Engineer

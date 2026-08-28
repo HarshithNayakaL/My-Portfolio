@@ -59,11 +59,11 @@
       "headers": [
         {
           "key": "Vary",
-          "value": "Accept, Accept-Encoding"
+          "value": "Accept, Accept-Encoding, User-Agent"
         },
         {
           "key": "Link",
-          "value": "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\""
+          "value": "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\", </openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\""
         }
       ]
     },
@@ -72,11 +72,11 @@
       "headers": [
         {
           "key": "Vary",
-          "value": "Accept, Accept-Encoding"
+          "value": "Accept, Accept-Encoding, User-Agent"
         },
         {
           "key": "Link",
-          "value": "</work/:slug/index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\""
+          "value": "</work/:slug/index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\", </openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\""
         }
       ]
     },
@@ -85,11 +85,11 @@
       "headers": [
         {
           "key": "Vary",
-          "value": "Accept, Accept-Encoding"
+          "value": "Accept, Accept-Encoding, User-Agent"
         },
         {
           "key": "Link",
-          "value": "</legal/:doc/index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\""
+          "value": "</legal/:doc/index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\", </openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\""
         }
       ]
     },
@@ -99,6 +99,142 @@
         {
           "key": "Content-Type",
           "value": "application/json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/api",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Link",
+          "value": "</openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\", </api/llms.txt>; rel=\"service-doc\""
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Link",
+          "value": "</openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\", </api/llms.txt>; rel=\"service-doc\""
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/openapi.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Link",
+          "value": "</openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\", </api/llms.txt>; rel=\"service-doc\""
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/api-catalog",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/linkset+json;profile=\"https://www.rfc-editor.org/info/rfc9727\""
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/ard.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/agent-card.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/agent-skills/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/schema-map.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
         }
       ]
     },
@@ -121,7 +257,7 @@
       ]
     },
     {
-      "source": "/llms.txt",
+      "source": "/(.*)llms.txt",
       "headers": [
         {
           "key": "Content-Type",
@@ -207,6 +343,12 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/.well-known/api-catalog",
+      "destination": "/.well-known/api-catalog.json"
     }
   ]
 }

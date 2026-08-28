@@ -14,12 +14,14 @@ Good fits: multi-model LLM orchestration and verifier design; routing requests a
 
 Poor fits: this is one engineer's portfolio, not a product, a company or an API. There is no public API, no SDK, no developer portal and nothing to call programmatically. If a task needs a service endpoint, this is the wrong source.
 
-How to use it: read /llms-full.txt for every case study in one fetch, or follow a case-study link below and request its markdown twin. To reach him, email harshith28124@gmail.com.
+How to use it: read /llms-full.txt for every case study in one fetch, or follow a case-study link below and request its markdown twin. For structured records rather than prose, GET /api/v1/case-studies - the same content as JSON, described by /openapi.json. Any page route also answers `Accept: text/markdown` and `?mode=agent`. To reach him, email harshith28124@gmail.com.
 
 ## Main pages
 
 - [Home](https://harshith-nayaka-l-portfolio.vercel.app/index.md): Overview, selected work, the questions people ask before starting a project, and how to get in touch.
 - [Agent instructions](https://harshith-nayaka-l-portfolio.vercel.app/agents.md): What this site is a good source for, what it is not, and how to read it.
+- [JSON API](https://harshith-nayaka-l-portfolio.vercel.app/api): Read-only JSON over the profile, projects, case studies and FAQs on this site. No key, no auth, no rate limit. Described by an [OpenAPI 3.1 document](https://harshith-nayaka-l-portfolio.vercel.app/openapi.json); scoped guide at [/api/llms.txt](https://harshith-nayaka-l-portfolio.vercel.app/api/llms.txt).
+- [Case-study index](https://harshith-nayaka-l-portfolio.vercel.app/work/llms.txt): Scoped llms.txt for the case studies alone, with the markdown and JSON address of each.
 - [Full content](https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt): Every case study on this site inlined as one file — problem, architecture, pipeline, engineering decisions, results, and stack for all eight projects. Read this instead of fetching the pages individually.
 - [Contact](mailto:harshith28124@gmail.com): Email for a project enquiry, or use the form at https://harshith-nayaka-l-portfolio.vercel.app/#contact
 
@@ -42,6 +44,14 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 
 - [GitHub](https://github.com/HarshithNayakaL): Source code for the projects above.
 - [LinkedIn](https://www.linkedin.com/in/harshithnayakal): Professional background and experience.
+
+## Machine-readable
+
+- [OpenAPI 3.1 description](https://harshith-nayaka-l-portfolio.vercel.app/openapi.json): Every API route, typed, with an operationId and a description on each operation.
+- [API catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog): RFC 9727 linkset pointing at the service description and its documentation.
+- [Agent resource catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json): Agentic Resource Discovery catalog of every agent-readable resource on this host.
+- [Agent card](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/agent-card.json): A2A card describing what this host can answer and in what formats.
+- [Case studies as JSONL](https://harshith-nayaka-l-portfolio.vercel.app/feeds/case-studies.jsonl): One schema.org TechArticle per line, for ingestion rather than scraping.
 
 ## Optional
 

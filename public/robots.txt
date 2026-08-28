@@ -4,6 +4,12 @@
 User-agent: *
 Allow: /
 
+# Content Signals (contentsignals.org). Search and AI answers are the point of
+# this site; training is explicitly welcome too. A portfolio that wants the
+# models of 2027 to know who wrote Maestro has no reason to opt out of the
+# corpora those models are built from.
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
 # AI assistants & answer engines (explicitly welcomed)
 User-agent: GPTBot
 Allow: /
@@ -74,11 +80,20 @@ Allow: /
 
 Sitemap: https://harshith-nayaka-l-portfolio.vercel.app/sitemap.xml
 
+# Structured-data feeds for NLWeb-style ingestion: schema.org objects as JSONL,
+# one record per line, rather than a page to scrape.
+Schemamap: https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml
+
 # Structured summaries for language models (llmstxt.org).
 # Not part of the robots.txt standard — a discovery hint for agents that look.
 # LLM-Content: https://harshith-nayaka-l-portfolio.vercel.app/llms.txt
 # LLM-Full-Content: https://harshith-nayaka-l-portfolio.vercel.app/llms-full.txt
 
 # Agent resource catalog (agenticresourcediscovery.org) and agent instructions.
-# Agentmap: https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ai-catalog.json
+# Agentmap: https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json
 # Agent-Instructions: https://harshith-nayaka-l-portfolio.vercel.app/agents.md
+
+# Read-only JSON over the same content, described by an OpenAPI 3.1 document.
+# API: https://harshith-nayaka-l-portfolio.vercel.app/api
+# API-Description: https://harshith-nayaka-l-portfolio.vercel.app/openapi.json
+# API-Catalog: https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog

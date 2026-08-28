@@ -12,6 +12,20 @@
  *
  * Usage: node scripts/check-llms-txt.mjs [origin]
  */
+/**
+ * Drop a leading YAML frontmatter block before checking document structure.
+ *
+ * The twins open with `---` metadata (title, description, canonical,
+ * last-updated) so an agent gets the document's identity without fetching the
+ * HTML page to find it. Frontmatter is metadata about the document rather than
+ * part of it — the universal convention across static site generators is
+ * frontmatter, then the H1 — so the H1 check reads past it.
+ */
+function stripFrontmatter(body) {
+  const m = body.replace(/^\uFEFF/, "").match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+  return m ? body.slice(m[0].length).trimStart() : body;
+}
+
 const ORIGIN = process.argv[2] ?? "http://localhost:4321";
 
 let failures = 0;
@@ -108,7 +122,8 @@ for (const route of routes) {
   const md = await get(`${ORIGIN}${expected}`);
   if (md.status !== 200) fail(`${expected} -> ${md.status}`);
   else if (!md.type.includes("text/markdown")) fail(`${expected} content-type is ${md.type}`);
-  else if (!/^#\s/.test(md.body)) fail(`${expected} does not start with an H1`);
+  else if (!/^#\s/.test(stripFrontmatter(md.body)))
+    fail(`${expected} does not start with an H1`);
   else if (md.body.trimStart().startsWith("<!")) fail(`${expected} served the SPA fallback, not markdown`);
 }
 pass(`${routes.length} routes have a working markdown twin`);

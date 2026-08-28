@@ -16,6 +16,20 @@ const legal = [
   { to: "/legal/cookies", label: "Cookie Policy" },
 ];
 
+/**
+ * The agent-facing surface, linked from the page rather than only from
+ * robots.txt and llms.txt. An agent that lands on the homepage can find the
+ * JSON API and its OpenAPI description without guessing at /api or /docs, and
+ * a person curious about how the site is built can read the same things.
+ */
+const forAgents = [
+  { href: "/api", label: "JSON API" },
+  { href: "/openapi.json", label: "OpenAPI 3.1" },
+  { href: "/llms.txt", label: "llms.txt" },
+  { href: "/agents.md", label: "Agent guide" },
+  { href: "/index.md", label: "This page as markdown" },
+];
+
 const connect = [
   { href: `mailto:${EMAIL}`, label: "Email", ext: false },
   { href: LINKEDIN, label: "LinkedIn", ext: true },
@@ -47,7 +61,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-line bg-surface/30">
       <div className="shell py-14 md:py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-12">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.25fr_repeat(4,1fr)] lg:gap-10">
           {/* Brand */}
           <div className="max-w-xs">
             <Link
@@ -78,6 +92,15 @@ export default function Footer() {
               <Link key={l.to} to={l.to} className={link}>
                 {l.label}
               </Link>
+            ))}
+          </nav>
+
+          <nav className={col} aria-label="For agents">
+            <p className={head}>For agents</p>
+            {forAgents.map((a) => (
+              <a key={a.href} href={a.href} className={link}>
+                {a.label}
+              </a>
             ))}
           </nav>
 

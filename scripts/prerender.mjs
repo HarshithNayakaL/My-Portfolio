@@ -373,6 +373,42 @@ function markdownFor(path, seo) {
   ].join("\n");
 }
 
+/** Source files behind a route, newest commit of which dates the page. */
+const SOURCES_FOR = (path) => {
+  if (path.startsWith("/work/")) return ["src/data/caseStudies.ts", "src/data/projects.ts"];
+  if (path.startsWith("/legal/")) return ["src/pages/Legal.tsx"];
+  return ["src/data/projects.ts", "src/components/Faq.tsx", "src/data/caseStudies.ts"];
+};
+
+/**
+ * YAML frontmatter for a markdown twin.
+ *
+ * An agent that fetches the markdown gets the document but none of the context
+ * around it: which URL it is the canonical version of, when it last changed,
+ * what it is called. Without that it either re-fetches the HTML page to find
+ * out or guesses. Four keys up front cost one line each and remove the second
+ * request.
+ *
+ * `last-updated` is the commit that last touched the source behind the page,
+ * for the same reason the sitemap uses it: a build timestamp changes on every
+ * deploy and so tells a reader nothing about whether the content moved.
+ */
+function frontmatter(path, seo) {
+  const yaml = (v) => `"${String(v).replace(/"/g, '\\"')}"`;
+  return [
+    "---",
+    `title: ${yaml(seo.title)}`,
+    `description: ${yaml(seo.description)}`,
+    `canonical: ${yaml(seo.canonical)}`,
+    `last-updated: ${yaml(lastCommitISO(SOURCES_FOR(path)))}`,
+    `author: ${yaml(NAME)}`,
+    `content-type: "text/markdown"`,
+    `html-version: ${yaml(seo.canonical)}`,
+    "---",
+    "",
+  ].join("\n");
+}
+
 // ---------------------------------------------------------------- prerender
 
 let count = 0;
@@ -395,7 +431,11 @@ for (const path of allRoutes) {
   const dir = path === "/" ? DIST : join(DIST, path.replace(/^\//, ""));
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, "index.html"), html, "utf8");
-  await writeFile(join(dir, "index.md"), markdownFor(path, seo), "utf8");
+  await writeFile(
+    join(dir, "index.md"),
+    frontmatter(path, seo) + markdownFor(path, seo),
+    "utf8",
+  );
   count++;
 }
 
@@ -475,12 +515,6 @@ function lastCommitISO(files) {
   }
   return BUILD_TIME;
 }
-
-const SOURCES_FOR = (path) => {
-  if (path.startsWith("/work/")) return ["src/data/caseStudies.ts", "src/data/projects.ts"];
-  if (path.startsWith("/legal/")) return ["src/pages/Legal.tsx"];
-  return ["src/data/projects.ts", "src/components/Faq.tsx", "src/data/caseStudies.ts"];
-};
 
 const priorityFor = (path) =>
   path === "/" ? "1.0" : path.startsWith("/work/") ? "0.9" : "0.3";
