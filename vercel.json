@@ -239,6 +239,19 @@
       ]
     },
     {
+      "source": "/feeds/(.*).jsonl",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/jsonl; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/robots.txt",
       "headers": [
         {
