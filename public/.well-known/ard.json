@@ -98,6 +98,20 @@
       "trustManifest": {
         "identity": "harshith-nayaka-l-portfolio.vercel.app"
       }
+    },
+    {
+      "identifier": "urn:air:harshith-nayaka-l-portfolio.vercel.app:feed:schema-map",
+      "displayName": "Schema map",
+      "type": "application/xml",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml",
+      "description": "Index of the schema.org JSONL feeds on this host: every case study as a TechArticle and every FAQ as a Question, one record per line.",
+      "representativeQueries": [
+        "what structured data feeds does this site publish",
+        "ingest the case studies as schema.org records"
+      ],
+      "trustManifest": {
+        "identity": "harshith-nayaka-l-portfolio.vercel.app"
+      }
     }
   ],
   "collections": []

@@ -8,7 +8,11 @@ Allow: /
 # this site; training is explicitly welcome too. A portfolio that wants the
 # models of 2027 to know who wrote Maestro has no reason to opt out of the
 # corpora those models are built from.
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
+#
+# Commented, not live: it is not a robots.txt directive, and Lighthouse fails
+# the whole file on an unknown one. Declaring the permissive default is worth
+# nothing next to a red "robots.txt is not valid" on every SEO report.
+# Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # AI assistants & answer engines (explicitly welcomed)
 User-agent: GPTBot
@@ -81,8 +85,10 @@ Allow: /
 Sitemap: https://harshith-nayaka-l-portfolio.vercel.app/sitemap.xml
 
 # Structured-data feeds for NLWeb-style ingestion: schema.org objects as JSONL,
-# one record per line, rather than a page to scrape.
-Schemamap: https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml
+# one record per line, rather than a page to scrape. Commented for the same
+# reason as above; the map is also listed in llms.txt and the ARD catalog,
+# which are parsed by the agents that actually want it.
+# Schemamap: https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml
 
 # Structured summaries for language models (llmstxt.org).
 # Not part of the robots.txt standard — a discovery hint for agents that look.

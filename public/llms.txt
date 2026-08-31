@@ -51,6 +51,7 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 - [API catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog): RFC 9727 linkset pointing at the service description and its documentation.
 - [Agent resource catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json): Agentic Resource Discovery catalog of every agent-readable resource on this host.
 - [Agent card](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/agent-card.json): A2A card describing what this host can answer and in what formats.
+- [Schema map](https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml): Index of the structured-data feeds below, with the date each was last changed.
 - [Case studies as JSONL](https://harshith-nayaka-l-portfolio.vercel.app/feeds/case-studies.jsonl): One schema.org TechArticle per line, for ingestion rather than scraping.
 
 ## Optional
