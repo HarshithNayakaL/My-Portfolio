@@ -33,6 +33,7 @@ const {
   GITHUB,
   LINKEDIN,
   faqs,
+  agentSkills,
   legalDocs,
   LEGAL_UPDATED,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
@@ -363,6 +364,15 @@ function markdownFor(path, seo) {
     "## Questions worth asking",
     "",
     ...faqs.flatMap((f) => [`**${f.q}**`, "", f.a, ""]),
+    "## Agent skills",
+    "",
+    "Packaged capability rather than deployed product: instructions plus executable drivers, loaded by a coding agent when a task matches.",
+    "",
+    ...agentSkills.map(
+      (s) =>
+        `- **${s.name}**${s.repo ? ` ([repo](${s.repo}))` : ""} — ${s.tagline}. ${s.premise}`,
+    ),
+    "",
     "## Elsewhere",
     "",
     `- [GitHub](${GITHUB})`,

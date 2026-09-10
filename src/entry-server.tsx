@@ -9,6 +9,7 @@ import App from "./App";
 export { routeSeo, allRoutes, ORIGIN } from "./data/seo";
 export { caseStudies } from "./data/caseStudies";
 export { projects, NAME, EMAIL, GITHUB, LINKEDIN } from "./data/projects";
+export { agentSkills } from "./data/skills";
 // Page copy the markdown versions are generated from. Re-exported rather than
 // retyped so /work/maestro/index.md and the rendered page can never disagree.
 export { faqs } from "./components/Faq";

@@ -23,13 +23,15 @@ export const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as
 /** Ordered by strength - the grid renders them in this order. */
 export const projects: Project[] = [
   {
-    slug: "creative-ops-pipeline",
-    title: "Creative-Ops Pipeline",
+    slug: "brandforge",
+    title: "BrandForge",
     kicker: "Flagship",
     outcome:
-      "A multi-model content pipeline that replaces hours of manual production with validated, on-brand output.",
-    tags: ["LLM orchestration", "Structured output", "QA gates", "Cost tiering"],
-    links: [],
+      "Give it a brand's site and one product photo: it researches the brand, pins what can't change about the product, generates a six-shot campaign, then grades its own output and blocks what it can't safely fix.",
+    tags: ["Multi-model", "Brand fidelity", "Self-verifying QA", "n8n"],
+    links: [
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/BrandForge" },
+    ],
     hasCaseStudy: true,
   },
   {
@@ -40,6 +42,16 @@ export const projects: Project[] = [
       "A multi-modal assistant that lets artisans run an online storefront by talking and showing, not typing.",
     tags: ["Voice + Vision", "Gemini", "Google Cloud", "Product lead"],
     links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "seo-command-center",
+    title: "SEO Command Center",
+    kicker: "Built at DemandNXT",
+    outcome:
+      "The internal audit platform a marketing team runs on across seven brands \u2014 real-browser crawling, and a score where every weight traces to something Google actually published.",
+    tags: ["Production", "Playwright", "Defensible scoring", "Next.js"],
+    links: [],
     hasCaseStudy: true,
   },
   {

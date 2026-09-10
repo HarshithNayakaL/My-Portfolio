@@ -102,7 +102,15 @@ pass(`${internal.length} internal links checked`);
 
 // --------------------------------------------------------- discovery links
 console.log("\nrel=alternate / rel=describedby on every page");
-const routes = ["/", "/work/maestro", "/work/craftconnect", "/work/ai-notes", "/work/nova-ai", "/work/blogspace", "/work/cannon", "/work/replydesk", "/work/creative-ops-pipeline", "/legal/privacy", "/legal/terms", "/legal/cookies"];
+// Routes come from the sitemap, never a list in this file. A hardcoded copy
+// silently rots the moment a case study is added or renamed, and then the
+// checker reports a route that no longer exists as a broken page.
+const sitemap = await get(`${ORIGIN}/sitemap.xml`);
+// The sitemap always carries absolute production URLs, so take the pathname
+// rather than stripping ORIGIN — that lets this run against a local build too.
+const routes = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)]
+  .map((m) => new URL(m[1]).pathname)
+  .map((p) => (p !== "/" ? p.replace(/\/$/, "") : p));
 for (const route of routes) {
   const page = await get(`${ORIGIN}${route}`);
   if (page.status !== 200) { fail(`${route} -> ${page.status}`); continue; }

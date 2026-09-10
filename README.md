@@ -33,7 +33,7 @@ The architecture diagrams are data-driven: edit the `pipeline` arrays in `caseSt
 ## Remaining content TODOs (the `[FILL]`s)
 - [ ] **Real photo** of Harshith. Drop a square image in `/public` and swap the monogram block in `src/components/About.tsx` (marked with a `TODO` comment) for an `<img>`.
 - [ ] **Nova AI live URL** and **CraftConnect repo URL** — currently both link to the GitHub profile in `src/data/projects.ts`. Replace with exact URLs when available.
-- [ ] **Flagship case study** (`creative-ops-pipeline`) is marked *in progress* with a real architecture but a placeholder narrative. Finish the write-up in `caseStudies.ts` when ready.
+- [x] **Flagship case study** is `brandforge` — a real, public repo replacing the former `creative-ops-pipeline` placeholder.
 - [ ] **Domain** + final OG URL (`og:url` not yet set in `index.html`).
 - [ ] **"Open to select freelance projects"** chip in `About.tsx` — remove it if you'd rather not signal availability to employers.
 - [ ] Optional: a real **OG preview PNG**. `public/og-image.svg` exists, but some social scrapers don't render SVG; export a 1200×630 PNG and point `og:image` at it for guaranteed previews.

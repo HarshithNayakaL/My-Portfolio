@@ -36,9 +36,10 @@ const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";
  * rather than falling through to the HTML 404 page. `scripts/build-api.mjs`
  * fails the build if either set drifts from the data.
  */
-const API_COLLECTIONS = new Set(["profile", "projects", "case-studies", "faqs"]);
+const API_COLLECTIONS = new Set(["profile", "projects", "case-studies", "faqs", "skills"]);
 const PROJECT_SLUGS = new Set([
-  "creative-ops-pipeline",
+  "brandforge",
+  "seo-command-center",
   "craftconnect",
   "maestro",
   "cannon",
@@ -49,7 +50,8 @@ const PROJECT_SLUGS = new Set([
 ]);
 const CASE_STUDY_SLUGS = new Set([
   "craftconnect",
-  "creative-ops-pipeline",
+  "brandforge",
+  "seo-command-center",
   "replydesk",
   "blogspace",
   "cannon",

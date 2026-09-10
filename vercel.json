@@ -22,6 +22,16 @@
       ],
       "destination": "https://harshith-nayaka-l-portfolio.vercel.app/:path*",
       "permanent": true
+    },
+    {
+      "source": "/work/creative-ops-pipeline",
+      "destination": "/work/brandforge",
+      "permanent": true
+    },
+    {
+      "source": "/work/creative-ops-pipeline/index.md",
+      "destination": "/work/brandforge/index.md",
+      "permanent": true
     }
   ],
   "headers": [

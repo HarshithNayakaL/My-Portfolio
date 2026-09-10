@@ -147,99 +147,241 @@ const craftconnect: CaseStudy = {
   links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
 };
 
-const creativeOps: CaseStudy = {
-  slug: "creative-ops-pipeline",
-  title: "Creative-Ops Pipeline",
-  kicker: "Flagship case study",
+const brandforge: CaseStudy = {
+  slug: "brandforge",
+  title: "BrandForge",
+  kicker: "Flagship",
   outcome:
-    "A multi-model content pipeline that turns a one-line brief into validated, on-brand output, without a human babysitting every step.",
+    "Give it a brand's website and one product photo. It researches the brand from that site, pins what cannot change about the product, plans its own campaign, generates six images, grades its own work, repairs what it can and refuses what it cannot safely fix.",
   meta: [
-    { label: "Type", value: "Production AI pipeline" },
-    { label: "Focus", value: "Reliability & cost engineering" },
-    { label: "Pattern", value: "Multi-model + QA gates" },
+    { label: "Type", value: "Multi-model generation pipeline" },
+    { label: "Focus", value: "Brand fidelity & product identity" },
+    { label: "Pattern", value: "Generate → verify → repair → block" },
+    { label: "Status", value: "Open source, orchestration runs in-process or on n8n" },
   ],
   problem: [
-    "Producing on-brand content at volume is mostly invisible manual labour: drafting, reformatting, checking it didn't drift off-brand, fixing the one field that came back malformed, doing it again tomorrow. It scales linearly with headcount, which is to say it doesn't scale.",
-    "The interesting problem isn't 'can an LLM write this'. It's 'can a system produce this reliably, at a sane cost, and fail safely when a model misbehaves'.",
+    "Ask a generative model for a brand's campaign imagery and you get two failures that look like success. The brand gets imagined: a model asked about a company recalls a stereotype of its category rather than the company itself, and produces something plausible for a coffee brand instead of something true about this one. And the product drifts: image models produce a convincing member of a category, not your item, so the handle changes shape, the label moves, and the result is unusable for the one job it had.",
+    "Both failures pass a casual glance. That is what makes them expensive — nobody catches them until a customer does.",
   ],
   build: [
-    "A pipeline that takes a structured brief and runs it through tiered models, schema-constrained generation, and explicit quality gates before anything is considered done. Cheap models do the bulk work; expensive models are spent only where judgment is actually needed.",
-    "Every stage assumes the model can be wrong. Output is validated against a schema, checked by a QA gate, and when something fails the run is logged with enough context to recover, not silently dropped.",
-    "This is a clean rebuild around public APIs that demonstrates the architecture and the engineering judgment behind it, with generic demo content in place of any real campaign data.",
+    "The brand is observed, never recalled. A bounded Playwright crawl reads the brand's own site, and every conclusion the model draws is tagged observed — backed by a specific piece of evidence on a specific page — or inferred, meaning the model generalised. The distinction is surfaced in the interface rather than flattened, so a person reviewing the output can see which claims are grounded.",
+    "The product is pinned before anything is generated. One pass analyses the supplied photo into a canonical identity plus a set of invariants — the attributes that must survive every shot. Generation then runs through the image edits endpoint with that photo as the anchor rather than text-to-image, because text-to-image has nothing to be faithful to.",
+    "Then it grades itself, and the grading is not advisory. A multimodal QA pass compares each generated shot against the original attribute by attribute. The model scores; deterministic code decides. A failed invariant forces a repair no matter how good the aesthetic score, an invariant the model failed to report on counts as a failure rather than a pass, and running out of repair budget produces a BLOCK — shipped visibly as blocked, never quietly dropped or silently passed.",
+    "The whole thing is brand-agnostic by construction: point it at a different brand with no code change and the crawl, the kit and the plan all regenerate.",
   ],
   pipeline: [
     {
       title: "Intake",
       nodes: [
-        { id: "brief", label: "Structured brief", detail: "What, for whom, constraints", kind: "input" },
+        { id: "url", label: "Brand URL", detail: "SSRF-guarded", kind: "input" },
+        { id: "photo", label: "Product photo", detail: "Magic-byte checked", kind: "input" },
       ],
     },
     {
-      title: "Route",
+      title: "Observe",
       nodes: [
-        { id: "cheap", label: "Draft (low-cost model)", detail: "Bulk generation", kind: "model" },
-        { id: "premium", label: "Refine (high-capability model)", detail: "Only where it pays off", kind: "model" },
+        { id: "crawl", label: "Bounded crawl", detail: "Playwright, page ceiling", kind: "logic" },
+        { id: "kit", label: "Brand kit", detail: "Observed vs inferred", kind: "model" },
       ],
     },
     {
-      title: "Structure",
+      title: "Pin",
       nodes: [
-        { id: "schema", label: "Schema-constrained output", detail: "Generate then validate", kind: "logic" },
+        { id: "identity", label: "Product identity", detail: "Invariants extracted once", kind: "model" },
       ],
     },
     {
-      title: "Gate",
+      title: "Plan",
       nodes: [
-        { id: "rules", label: "Rule checks", detail: "Format, fields, limits", kind: "gate" },
-        { id: "critique", label: "LLM critique gate", detail: "On-brand? On-spec?", kind: "gate" },
+        { id: "shots", label: "Six shot contracts", detail: "The campaign, planned", kind: "logic" },
       ],
     },
     {
-      title: "Resolve",
+      title: "Generate",
       nodes: [
-        { id: "errlog", label: "Error log that still saves", detail: "Recover, don't drop", kind: "logic" },
-        { id: "publish", label: "Approved output", detail: "Ready downstream", kind: "output" },
+        { id: "gen", label: "Image edits", detail: "Your photo as anchor, 3 at a time", kind: "model" },
+      ],
+    },
+    {
+      title: "Verify",
+      nodes: [
+        { id: "qa", label: "Multimodal QA", detail: "Attribute by attribute", kind: "gate" },
+        { id: "verdict", label: "Pass · Repair · Block", detail: "Code decides, not the model", kind: "output" },
       ],
     },
   ],
   howItWorks: [
     {
-      title: "Cost-tiered models, spent on purpose",
-      body: "Not every token needs a frontier model. The bulk of generation runs on a cheaper model; the expensive one is reserved for the steps where its judgment changes the outcome. The result is the same quality bar at a fraction of the bill.",
+      title: "The model scores, the code decides",
+      body: "QA returns numbers; it does not return a verdict. Deterministic code reads those numbers against the product invariants, and any failed invariant forces a repair however high the aesthetic score came back. An invariant the model simply did not mention is treated as a failure, not an absence of evidence — otherwise silence becomes a pass, which is the easiest way for a grader to be useless.",
     },
     {
-      title: "Generate, then validate, then trust",
-      body: "Structured output is requested against a schema, but the schema request is treated as a hope, not a guarantee. Every output is validated before the pipeline acts on it. Malformed responses are caught at the boundary, not three steps later.",
+      title: "A refusal is a result",
+      body: "When repairs run out, the shot is marked BLOCKED and shipped as blocked: it keeps full layout weight in the gallery and carries the reason it failed and what QA saw. A pipeline that hides its failures is reporting a higher success rate than it earned, and the person reviewing it has no way to know.",
     },
     {
-      title: "QA gates as code, not vibes",
-      body: "Quality is checked explicitly: deterministic rule checks for the things rules can catch, and an LLM critique pass for the judgment calls ('is this actually on-brand'). Nothing passes on optimism.",
+      title: "Nothing is discarded",
+      body: "A repaired shot keeps every earlier attempt, the exact prompt that produced it, and each QA verdict on disk. The run also writes a full event log. That is what makes a bad output diagnosable after the fact instead of a mystery.",
     },
     {
-      title: "Failures save their work",
-      body: "When a run breaks, it isn't thrown away. It's logged with enough context to resume or retry the failing step, so a single bad model response never costs the whole job.",
+      title: "Reviewable with no keys and no network",
+      body: "Every screen can be exercised from local fixtures, and the fixtures refuse to impersonate real output: run ids are prefixed, the manifest carries a fixture flag, and the model fields say so in words. A demo that quietly looks like a real result is a lie waiting to be quoted.",
+    },
+    {
+      title: "One implementation, two orchestrators",
+      body: "The pipeline runs in-process by default and can hand orchestration to n8n by switching one environment variable. Both paths call the same stage functions — there is one implementation, not a code path and a workflow that drift apart. The exported workflow's node types are read from the installed n8n and re-checked by a script.",
+    },
+    {
+      title: "Keys never reach the browser",
+      body: "Both model credentials live only in the API process; the frontend has none and the dev server proxies to it. A preflight command reports which keys the API can actually see, so a missing key surfaces before a run starts spending.",
     },
   ],
   results: [
     {
-      label: "What it demonstrates",
-      body: "Judgment about where to spend compute, how to make LLM output trustworthy enough to build on, and how to fail without losing work.",
+      label: "What it proves",
+      body: "That a generative pipeline can be held to a standard rather than admired for its best output — brand claims traced to evidence, product attributes verified rather than assumed, and failures surfaced instead of hidden.",
     },
     {
-      label: "Honesty note",
-      body: "This is a clean rebuild on public APIs with generic demo content. No client data, no proprietary logic. The skill is the point, not the source material.",
+      label: "Verification",
+      body: "One command runs eight groups with no keys and no external network: palette contrast at WCAG AA across 15 pairs, 52 unit tests over the deterministic parts, a production build, n8n workflow build and integrity (every node reachable, every money-spending HTTP node carrying an error path), 16 SSRF vectors rejected, API security and error paths, and a UI sweep across three viewports.",
+    },
+    {
+      label: "Honest status",
+      body: "The pipeline up to brand analysis has been exercised against real sites. Everything past it — brand kit, product identity, planning, generation, QA and repair — is implemented and schema-validated but needs live API keys to run end to end.",
     },
   ],
   tech: [
-    "LLM orchestration",
-    "Tiered model routing",
-    "Schema-constrained output",
-    "Validation layer",
-    "QA gates",
-    "Structured logging",
+    "Node.js",
+    "TypeScript",
+    "React",
+    "Vite",
+    "Playwright",
+    "Google Gemini (multimodal)",
+    "OpenAI image edits",
+    "n8n",
+    "Zod",
   ],
   metaDescription:
-    "Multi-model content pipeline turning a one-line brief into validated, on-brand output through tiered routing, schema-constrained generation and QA gates.",
+    "Multi-model campaign pipeline that observes a brand from its own site, pins the product's invariants, then grades and repairs its own generated images — or blocks them.",
+  links: [
+    {
+      label: "View on GitHub",
+      href: "https://github.com/HarshithNayakaL/BrandForge",
+    },
+  ],
+};
+
+const seoCommandCenter: CaseStudy = {
+  slug: "seo-command-center",
+  title: "SEO Command Center",
+  kicker: "Built at DemandNXT",
+  outcome:
+    "An internal audit platform a marketing team runs on: it crawls seven brand sites in a real browser, scores them against a model where every weight is tied to something Google actually published, and hands back paste-ready copy fixes.",
+  meta: [
+    { label: "Type", value: "Internal production platform" },
+    { label: "Context", value: "Seven-brand portfolio, marketing team" },
+    { label: "Focus", value: "Defensible scoring & evidence" },
+    { label: "Status", value: "In production, proprietary" },
+  ],
+  problem: [
+    "Every SEO tool shows you a number. Almost none of them can tell you where the number came from. Google does not publish numeric ranking weights, and its own Lighthouse SEO score weights every audit equally while its documentation states plainly that the score is not a ranking signal. So a single score is a judgement, and most tools present it as a measurement.",
+    "That matters the moment someone acts on it. A team reading a confident 80 will spend real budget on the wrong page — and the tool that produced it has no way to defend the number in a room.",
+  ],
+  build: [
+    "Every check declares its own evidence basis: an impact tier, a weight, and a source URL. Five tiers, from blocker (the page cannot be indexed, so it cannot rank at any quality) through confirmed, relevance and appearance down to hygiene. The goal is not false precision — it is that every weight traces to a public statement, and the ordering is defensible even where the exact number is a judgement call.",
+    "Applying that honestly meant correcting the tool against Google's own documentation rather than against intuition. Meta description had been weighted like a ranking factor; Google says it is not one, so it was down-weighted to appearance. Heading order had been weighted like a ranking factor; Google says it does not matter if they are out of order, so it was reclassified as hygiene — still worth fixing for accessibility, no longer priced like a ranking lever.",
+    "Checks are weighted, not counted. A missing title and one image without alt text are not the same event, and under the old equal-weight model both moved the category to 50. And a failed indexing blocker caps the whole score at 25, because a page carrying noindex could previously report 74 and sit mid-table while its real search value was zero.",
+    "The AI layer is additive and boxed in. The whole audit runs end to end with no API keys at all; insights generate only when a key is present, and the free crawl layer never calls the model. Cached insights carry forward onto new runs and record which run they reasoned over, so a superseded read is labelled as based on an earlier crawl rather than presented as current.",
+  ],
+  pipeline: [
+    {
+      title: "Crawl",
+      nodes: [
+        { id: "browser", label: "Real browser render", detail: "Playwright, three viewports", kind: "input" },
+      ],
+    },
+    {
+      title: "Parse",
+      nodes: [
+        { id: "parse", label: "Rendered HTML", detail: "Images and inline SVG alike", kind: "logic" },
+      ],
+    },
+    {
+      title: "Check",
+      nodes: [
+        { id: "checks", label: "20 pure checks", detail: "Five categories, unit-tested", kind: "gate" },
+      ],
+    },
+    {
+      title: "Score",
+      nodes: [
+        { id: "weight", label: "Weighted by evidence", detail: "Blocker caps at 25", kind: "logic" },
+      ],
+    },
+    {
+      title: "Explain",
+      nodes: [
+        { id: "ai", label: "Analyst read", detail: "Optional, cached, never required", kind: "model" },
+        { id: "export", label: "Handoff document", detail: "PDF · Word · HTML", kind: "output" },
+      ],
+    },
+  ],
+  howItWorks: [
+    {
+      title: "A check that cannot run must say so",
+      body: "Unmeasured checks used to return a soft warn worth 60 points for something nobody tested, and the run-level rollup then averaged pages as equals — so nine inner pages resting on one trivially-passing check outvoted the one page actually assessed, nine to one. Unmeasured checks are now excluded outright and pages are weighted by how much evidence each contributed. On a representative shape that moved a category from 93 to 69, which is the number being honest rather than the number being worse.",
+    },
+    {
+      title: "A false alarm costs more than a miss",
+      body: "The robots check scanned every Disallow line without tracking which user-agent group it belonged to. Two sites blocking a single aggressive crawler — normal hygiene — were reported as blocking their entire site, and the AI layer faithfully amplified that into a catastrophic finding. Nothing was wrong with either site. A false alarm on the most severe finding a tool can report burns the credibility of every other finding on the page, so the parser now groups by user-agent and both real files are pinned as regression tests.",
+    },
+    {
+      title: "The AI must never invent facts about the business",
+      body: "Asked to replace broken placeholder counters on a homepage, the model proposed a set of plausible, well-written, entirely invented business metrics — years trading, projects completed, clients served. Pasted as-is that publishes a lie on a company's own site. The instruction not to invent metrics had been read as SEO metrics only; it now separately forbids inventing facts about the business and requires a bracketed placeholder, and the interface detects any remaining placeholder and warns before the copy can be pasted live.",
+    },
+    {
+      title: "Which SVGs actually owe a name",
+      body: "The obvious accessibility rule — every SVG needs a title — is wrong, and produced 83 findings on one homepage, burying the real ones. Following axe-core's actual criteria instead, a name is owed in two cases: the SVG claims an image role, or it is the entire content of a link or button. That second case caught 60 genuine defects on one site: commercial internal links whose only content was an unnamed icon, so a screen reader announced 'link' and nothing else and Google got zero anchor text for a money page.",
+    },
+    {
+      title: "Reasoning tokens share the answer's budget",
+      body: "The insight feature silently stopped working while reporting success. The model bills its reasoning against the same output ceiling the answer comes from; a real call spent 4,868 tokens thinking and 3,309 answering against a ceiling of 8,192, truncated the JSON mid-string, and the script exited zero — so the button said refreshed over week-old data. The ceiling was resized from measurement across every site, truncation is now detected before parsing rather than surfacing as a parser error, and a run that writes nothing exits non-zero.",
+    },
+    {
+      title: "Checks tests cannot make",
+      body: "Typecheck catches type errors and tests catch broken behaviour, but neither catches a broken promise — code claiming something exists elsewhere when it does not. A doc referenced in a comment but never written, an env var read in code but missing from the example file, an npm script named in documentation but absent from the manifest, a database table written but never read. All four had shipped undetected. A separate doctor command checks exactly that one thing and runs on every change.",
+    },
+  ],
+  results: [
+    {
+      label: "What it proves",
+      body: "That a score can be built to be defended rather than displayed. Every weight in the model traces to a public statement, every check names its evidence tier, and the tool corrects itself against primary documentation when the two disagree.",
+    },
+    {
+      label: "Measured, not guessed",
+      body: "Crawl profiling found the network-idle wait burning its full timeout on most pages because ad and analytics tags hold connections open — 35 to 58 percent of every page's time spent waiting for nothing. Blocking third-party tag hosts and running inner pages three at a time took one site from 110 seconds to 44, with scores byte-identical before and after. Concurrency is capped at 3 from measurement: sequential 39.5s, three at a time 28.6s, six at a time 46.9s.",
+    },
+    {
+      label: "Verification",
+      body: "171 tests over the pure checks, the scoring rollup, and recorded API fixtures for the awkward cases — a metric returned as a string, an SVG with no title — so the edge cases are exercised without a network call.",
+    },
+    {
+      label: "Honest limits",
+      body: "Field data cannot be measured from a lab run, and the tool says so rather than substituting a proxy. Lab vitals are captured with third-party trackers blocked, which makes them optimistic by construction: a page that looks slow here is slower in the wild, never faster. That caveat ships in the interface, on the cell, not in a footnote.",
+    },
+  ],
+  tech: [
+    "Next.js",
+    "TypeScript",
+    "Playwright",
+    "SQLite",
+    "Drizzle ORM",
+    "Google Gemini (multimodal)",
+    "Vitest",
+    "PageSpeed Insights API",
+  ],
+  metaDescription:
+    "Internal SEO audit platform for a seven-brand portfolio: real-browser crawling, a scoring model where every weight traces to a public source, and paste-ready copy fixes.",
   links: [],
 };
 
@@ -881,7 +1023,8 @@ const replydesk: CaseStudy = {
 
 export const caseStudies: Record<string, CaseStudy> = {
   craftconnect,
-  "creative-ops-pipeline": creativeOps,
+  brandforge,
+  "seo-command-center": seoCommandCenter,
   maestro,
   cannon,
   replydesk,

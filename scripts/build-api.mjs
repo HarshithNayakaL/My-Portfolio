@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
 
-const { caseStudies, projects, faqs, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN } =
+const { caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN } =
   await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
@@ -115,6 +115,7 @@ await put(`${API}/index.json`, {
     projects: abs(`${API}/projects`),
     caseStudies: abs(`${API}/case-studies`),
     faqs: abs(`${API}/faqs`),
+    skills: abs(`${API}/skills`),
   },
   _links: { self: abs(API), root: abs("/api"), describedby: abs("/openapi.json") },
 });
@@ -132,11 +133,31 @@ await put(`${API}/profile.json`, {
     "Multi-modal pipelines (voice, vision, text)",
     "Full-stack application engineering around AI",
   ],
-  counts: { projects: projectList.length, caseStudies: studyList.length, faqs: faqs.length },
+  counts: {
+    projects: projectList.length,
+    caseStudies: studyList.length,
+    faqs: faqs.length,
+    agentSkills: agentSkills.length,
+  },
   _links: { self: abs(`${API}/profile`), root: abs(API), html: abs("/"), markdown: abs("/index.md") },
 });
 
 await put(`${API}/projects.json`, collection("projects", projectList));
+await put(
+  `${API}/skills.json`,
+  collection(
+    "skills",
+    agentSkills.map((s) => ({
+      name: s.name,
+      tagline: s.tagline,
+      premise: s.premise,
+      contents: s.contents,
+      discipline: s.discipline,
+      tags: s.tags,
+      repository: s.repo ?? null,
+    })),
+  ),
+);
 await put(`${API}/case-studies.json`, collection("case-studies", studyList));
 await put(
   `${API}/faqs.json`,
@@ -195,6 +216,7 @@ const openapi = {
     { name: "Projects", description: "Shipped work, one record per project." },
     { name: "Case studies", description: "The long-form engineering write-up behind each project." },
     { name: "FAQs", description: "Questions this site answers, as question/answer pairs." },
+    { name: "Agent skills", description: "Packaged capability an agent can load: instructions plus drivers." },
   ],
   paths: {
     "/api": {
@@ -260,6 +282,15 @@ const openapi = {
         description: "The full engineering write-up for one project: what the problem was, what was built, how the pipeline is staged, what it produced, and what it runs on.",
         parameters: [slugParam("case study")],
         responses: { 200: ok(ref("CaseStudy"), "The case study."), 404: notFound },
+      },
+    },
+    "/api/v1/skills": {
+      get: {
+        operationId: "listAgentSkills",
+        tags: ["Agent skills"],
+        summary: "List agent skills",
+        description: "Packaged agent skills — instructions plus executable drivers — each with the failure mode it was built against, what it contains, and the methodological rule it keeps.",
+        responses: { 200: ok(ref("AgentSkillList"), "All agent skills.") },
       },
     },
     "/api/v1/faqs": {
@@ -427,6 +458,19 @@ const openapi = {
           _links: { type: "object", additionalProperties: ref("Link") },
         },
       },
+      AgentSkill: {
+        type: "object",
+        required: ["name", "tagline", "premise", "contents", "discipline", "tags"],
+        properties: {
+          name: { type: "string" },
+          tagline: { type: "string" },
+          premise: { type: "string", description: "The failure mode the skill was built against." },
+          contents: { type: "string", description: "What the skill ships." },
+          discipline: { type: "string", description: "The methodological rule it keeps." },
+          tags: { type: "array", items: { type: "string" } },
+          repository: { type: "string", format: "uri", nullable: true, description: "Null when the skill is not published publicly." },
+        },
+      },
       Faq: {
         type: "object",
         required: ["id", "question", "answer"],
@@ -455,6 +499,17 @@ const openapi = {
           resource: { type: "string" },
           count: { type: "integer" },
           data: { type: "array", items: ref("CaseStudy") },
+          _links: { type: "object", additionalProperties: ref("Link") },
+        },
+      },
+      AgentSkillList: {
+        type: "object",
+        required: ["object", "count", "data"],
+        properties: {
+          object: { type: "string", enum: ["list"] },
+          resource: { type: "string" },
+          count: { type: "integer" },
+          data: { type: "array", items: ref("AgentSkill") },
           _links: { type: "object", additionalProperties: ref("Link") },
         },
       },
