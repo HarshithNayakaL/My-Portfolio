@@ -147,6 +147,104 @@ const craftconnect: CaseStudy = {
   links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
 };
 
+const creativeOps: CaseStudy = {
+  slug: "creative-ops-pipeline",
+  title: "Creative-Ops Pipeline",
+  kicker: "~90-node n8n workflow",
+  outcome:
+    "A multi-model content pipeline that turns a one-line brief into validated, on-brand output, without a human babysitting every step.",
+  meta: [
+    { label: "Type", value: "Production AI pipeline" },
+    { label: "Scale", value: "~90-node n8n workflow" },
+    { label: "Focus", value: "Reliability & cost engineering" },
+    { label: "Pattern", value: "Multi-model + QA gates" },
+  ],
+  problem: [
+    "Producing on-brand content at volume is mostly invisible manual labour: drafting, reformatting, checking it didn't drift off-brand, fixing the one field that came back malformed, doing it again tomorrow. It scales linearly with headcount, which is to say it doesn't scale.",
+    "The interesting problem isn't 'can an LLM write this'. It's 'can a system produce this reliably, at a sane cost, and fail safely when a model misbehaves'.",
+  ],
+  build: [
+    "A pipeline that takes a structured brief and runs it through tiered models, schema-constrained generation, and explicit quality gates before anything is considered done. Cheap models do the bulk work; expensive models are spent only where judgment is actually needed.",
+    "Every stage assumes the model can be wrong. Output is validated against a schema, checked by a QA gate, and when something fails the run is logged with enough context to recover, not silently dropped.",
+    "This is a clean rebuild around public APIs that demonstrates the architecture and the engineering judgment behind it, with generic demo content in place of any real campaign data.",
+  ],
+  pipeline: [
+    {
+      title: "Intake",
+      nodes: [
+        { id: "brief", label: "Structured brief", detail: "What, for whom, constraints", kind: "input" },
+      ],
+    },
+    {
+      title: "Route",
+      nodes: [
+        { id: "cheap", label: "Draft (low-cost model)", detail: "Bulk generation", kind: "model" },
+        { id: "premium", label: "Refine (high-capability model)", detail: "Only where it pays off", kind: "model" },
+      ],
+    },
+    {
+      title: "Structure",
+      nodes: [
+        { id: "schema", label: "Schema-constrained output", detail: "Generate then validate", kind: "logic" },
+      ],
+    },
+    {
+      title: "Gate",
+      nodes: [
+        { id: "rules", label: "Rule checks", detail: "Format, fields, limits", kind: "gate" },
+        { id: "critique", label: "LLM critique gate", detail: "On-brand? On-spec?", kind: "gate" },
+      ],
+    },
+    {
+      title: "Resolve",
+      nodes: [
+        { id: "errlog", label: "Error log that still saves", detail: "Recover, don't drop", kind: "logic" },
+        { id: "publish", label: "Approved output", detail: "Ready downstream", kind: "output" },
+      ],
+    },
+  ],
+  howItWorks: [
+    {
+      title: "Cost-tiered models, spent on purpose",
+      body: "Not every token needs a frontier model. The bulk of generation runs on a cheaper model; the expensive one is reserved for the steps where its judgment changes the outcome. The result is the same quality bar at a fraction of the bill.",
+    },
+    {
+      title: "Generate, then validate, then trust",
+      body: "Structured output is requested against a schema, but the schema request is treated as a hope, not a guarantee. Every output is validated before the pipeline acts on it. Malformed responses are caught at the boundary, not three steps later.",
+    },
+    {
+      title: "QA gates as code, not vibes",
+      body: "Quality is checked explicitly: deterministic rule checks for the things rules can catch, and an LLM critique pass for the judgment calls ('is this actually on-brand'). Nothing passes on optimism.",
+    },
+    {
+      title: "Failures save their work",
+      body: "When a run breaks, it isn't thrown away. It's logged with enough context to resume or retry the failing step, so a single bad model response never costs the whole job.",
+    },
+  ],
+  results: [
+    {
+      label: "What it demonstrates",
+      body: "Judgment about where to spend compute, how to make LLM output trustworthy enough to build on, and how to fail without losing work.",
+    },
+    {
+      label: "Honesty note",
+      body: "This is a clean rebuild on public APIs with generic demo content. No client data, no proprietary logic. The skill is the point, not the source material.",
+    },
+  ],
+  tech: [
+    "n8n",
+    "LLM orchestration",
+    "Tiered model routing",
+    "Schema-constrained output",
+    "Validation layer",
+    "QA gates",
+    "Structured logging",
+  ],
+  metaDescription:
+    "Multi-model content pipeline turning a one-line brief into validated, on-brand output through tiered routing, schema-constrained generation and QA gates.",
+  links: [],
+};
+
 const brandforge: CaseStudy = {
   slug: "brandforge",
   title: "BrandForge",
@@ -271,17 +369,17 @@ const brandforge: CaseStudy = {
   ],
 };
 
-const seoCommandCenter: CaseStudy = {
-  slug: "seo-command-center",
-  title: "SEO Command Center",
-  kicker: "Built at DemandNXT",
+const brandAuditPlatform: CaseStudy = {
+  slug: "brand-audit-platform",
+  title: "Multi-Brand Audit Platform",
+  kicker: "Internal tooling, in production",
   outcome:
-    "An internal audit platform a marketing team runs on: it crawls seven brand sites in a real browser, scores them against a model where every weight is tied to something Google actually published, and hands back paste-ready copy fixes.",
+    "An internal audit platform a marketing team runs on: it crawls every brand site in the portfolio in a real browser, scores them against a model where every weight is tied to something Google actually published, and hands back paste-ready copy fixes.",
   meta: [
     { label: "Type", value: "Internal production platform" },
-    { label: "Context", value: "Seven-brand portfolio, marketing team" },
+    { label: "Context", value: "Multi-brand portfolio, internal marketing team" },
     { label: "Focus", value: "Defensible scoring & evidence" },
-    { label: "Status", value: "In production, proprietary" },
+    { label: "Status", value: "In production \u2014 proprietary, no code shown" },
   ],
   problem: [
     "Every SEO tool shows you a number. Almost none of them can tell you where the number came from. Google does not publish numeric ranking weights, and its own Lighthouse SEO score weights every audit equally while its documentation states plainly that the score is not a ranking signal. So a single score is a judgement, and most tools present it as a measurement.",
@@ -381,7 +479,7 @@ const seoCommandCenter: CaseStudy = {
     "PageSpeed Insights API",
   ],
   metaDescription:
-    "Internal SEO audit platform across seven brands: real-browser crawling, a score where every weight traces to a public source, and paste-ready copy fixes.",
+    "Internal audit tooling for a multi-brand portfolio: real-browser crawling, a score where every weight traces to a public source, and paste-ready copy fixes.",
   links: [],
 };
 
@@ -1024,7 +1122,8 @@ const replydesk: CaseStudy = {
 export const caseStudies: Record<string, CaseStudy> = {
   craftconnect,
   brandforge,
-  "seo-command-center": seoCommandCenter,
+  "brand-audit-platform": brandAuditPlatform,
+  "creative-ops-pipeline": creativeOps,
   maestro,
   cannon,
   replydesk,

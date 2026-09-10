@@ -24,13 +24,13 @@
       "permanent": true
     },
     {
-      "source": "/work/creative-ops-pipeline",
-      "destination": "/work/brandforge",
+      "source": "/work/seo-command-center",
+      "destination": "/work/brand-audit-platform",
       "permanent": true
     },
     {
-      "source": "/work/creative-ops-pipeline/index.md",
-      "destination": "/work/brandforge/index.md",
+      "source": "/work/seo-command-center/index.md",
+      "destination": "/work/brand-audit-platform/index.md",
       "permanent": true
     }
   ],

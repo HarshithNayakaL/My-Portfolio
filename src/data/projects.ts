@@ -35,6 +35,16 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
+    slug: "creative-ops-pipeline",
+    title: "Creative-Ops Pipeline",
+    kicker: "~90-node n8n workflow",
+    outcome:
+      "A multi-model content pipeline that turns a one-line brief into validated, on-brand output \u2014 tiered model routing, schema-constrained generation and QA gates, orchestrated across roughly ninety n8n nodes.",
+    tags: ["n8n", "LLM orchestration", "Structured output", "QA gates"],
+    links: [],
+    hasCaseStudy: true,
+  },
+  {
     slug: "craftconnect",
     title: "CraftConnect",
     kicker: "Gen AI Exchange Hackathon 2025",
@@ -45,12 +55,12 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
-    slug: "seo-command-center",
-    title: "SEO Command Center",
-    kicker: "Built at DemandNXT",
+    slug: "brand-audit-platform",
+    title: "Multi-Brand Audit Platform",
+    kicker: "Internal tooling, in production",
     outcome:
-      "The internal audit platform a marketing team runs on across seven brands \u2014 real-browser crawling, and a score where every weight traces to something Google actually published.",
-    tags: ["Production", "Playwright", "Defensible scoring", "Next.js"],
+      "An internal audit platform a marketing team runs on across a multi-brand portfolio \u2014 real-browser crawling, and a score where every weight traces to something Google actually published.",
+    tags: ["Internal tooling", "Playwright", "Defensible scoring", "Next.js"],
     links: [],
     hasCaseStudy: true,
   },
