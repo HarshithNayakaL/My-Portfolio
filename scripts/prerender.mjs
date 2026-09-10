@@ -40,18 +40,25 @@ const {
 
 let template = await readFile(join(DIST, "index.html"), "utf8");
 
-// ------------------------------------------------------- inline the stylesheet
+// ------------------------------------------- move the stylesheet out of <head>
 //
 // Vite emits <link rel="stylesheet">, which blocks the first render: the
 // browser cannot paint until that file has been requested, waited for and
 // parsed. On mobile PageSpeed measured 150ms for the request and ~450ms of
-// render-blocking, on top of a 480ms critical path, purely because the
-// stylesheet is a second round trip discovered only after the HTML arrives.
+// render-blocking, purely because the stylesheet is a second round trip
+// discovered only after the HTML arrives. So it is inlined — one document, no
+// extra round trip, ~9KB compressed.
 //
-// The whole sheet is ~9KB compressed — under the ~14KB that fits in the first
-// congestion window — so inlining it costs one round trip's worth of bytes and
-// saves one round trip's worth of waiting. The page now paints from the HTML
-// response alone, with no external CSS on the critical path.
+// It is inlined at the END OF BODY rather than in <head>, and that placement
+// is the point. Inlined in <head> the sheet is 41KB of CSS sitting ahead of
+// every word of content, so <body> did not begin until 42% of the way through
+// the document. A browser does not care. An agent with a byte budget reads
+// 42% of a stylesheet and runs out before it reaches the work, the FAQ or the
+// contact details — which is exactly what one reported: a truncated body and
+// "incomplete FAQ sections", against a response the server had sent in full.
+//
+// The bytes are identical either way; only the order changes, and the order
+// is what decides whether a reader with a budget gets content or padding.
 //
 // Safe under the CSP because style-src already allows 'unsafe-inline' (the
 // prerendered markup carries style attributes). Nothing to hash.
@@ -68,7 +75,48 @@ let template = await readFile(join(DIST, "index.html"), "utf8");
   if (/<\/style/i.test(css)) {
     throw new Error("prerender: stylesheet contains </style — cannot inline safely");
   }
-  template = template.replace(link[0], `<style>${css}</style>`);
+  template = template.replace(link[0], "");
+  template = template.replace("</body>", `<style>${css}</style></body>`);
+}
+
+// ------------------------------- generate the Selected-work ItemList schema
+//
+// This used to be a hand-maintained array in index.html duplicating
+// `projects`, and it rotted exactly the way a duplicated list does: it still
+// advertised /work/creative-ops-pipeline to search engines after that route
+// had been retired, so the structured data pointed at a redirect. It is now
+// generated from the same array the page renders, in the same order, and
+// cannot disagree with it.
+{
+  const items = projects
+    .filter((p) => p.hasCaseStudy)
+    .map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${ORIGIN}/work/${p.slug}`,
+      name: `${p.title} — ${p.outcome.replace(/\s+/g, " ").trim()}`,
+    }));
+  const list = { "@type": "ItemList", name: "Selected work", itemListElement: items };
+  if (!template.includes('"__ITEMLIST__"')) {
+    throw new Error("prerender: __ITEMLIST__ marker missing from index.html");
+  }
+  template = template.replace('"__ITEMLIST__"', JSON.stringify(list));
+}
+
+// ------------------------------------------- move JSON-LD out of <head> too
+//
+// Structured data is metadata about the page, not part of it, and Google
+// reads JSON-LD from <body> exactly as it reads it from <head>. In <head> it
+// was another 14KB in front of the first sentence, for no benefit to any
+// reader — human or machine.
+{
+  const blocks = template.match(
+    /<script type="application\/ld\+json">[\s\S]*?<\/script>/gi,
+  );
+  if (blocks) {
+    for (const b of blocks) template = template.replace(b, "");
+    template = template.replace("</body>", `${blocks.join("")}</body>`);
+  }
 }
 
 const escapeAttr = (s) =>

@@ -84,6 +84,19 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
+    slug: "nova-ai",
+    title: "Nova",
+    kicker: "Cost-tiered model routing",
+    outcome:
+      "A chat app that scores every turn for difficulty and sends it to the smallest model that can carry it \u2014 lane, reasoning and cost stamped on every answer.",
+    tags: ["Model routing", "Cost tiering", "Arbiter model", "Serverless"],
+    links: [
+      { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
     slug: "replydesk",
     title: "ReplyDesk",
     kicker: "WhatsApp lead agent",
@@ -99,16 +112,13 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
-    slug: "nova-ai",
-    title: "Nova",
-    kicker: "Cost-tiered model routing",
+    slug: "ai-notes",
+    title: "AI Notes",
+    kicker: "Local inference, no server",
     outcome:
-      "A chat app that scores every turn for difficulty and sends it to the smallest model that can carry it \u2014 lane, reasoning and cost stamped on every answer.",
-    tags: ["Model routing", "Cost tiering", "Arbiter model", "Serverless"],
-    links: [
-      { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
-    ],
+      "A notes app running a local LLM through Ollama, so inference never leaves the machine.",
+    tags: ["DeepSeek R1", "Ollama", "Local/self-hosted"],
+    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/AI-Notes-App" }],
     hasCaseStudy: true,
   },
   {
@@ -121,16 +131,6 @@ export const projects: Project[] = [
     links: [
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/blogspace-internship" },
     ],
-    hasCaseStudy: true,
-  },
-  {
-    slug: "ai-notes",
-    title: "AI Notes",
-    kicker: "Local inference, no server",
-    outcome:
-      "A notes app running a local LLM through Ollama, so inference never leaves the machine.",
-    tags: ["DeepSeek R1", "Ollama", "Local/self-hosted"],
-    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/AI-Notes-App" }],
     hasCaseStudy: true,
   },
 ];

@@ -36,6 +36,7 @@ export const agentSkills: AgentSkill[] = [
     discipline:
       "Every weight, threshold and filter is read out of the published Rust and Scala source, down to the credibility model's actual formula. Where the source says nothing, the skill says nothing.",
     tags: ["Open-source ranking", "Retrieval & filters", "Account credibility", "Node, no deps"],
+    repo: "https://github.com/HarshithNayakaL/x-algorithm-source",
   },
   {
     name: "linkedin-boost",
@@ -47,6 +48,7 @@ export const agentSkills: AgentSkill[] = [
     discipline:
       "A three-tier honesty boundary is enforced throughout: documented, inference from mechanism, or folklore. LinkedIn has never published an objective weight, a link penalty, a hashtag rule or a posting-frequency rule — so when asked for one, the skill says it is not public rather than inventing it.",
     tags: ["Multi-surface ranking", "Honesty boundary", "Profile & post audit", "Node, no deps"],
+    repo: "https://github.com/HarshithNayakaL/linkedin-algorithm-source",
   },
   {
     name: "humanizer",
@@ -58,6 +60,7 @@ export const agentSkills: AgentSkill[] = [
     discipline:
       "Never invent specifics. The commonest way to raise a genericness score is to add a concrete detail, and the commonest way to ruin a piece is to make one up — so a fabricated statistic is treated as a strictly worse outcome than a bland sentence.",
     tags: ["Register vs genericness", "Markdown-safe", "Scored 0-100", "Python"],
+    repo: "https://github.com/HarshithNayakaL/humanizer-claude-skill",
   },
   {
     name: "ui-ux-taste",

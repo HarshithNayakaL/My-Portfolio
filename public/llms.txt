@@ -45,9 +45,9 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 
 Packaged capability rather than deployed product: instructions plus executable drivers, loaded by a coding agent when a task matches. Listed here because each is a claim about method, and the method is the point.
 
-- [x-algorithm-boost](https://harshith-nayaka-l-portfolio.vercel.app/api/v1/skills): X (Twitter) strategy derived from the open-sourced For You algorithm - real ranking weights, filter stack and credibility model read out of the published source rather than from blog posts about it.
-- [linkedin-boost](https://harshith-nayaka-l-portfolio.vercel.app/api/v1/skills): every LinkedIn surface (feed, search, recruiter sourcing, applicant ranking) built from LinkedIn Engineering's published architecture, with an explicit honesty boundary separating documented mechanism from inference from folklore.
-- [humanizer](https://harshith-nayaka-l-portfolio.vercel.app/api/v1/skills): removes the register signals that make prose read as machine-written, and scores what is left - while refusing to invent the concrete details that would raise the score dishonestly.
+- [x-algorithm-boost](https://github.com/HarshithNayakaL/x-algorithm-source): X (Twitter) strategy derived from the open-sourced For You algorithm - real ranking weights, filter stack and credibility model read out of the published source rather than from blog posts about it.
+- [linkedin-boost](https://github.com/HarshithNayakaL/linkedin-algorithm-source): every LinkedIn surface (feed, search, recruiter sourcing, applicant ranking) built from LinkedIn Engineering's published architecture, with an explicit honesty boundary separating documented mechanism from inference from folklore.
+- [humanizer](https://github.com/HarshithNayakaL/humanizer-claude-skill): removes the register signals that make prose read as machine-written, and scores what is left - while refusing to invent the concrete details that would raise the score dishonestly.
 - [ui-ux-taste](https://github.com/HarshithNayakaL/ui-ux-taste-skill): decides what an interface should look like by showing real reference directions rather than asking for adjectives, and returns one opinionated stack plus an ASCII wireframe.
 
 ## Profiles
