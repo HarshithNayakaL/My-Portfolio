@@ -40,67 +40,43 @@ const {
 
 let template = await readFile(join(DIST, "index.html"), "utf8");
 
-// ------------------------------------------- move the stylesheet out of <head>
+// --------------------------------------------- keep the stylesheet in <head>
 //
-// Vite emits <link rel="stylesheet">, which blocks the first render: the
-// browser cannot paint until that file has been requested, waited for and
-// parsed. On mobile PageSpeed measured 150ms for the request and ~450ms of
-// render-blocking, purely because the stylesheet is a second round trip
-// discovered only after the HTML arrives. So it is inlined — one document, no
-// extra round trip, ~9KB compressed.
+// This has been wrong in both directions, so the reasoning is written down.
 //
-// It is inlined at the END OF BODY rather than in <head>, and that placement
-// is the point. Inlined in <head> the sheet is 41KB of CSS sitting ahead of
+// It started as Vite's <link rel="stylesheet"> in <head>. That was replaced by
+// inlining the whole sheet, to remove a render-blocking round trip: mobile
+// PageSpeed measured ~150ms of request and ~450ms of blocking.
+//
+// Inlining moved the cost somewhere worse. 41KB of CSS sat in <head> ahead of
 // every word of content, so <body> did not begin until 42% of the way through
-// the document. A browser does not care. An agent with a byte budget reads
-// 42% of a stylesheet and runs out before it reaches the work, the FAQ or the
-// contact details — which is exactly what one reported: a truncated body and
-// "incomplete FAQ sections", against a response the server had sent in full.
+// the document, and an agent reading with a byte budget spent it on a
+// stylesheet and reported a truncated body with "incomplete FAQ sections".
 //
-// The bytes are identical either way; only the order changes, and the order
-// is what decides whether a reader with a budget gets content or padding.
+// The obvious next move — inline it at the END of body — fixed that and broke
+// something worse. A stylesheet after the content does not block the first
+// paint, so the browser paints the document unstyled and restyles when it gets
+// there. Measured on a throttled connection against this build: at 300ms and
+// still at 1200ms the h1 rendered at the browser default 32px on a transparent
+// background. Over a second of raw HTML on screen. Lighthouse reported CLS 0
+// throughout, because nothing moved — it was simply unstyled, and CLS does not
+// measure that.
 //
-// Safe under the CSP because style-src already allows 'unsafe-inline' (the
-// prerendered markup carries style attributes). Nothing to hash.
+// So: the sheet stays an external file linked from <head>. The link blocks the
+// first paint, which is the property that prevents the flash. It costs one
+// request for ~9KB gzipped on a connection that is already open, and it keeps
+// <head> at a few KB so the document is content almost immediately.
+//
+// The rule to keep: CSS that must apply before the first paint belongs in
+// <head>. Bytes that no reader needs — structured data, below-the-fold
+// anything — belong after the content. Those are different questions and
+// answering them with one move is what produced both bugs.
 {
-  const link = template.match(
-    /<link\s+rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/i,
-  );
-  if (!link) {
-    throw new Error("prerender: no stylesheet <link> in index.html — did the build change?");
+  if (!/<link\s+rel="stylesheet"[^>]*href="\/assets\/[^"]+\.css"/i.test(template)) {
+    throw new Error(
+      "prerender: no stylesheet <link> in <head> — the flash-of-unstyled-content guard depends on it",
+    );
   }
-  const css = await readFile(join(DIST, link[1].replace(/^\//, "")), "utf8");
-  // A literal </style> inside the CSS would close the element early. Vite has
-  // no reason to emit one, but assert rather than trust it.
-  if (/<\/style/i.test(css)) {
-    throw new Error("prerender: stylesheet contains </style — cannot inline safely");
-  }
-  template = template.replace(link[0], "");
-  template = template.replace("</body>", `<style>${css}</style></body>`);
-}
-
-// ------------------------------- generate the Selected-work ItemList schema
-//
-// This used to be a hand-maintained array in index.html duplicating
-// `projects`, and it rotted exactly the way a duplicated list does: it still
-// advertised /work/creative-ops-pipeline to search engines after that route
-// had been retired, so the structured data pointed at a redirect. It is now
-// generated from the same array the page renders, in the same order, and
-// cannot disagree with it.
-{
-  const items = projects
-    .filter((p) => p.hasCaseStudy)
-    .map((p, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      url: `${ORIGIN}/work/${p.slug}`,
-      name: `${p.title} — ${p.outcome.replace(/\s+/g, " ").trim()}`,
-    }));
-  const list = { "@type": "ItemList", name: "Selected work", itemListElement: items };
-  if (!template.includes('"__ITEMLIST__"')) {
-    throw new Error("prerender: __ITEMLIST__ marker missing from index.html");
-  }
-  template = template.replace('"__ITEMLIST__"', JSON.stringify(list));
 }
 
 // ------------------------------------------- move JSON-LD out of <head> too
