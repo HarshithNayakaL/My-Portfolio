@@ -596,6 +596,33 @@ const sitemap = [
 
 await writeFile(join(DIST, "sitemap.xml"), sitemap, "utf8");
 
+// ------------------------------------------- meta description length guard
+//
+// `CaseStudy.metaDescription` is documented as "120-160 characters" and that
+// was the whole enforcement: a comment. Two descriptions shipped at 168 and
+// 169 characters, and Bing flagged them — search engines truncate past ~160,
+// so the end of the sentence is written for nobody.
+//
+// A documented rule with no check is a rule that holds until someone is in a
+// hurry. This one now fails the build.
+{
+  const LIMIT = 160;
+  const MIN = 25;
+  const tooLong = [];
+  for (const path of allRoutes) {
+    const { description } = routeSeo[path];
+    if (description.length > LIMIT || description.length < MIN) {
+      tooLong.push(`${path} (${description.length})`);
+    }
+  }
+  if (tooLong.length) {
+    throw new Error(
+      `prerender: meta description must be ${MIN}-${LIMIT} characters. ` +
+        `Out of range: ${tooLong.join(", ")}`,
+    );
+  }
+}
+
 // -------------------------------------------------- screenshot cache safety
 
 /**

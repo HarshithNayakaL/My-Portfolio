@@ -262,7 +262,7 @@ const brandforge: CaseStudy = {
     "Zod",
   ],
   metaDescription:
-    "Multi-model campaign pipeline that observes a brand from its own site, pins the product's invariants, then grades and repairs its own generated images — or blocks them.",
+    "Multi-model campaign pipeline: observes a brand from its own site, pins the product's invariants, then grades its own images and blocks what it cannot fix.",
   links: [
     {
       label: "View on GitHub",
@@ -381,7 +381,7 @@ const seoCommandCenter: CaseStudy = {
     "PageSpeed Insights API",
   ],
   metaDescription:
-    "Internal SEO audit platform for a seven-brand portfolio: real-browser crawling, a scoring model where every weight traces to a public source, and paste-ready copy fixes.",
+    "Internal SEO audit platform across seven brands: real-browser crawling, a score where every weight traces to a public source, and paste-ready copy fixes.",
   links: [],
 };
 
