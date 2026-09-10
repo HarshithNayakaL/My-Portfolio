@@ -27,6 +27,17 @@ export const config = {
 };
 
 const PAGE_ROUTE = /^\/$|^\/work\/[a-z0-9-]+$|^\/legal\/[a-z0-9-]+$/;
+
+/**
+ * `<route>.md` as well as `<route>/index.md`.
+ *
+ * llms.txt v2 specifies the index.md form for extensionless routes, and that
+ * is what the pages advertise. But the reflex of an agent handed a URL is to
+ * append `.md` to it, and a 404 there reads as "this site has no markdown"
+ * even though every page has had a twin all along. Both spellings now resolve
+ * to the same file; the advertised one stays canonical.
+ */
+const DOT_MD_ROUTE = /^(\/work\/[a-z0-9-]+|\/legal\/[a-z0-9-]+|\/index)\.md$/;
 const HAS_EXTENSION = /\.[a-z0-9]{2,5}$/i;
 
 const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";
@@ -193,6 +204,13 @@ export default function middleware(request: Request) {
 
   const url = new URL(request.url);
   const path = url.pathname.replace(/(.)\/$/, "$1");
+
+  // <route>.md -> <route>/index.md, before the extension guard below sends
+  // anything with a dot straight through to the filesystem.
+  const dotMd = path.match(DOT_MD_ROUTE);
+  if (dotMd && dotMd[1] !== "/index") {
+    return rewrite(new URL(`${dotMd[1]}/index.md`, url));
+  }
 
   // The API answers in JSON, including when it has nothing to answer with.
   // Its own static .json files carry an extension and pass through untouched.

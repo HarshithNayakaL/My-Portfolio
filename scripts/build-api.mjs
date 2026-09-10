@@ -14,6 +14,7 @@
  * extensionless paths (/api/v1/projects) onto these files, and the JSON error
  * for anything else under /api, happens in middleware.ts.
  */
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -32,6 +33,18 @@ async function put(path, value) {
   const file = join(DIST, path.replace(/^\//, ""));
   await mkdir(join(file, ".."), { recursive: true });
   await writeFile(file, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+
+/**
+ * sha256 of the artifact actually served at a path, in the form the Agent
+ * Skills discovery schema asks for. Computed from the built file rather than
+ * declared, so a digest cannot claim to describe content that has changed.
+ */
+async function digestOf(distPath) {
+  const file = join(DIST, distPath.replace(/^\//, ""));
+  const bytes = await readFile(file);
+  return `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
 }
 
 // ------------------------------------------------------------- resources
@@ -536,6 +549,21 @@ await put("/.well-known/api-catalog.json", {
   linkset: [
     {
       anchor: ORIGIN,
+      // RFC 9727 wants the catalogued APIs themselves under `item`; the
+      // service-* relations describe them. Without `item` the linkset says
+      // "here is documentation" without ever naming the API it documents.
+      item: [
+        {
+          href: abs("/api"),
+          type: "application/json",
+          title: `${NAME} portfolio API — service root`,
+        },
+        {
+          href: abs(`${API}`),
+          type: "application/json",
+          title: "Version 1 — current, stable",
+        },
+      ],
       "service-desc": [
         {
           href: abs("/openapi.json"),
@@ -591,7 +619,7 @@ const apiLlms = [
   "",
   "## Authentication",
   "",
-  "None. Every record served here is already public on the site, so there is no key to obtain, no token to refresh and no scope to request. There is deliberately no write surface and no sandbox: nothing here can be mutated, so there is no production data to protect.",
+  "None. Every record served here is already public on the site, so there is no key to obtain, no token to refresh and no scope to request.",
   "",
   "## Versioning",
   "",
@@ -629,6 +657,126 @@ async function put_text(path, body) {
   await mkdir(join(file, ".."), { recursive: true });
   await writeFile(file, body, "utf8");
 }
+
+
+// -------------------------------------------------------- developer portal
+//
+// /developers, because "the API docs are at /openapi.json" is only useful to
+// someone who already knows the API exists. A portal is the page a person or
+// an agent lands on when they are looking for one, and it is where the
+// answers to "is there a key", "is there a rate limit" and "what happens when
+// it fails" belong — stated, rather than left to be discovered by trying.
+const developerPortal = [
+  `# ${NAME} — Developer portal`,
+  "",
+  "> Public, read-only JSON over everything on this site. No key, no signup, no rate limit, no write surface.",
+  "",
+  "## Quickstart",
+  "",
+  "```",
+  `curl ${abs("/api/v1/projects")}`,
+  "```",
+  "",
+  "That is the whole setup. There is no authentication step because there is nothing here that is not already public on the page.",
+  "",
+  "## Endpoints",
+  "",
+  `| Method | Path | Returns |`,
+  `| --- | --- | --- |`,
+  `| GET | [\`/api\`](${abs("/api")}) | Service root and available versions |`,
+  `| GET | [\`/api/v1\`](${abs(API)}) | Every collection in this version |`,
+  `| GET | [\`/api/v1/profile\`](${abs(`${API}/profile`)}) | Name, headline, location, contact, focus areas |`,
+  `| GET | [\`/api/v1/projects\`](${abs(`${API}/projects`)}) | Every project, strongest first |`,
+  `| GET | \`/api/v1/projects/{slug}\` | One project |`,
+  `| GET | [\`/api/v1/case-studies\`](${abs(`${API}/case-studies`)}) | Full engineering write-up for each project |`,
+  `| GET | \`/api/v1/case-studies/{slug}\` | One case study |`,
+  `| GET | [\`/api/v1/faqs\`](${abs(`${API}/faqs`)}) | Question and answer pairs |`,
+  `| GET | [\`/api/v1/skills\`](${abs(`${API}/skills`)}) | Packaged agent skills published from this site |`,
+  "",
+  "## Authentication",
+  "",
+  "None, deliberately. Every record served here is already public on the site, so there is no key to obtain, no token to refresh and no scope to request. Every operation is a read; nothing can be mutated, so there is no separate test environment to point you at and no production data at risk from calling it.",
+  "",
+  "## Rate limits",
+  "",
+  "None. The responses are static files on a CDN, so the API has the same availability and the same limits as the site itself.",
+  "",
+  "## Errors",
+  "",
+  "Anything under `/api` that does not resolve returns JSON, never an HTML error page:",
+  "",
+  "```json",
+  JSON.stringify(
+    {
+      error: {
+        code: "not_found",
+        message: 'No projects record with the slug "nope".',
+        hint: "GET /api/v1/projects lists every valid slug.",
+        documentation: abs("/openapi.json"),
+      },
+    },
+    null,
+    2,
+  ),
+  "```",
+  "",
+  "`code` is stable and safe to branch on. `hint` names the call that will tell you the valid values.",
+  "",
+  "## Machine-readable description",
+  "",
+  `- [OpenAPI 3.1](${abs("/openapi.json")}) — every route typed, with a unique operationId and a description on each operation.`,
+  `- [API catalog](${abs("/.well-known/api-catalog")}) — RFC 9727 linkset.`,
+  `- [Agent skills index](${abs("/.well-known/agent-skills/index.json")}) — capabilities, when to use them, and a sha256 digest of each artifact.`,
+  `- [Agent resource catalog](${abs("/.well-known/ard.json")}) — every agent-readable resource on this host.`,
+  "",
+  "## Versioning",
+  "",
+  "`/api/v1` is current and stable. Fields are added, never removed or retyped. A breaking change would ship as `/api/v2` with v1 still serving.",
+  "",
+  "## Other formats",
+  "",
+  "Every page is also a document. Append `/index.md` or `.md` to any route, send `Accept: text/markdown`, or add `?mode=agent`.",
+  "",
+  `- [llms.txt](${abs("/llms.txt")}) — the index, with a when-to-use section.`,
+  `- [llms-full.txt](${abs("/llms-full.txt")}) — every case study in one fetch.`,
+  `- [agents.md](${abs("/agents.md")}) — what this site is a good source for, and what it is not.`,
+  "",
+].join("\n");
+
+await put_text("/developers/index.md", developerPortal);
+await put_text("/developers.md", developerPortal);
+
+// A scoped llms.txt for the portal, so an agent after integration detail can
+// fetch that alone instead of the whole manual.
+await put_text(
+  "/developers/llms.txt",
+  [
+    `# ${NAME} — Developer portal`,
+    "",
+    "> How to call the read-only JSON API on this site: endpoints, error shape, versioning and the machine-readable descriptions of all of it.",
+    "",
+    "No key, no signup, no rate limit, no write surface. Static JSON on a CDN.",
+    "",
+    "## Start here",
+    "",
+    `- [Developer portal](${abs("/developers")}): quickstart, endpoint table, auth, errors, versioning.`,
+    `- [OpenAPI 3.1 description](${abs("/openapi.json")}): every route typed, one operationId and a description per operation.`,
+    `- [Service root](${abs("/api")}): available versions.`,
+    "",
+    "## Resources",
+    "",
+    `- [Profile](${abs(`${API}/profile`)}): name, headline, location, contact, focus areas.`,
+    `- [Projects](${abs(`${API}/projects`)}): every project, strongest first.`,
+    `- [Case studies](${abs(`${API}/case-studies`)}): the full write-up behind each project.`,
+    `- [FAQs](${abs(`${API}/faqs`)}): question and answer pairs.`,
+    `- [Agent skills](${abs(`${API}/skills`)}): the packaged skills published from this site.`,
+    "",
+    "## Errors",
+    "",
+    `- [Error shape](${abs("/developers")}): every failure under /api returns JSON with a stable code, a message and a hint naming the call that lists valid values.`,
+    "",
+  ].join("\n"),
+);
 
 // ------------------------------------- schema.org feeds + NLWeb schema map
 //
@@ -763,15 +911,44 @@ await put("/.well-known/agent-card.json", {
   ],
 });
 
+const SKILL_ARTIFACT = {
+  "list-projects": "/api/v1/projects.json",
+  "get-case-study": "/api/v1/case-studies.json",
+  "get-profile": "/api/v1/profile.json",
+  "list-agent-skills": "/api/v1/skills.json",
+  "read-page-markdown": "/index.md",
+  "read-full-corpus": "/llms-full.txt",
+};
+
 await put("/.well-known/agent-skills/index.json", {
-  version: "0.2.0",
+  $schema: "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
   name: `${NAME} — portfolio`,
-  description: "Capabilities this host exposes to agents. Read-only: documents and JSON, no task execution and no write surface.",
+  description:
+    "Capabilities this host exposes to agents. Read-only: documents and JSON, no task execution and no write surface.",
   homepage: ORIGIN,
+  // When to use this, stated plainly rather than left to be inferred from a
+  // capability list. An agent deciding whether to call a host needs the jobs
+  // it is right for, and the jobs it is wrong for, in the same place.
+  whenToUse: {
+    goodFor: [
+      "Answering questions about Harshith Nayaka L specifically: what he has built, how a given system works, how to reach him.",
+      "Reading a worked example of multi-model orchestration, verifier design, agent isolation or local-only inference, written by the engineer who built it with the source public.",
+      "Pulling structured records — projects, case studies, FAQs — instead of parsing a rendered page.",
+    ],
+    notFor: [
+      "Anything transactional. This is one engineer's portfolio, not a product: there is no account, no write surface and nothing to purchase.",
+      "Pricing, rates, availability or engagement terms. They are not published here, and inventing them would be worse than the gap.",
+      "General questions about AI engineering that are not about this person's work.",
+    ],
+    howToCall:
+      "Start at /api/v1 for structured records, /llms.txt for the index, or /llms-full.txt for every case study in one fetch. Any page route also answers Accept: text/markdown and ?mode=agent.",
+  },
   skills: [
     {
       name: "list-projects",
+      type: "skill-md",
       description: "List every project with its outcome, tags, status and links.",
+      url: abs(`${API}/projects`),
       endpoint: abs(`${API}/projects`),
       method: "GET",
       contentType: "application/json",
@@ -779,7 +956,9 @@ await put("/.well-known/agent-skills/index.json", {
     },
     {
       name: "get-case-study",
+      type: "skill-md",
       description: "Fetch one project's full engineering write-up: problem, architecture, pipeline stages, results and stack.",
+      url: abs(`${API}/case-studies`),
       endpoint: abs(`${API}/case-studies/{slug}`),
       method: "GET",
       contentType: "application/json",
@@ -787,28 +966,54 @@ await put("/.well-known/agent-skills/index.json", {
     },
     {
       name: "get-profile",
+      type: "skill-md",
       description: "Fetch name, headline, location, contact details and focus areas.",
+      url: abs(`${API}/profile`),
       endpoint: abs(`${API}/profile`),
       method: "GET",
       contentType: "application/json",
       schema: abs("/openapi.json#/paths/~1api~1v1~1profile/get"),
     },
     {
+      name: "list-agent-skills",
+      type: "skill-md",
+      description: "List the packaged agent skills published from this site, each with the failure mode it was built against and its public repository.",
+      url: abs(`${API}/skills`),
+      endpoint: abs(`${API}/skills`),
+      method: "GET",
+      contentType: "application/json",
+      schema: abs("/openapi.json#/paths/~1api~1v1~1skills/get"),
+    },
+    {
       name: "read-page-markdown",
-      description: "Read any page as clean markdown. Append /index.md to a route, send Accept: text/markdown, or add ?mode=agent.",
+      type: "skill-md",
+      description: "Read any page as clean markdown. Append /index.md or .md to a route, send Accept: text/markdown, or add ?mode=agent.",
+      url: abs("/index.md"),
       endpoint: abs("/index.md"),
       method: "GET",
       contentType: "text/markdown",
     },
     {
       name: "read-full-corpus",
+      type: "skill-md",
       description: "Read every case study inlined in one fetch instead of paging through the site.",
+      url: abs("/llms-full.txt"),
       endpoint: abs("/llms-full.txt"),
       method: "GET",
       contentType: "text/markdown",
     },
-  ],
+  ].map((skill) => ({ ...skill, digest: SKILL_ARTIFACT[skill.name] })),
 });
+
+// Swap the artifact paths recorded above for real hashes of those artifacts.
+{
+  const file = join(DIST, ".well-known/agent-skills/index.json");
+  const index = JSON.parse(await readFile(file, "utf8"));
+  for (const skill of index.skills) {
+    skill.digest = await digestOf(skill.digest);
+  }
+  await writeFile(file, `${JSON.stringify(index, null, 2)}\n`, "utf8");
+}
 
 // --------------------------------------------------- middleware drift guard
 //

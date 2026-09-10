@@ -24,6 +24,7 @@ const legal = [
  * a person curious about how the site is built can read the same things.
  */
 const forAgents = [
+  { href: "/developers", label: "Developer portal" },
   { href: "/api", label: "JSON API" },
   { href: "/openapi.json", label: "OpenAPI 3.1" },
   { href: "/llms.txt", label: "llms.txt" },

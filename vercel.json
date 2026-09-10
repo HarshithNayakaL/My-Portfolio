@@ -188,6 +188,23 @@
       ]
     },
     {
+      "source": "/(developers|docs)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        },
+        {
+          "key": "Link",
+          "value": "</openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\""
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/.well-known/api-catalog",
       "headers": [
         {
@@ -372,6 +389,14 @@
     {
       "source": "/.well-known/api-catalog",
       "destination": "/.well-known/api-catalog.json"
+    },
+    {
+      "source": "/developers",
+      "destination": "/developers/index.md"
+    },
+    {
+      "source": "/docs",
+      "destination": "/developers/index.md"
     }
   ]
 }
