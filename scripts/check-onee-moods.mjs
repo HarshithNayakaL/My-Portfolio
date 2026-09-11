@@ -36,6 +36,9 @@ const base = () => ({
   poke: { at: -Infinity, streak: 0, total: 0 },
   bornAt: NOW - 10_000,
   firstFootAt: Infinity,
+  travelling: false,
+  arrivedAt: -Infinity,
+  beat: 0,
 });
 const withPointer = (s, extra) => ({ ...s, pointer: { ...s.pointer, inside: true, ...extra } });
 const poked = (s, total, streak = 1) => ({ ...s, poke: { at: NOW - 200, streak, total } });
@@ -60,6 +63,8 @@ const scenarios = {
   bored: (s) => ({ ...s, lastInputAt: NOW - 20_000 }),
   drowsy: (s) => ({ ...s, lastInputAt: NOW - 45_000 }),
   sleeping: (s) => ({ ...s, lastInputAt: NOW - 80_000 }),
+  travelling: (s) => ({ ...s, travelling: true }),
+  arriving: (s) => ({ ...s, arrivedAt: NOW - 300 }),
   working: (s) => ({ ...s, section: "work" }),
   thinking: (s) => ({ ...s, section: "capabilities" }),
   curious: (s) => ({ ...s, section: "about" }),
@@ -70,12 +75,23 @@ const scenarios = {
 let failures = 0;
 const reached = new Set();
 
-for (const [want, build] of Object.entries(scenarios)) {
-  const got = readMood(build(base())).animation;
+// A scenario named after an animation must produce it. The two named for a
+// situation instead assert the head of the pool that situation draws from.
+const POOL_HEADS = { travelling: "searching", arriving: "happy" };
+
+for (const [name, build] of Object.entries(scenarios)) {
+  const want = POOL_HEADS[name] ?? name;
+  const senses = build(base());
+  const got = readMood(senses).animation;
   reached.add(got);
   if (got !== want) {
-    console.error(`  FAIL  scenario "${want}" produced "${got}"`);
+    console.error(`  FAIL  scenario "${name}" produced "${got}", expected "${want}"`);
     failures += 1;
+  }
+  // Ambient moods rotate, so every entry in the pool has to be a real
+  // animation and every one of them has to be reachable.
+  for (let beat = 1; beat < 12; beat += 1) {
+    reached.add(readMood({ ...senses, beat }).animation);
   }
 }
 

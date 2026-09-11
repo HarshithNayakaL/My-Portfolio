@@ -16,8 +16,8 @@ import { createOneeRuntime, restingScene, type OneeAnimation } from "./oneeRunti
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-// Layout. Onee keeps clear of the nav, hugs the edges, and is small enough
-// that trailing a cursor never puts it on top of what you are reading.
+// Layout. The nav is the one place Onee may never go; everywhere else in the
+// window is fair game, subject to the hit test in `isFree` below.
 const TOP_LIMIT = 104;
 const EDGE = 18;
 const BUBBLE = 96; // personal space it backs out of
@@ -25,8 +25,25 @@ const TRAIL = 232; // how far behind the pointer it prefers to sit
 
 // Spring. Slack enough to read as an animal ambling after you rather than a
 // cursor attachment.
-const PULL = 0.07;
-const DRAG = 0.84;
+const PULL = 0.062;
+const DRAG = 0.86;
+// Crossing the screen gets a stiffer, looser spring so a trip reads as a
+// deliberate scurry with a little overshoot at the end, not a slow slide.
+const PULL_TRAVEL = 0.1;
+const DRAG_TRAVEL = 0.84;
+const ARRIVED_WITHIN = 26; // px from the perch before it counts as landed
+
+// How long Onee stays somewhere before finding a new spot, and how often the
+// ambient mood pools step forward.
+const PERCH_MIN_MS = 2_600;
+const PERCH_MAX_MS = 5_400;
+// Retried sooner than a full stay when there was nowhere free to go, so a
+// crowded screen doesn't pin Onee in one corner for twenty seconds.
+const PERCH_RETRY_MS = 1_100;
+const BEAT_MS = 2_900;
+
+// A perch has to be this far away to be worth the trip.
+const PERCH_TRAVEL_MIN = 170;
 
 // Scroll momentum. Each scrolled pixel adds to a lag that bleeds off over
 // about a second. Using the accumulated lag rather than instantaneous speed is
@@ -151,6 +168,9 @@ export function mountOnee(host: HTMLElement): () => void {
     poke: { at: -Infinity, streak: 0, total: 0 },
     bornAt: now0,
     firstFootAt: Infinity,
+    travelling: false,
+    arrivedAt: now0,
+    beat: 0,
   };
 
   // Whether Onee chases a cursor or rides the scroll is decided by the events
@@ -165,8 +185,11 @@ export function mountOnee(host: HTMLElement): () => void {
   let pos = { x: 0, y: 0 };
   const vel = { x: 0, y: 0 };
   let lag = 0;
-  let side: 1 | -1 = 1;
   let size = 72;
+  let perch = { x: 0, y: 0 };
+  let perchUntil = 0;
+  let checkedAt = 0;
+  let spotIsFree = true;
 
   const measure = () => {
     size = shell.offsetWidth || 72;
@@ -179,6 +202,159 @@ export function mountOnee(host: HTMLElement): () => void {
 
   pos = home();
   measure();
+  perch = { ...pos };
+
+  // --- where it is allowed to stand ---------------------------------------
+  // Onee roams the whole window, not a safe strip along the bottom, which
+  // means it has to know what is underneath before it lands. Candidate spots
+  // are hit-tested against the real page: anything resting on a word, a link
+  // or a button is thrown out, so it ends up in the margins, the gaps between
+  // sections and the empty half of a split layout — wherever those happen to
+  // be on the page you are actually reading.
+  const INTERACTIVE = "a[href], button, input, textarea, select";
+  const PAINTED = "img, svg, video, canvas";
+  // Onee takes pointer events so it can be poked, which means a naive
+  // elementFromPoint at a spot it already occupies returns Onee and reports
+  // clear space. Looking past the host layer is what makes the test mean
+  // "what is under Onee" rather than "is Onee there".
+  const under = (x: number, y: number) =>
+    document.elementsFromPoint(x, y).find((node) => !host.contains(node)) ?? null;
+
+  // Where the words on an element actually are. Measured, not inferred from
+  // the tag or from whether the element holds text somewhere, because the work
+  // rows stretch a link's hit area across the whole row with an `::after`
+  // overlay: every point in the row returns that <a>, and asking the <a>
+  // whether it contains text answers yes for a spot 400px from the title.
+  // Ranges give the real rectangles the glyphs occupy.
+  const textCache = new Map<Element, DOMRect[]>();
+  const wordRects = (el: Element) => {
+    const cached = textCache.get(el);
+    if (cached) return cached;
+    const rects: DOMRect[] = [];
+    for (const node of el.childNodes) {
+      if (node.nodeType !== 3 || !node.textContent?.trim()) continue;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      for (const box of range.getClientRects()) {
+        if (box.width > 1 && box.height > 1) rects.push(box);
+      }
+    }
+    textCache.set(el, rects);
+    return rects;
+  };
+
+  const onWords = (el: Element, x: number, y: number) => {
+    const pad = 6;
+    for (const r of wordRects(el)) {
+      if (x >= r.left - pad && x <= r.right + pad && y >= r.top - pad && y <= r.bottom + pad) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * What it would cost Onee to stand here — 0 is empty page.
+   *
+   * Scored rather than pass/fail because a strict test has a failure mode
+   * worse than the thing it prevents: on the work list every row carries a
+   * full-bleed link overlay, so nothing anywhere passed, no new spot was ever
+   * chosen, and Onee sat frozen on a project title for the length of the
+   * section. Scoring always yields a least-bad answer, so it keeps moving.
+   *
+   * Words cost more than click targets on purpose. Covering a word makes the
+   * page unreadable; overlapping a link that already spans the whole row costs
+   * a 96px patch of a target you can still hit anywhere else along it.
+   */
+  const spotCost = (x: number, y: number) => {
+    const r = size * 0.34;
+    let cost = 0;
+    for (const [px, py] of [
+      [x, y],
+      [x - r, y],
+      [x + r, y],
+      [x, y - r],
+      [x, y + r],
+    ]) {
+      const hit = under(px, py);
+      if (!hit) {
+        cost += 4; // outside the window
+        continue;
+      }
+      if (hit.closest(PAINTED) || onWords(hit, px, py)) cost += 3;
+      else if (hit.closest(INTERACTIVE)) cost += 2;
+    }
+    return cost;
+  };
+
+  const isFree = (x: number, y: number) => spotCost(x, y) === 0;
+
+  // Choosing a spot is spread over frames rather than done in one go. The
+  // search is ~40 candidates at five hit tests each, and every hit test
+  // resolves layout; running the lot inside a single frame cost 121ms on a
+  // throttled phone — one dropped frame every few seconds, which is precisely
+  // the jank a decoration has no right to introduce. A handful of candidates
+  // per frame costs nothing measurable and the answer is still ready in a
+  // fifth of a second, which is faster than anyone can notice Onee deciding.
+  const SEARCH_CANDIDATES = 40;
+  const SEARCH_PER_FRAME = 4;
+
+  type Spot = { x: number; y: number };
+  let search: {
+    tried: number;
+    best: Spot | null;
+    bestCost: number;
+    near: Spot | null;
+    nearCost: number;
+  } | null = null;
+
+  const beginSearch = () => {
+    // Rectangles are viewport-relative and the page moves under them, so the
+    // measurements only hold for the length of one search.
+    textCache.clear();
+    search = { tried: 0, best: null, bestCost: Infinity, near: null, nearCost: Infinity };
+  };
+
+  /**
+   * Advance the hunt for somewhere to stand. Returns the chosen spot once the
+   * search finishes, null while it is still looking or if nowhere will do.
+   */
+  const stepSearch = (): Spot | null | undefined => {
+    if (!search) return undefined;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const minX = EDGE + size / 2;
+    const maxX = vw - EDGE - size / 2;
+    const minY = TOP_LIMIT + size / 2;
+    const maxY = vh - EDGE - size / 2;
+    if (maxX <= minX || maxY <= minY) {
+      search = null;
+      return null;
+    }
+
+    for (let i = 0; i < SEARCH_PER_FRAME && search.tried < SEARCH_CANDIDATES; i += 1) {
+      search.tried += 1;
+      const x = minX + Math.random() * (maxX - minX);
+      const y = minY + Math.random() * (maxY - minY);
+      const cost = spotCost(x, y);
+      // Somewhere far enough away that the trip is worth watching.
+      if (Math.hypot(x - pos.x, y - pos.y) > PERCH_TRAVEL_MIN) {
+        if (cost < search.bestCost) {
+          search.bestCost = cost;
+          search.best = { x, y };
+        }
+      } else if (cost < search.nearCost) {
+        search.nearCost = cost;
+        search.near = { x, y };
+      }
+      if (search.bestCost === 0) break; // empty page, nothing will beat it
+    }
+
+    if (search.bestCost > 0 && search.tried < SEARCH_CANDIDATES) return undefined;
+    const chosen = search.best ?? search.near;
+    search = null;
+    return chosen;
+  };
 
   // --- listeners ----------------------------------------------------------
   const stir = () => {
@@ -259,6 +435,8 @@ export function mountOnee(host: HTMLElement): () => void {
 
   const onResize = () => {
     measure();
+    perchUntil = 0; // the layout moved; find somewhere that is still empty
+
     pos.x = clamp(pos.x, EDGE + size / 2, window.innerWidth - EDGE - size / 2);
     pos.y = clamp(pos.y, TOP_LIMIT, window.innerHeight - EDGE - size / 2);
   };
@@ -304,82 +482,120 @@ export function mountOnee(host: HTMLElement): () => void {
     // --- where it wants to be
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-
-    // The roaming band: the lower part of the viewport, clear of the nav.
-    // Onee is confined to it unless the cursor comes down to join it. Letting
-    // it trail a cursor freely in two dimensions looked right in the abstract
-    // and was wrong on the page — it parked on the middle of the H1 and ate a
-    // word. A character that wanders is charming; one that covers the headline
-    // is a bug wearing a costume.
     const floor = vh - EDGE - size / 2;
-    const ceiling = Math.min(floor, Math.max(TOP_LIMIT + size / 2, vh * 0.68));
 
-    // Idle patrol. The exponent biases the sweep toward the ends of its travel,
-    // so Onee loiters near the left and right edges — where the margins are —
-    // and crosses the middle of the column briskly instead of parking in it.
-    const swing = Math.sin(t / 11_000);
-    const edged = Math.sign(swing) * Math.abs(swing) ** 0.35;
-    const sweepX = vw / 2 + edged * (vw / 2 - EDGE - size / 2);
-    const sweepY = ceiling + (Math.sin(t / 7_300 + 1.2) * 0.5 + 0.5) * (floor - ceiling);
-
-    // Scrolling drags Onee behind — down the page pulls it up the screen — and
-    // it glides back down once the scrolling stops. That lag is what makes it
-    // read as being carried along rather than pinned to the glass, and on a
-    // touch device it is the only movement cue there is.
-    const dragged = sweepY - clamp(lag, -LAG_LIMIT, LAG_LIMIT);
+    // Is anyone actually steering? A cursor that hasn't moved in a couple of
+    // seconds means somebody is reading, not playing, and Onee should go back
+    // to its own business instead of hovering at their elbow for the rest of
+    // the page. This one condition is most of what makes it feel alive rather
+    // than tethered.
+    const engaged = roams && senses.pointer.inside && t - lastMove.t < 2_400;
 
     let tx: number;
     let ty: number;
 
-    if (roams && senses.pointer.inside) {
+    if (engaged) {
+      // Following. Onee keeps to a distance it likes, backing off when
+      // crowded and ambling over when left behind — but it shadows the cursor
+      // sideways rather than climbing after it, because trailing a cursor
+      // freely in two dimensions parked it on the middle of the H1 and ate a
+      // word. A character that wanders is charming; one that covers the
+      // headline is a bug wearing a costume.
       const dx = pos.x - senses.pointer.x;
       const dy = pos.y - senses.pointer.y;
       const d = Math.hypot(dx, dy) || 1;
+      const nx = dx / d;
+      const ny = dy / d;
 
-      if (senses.pointer.y > ceiling - 60) {
-        // The cursor has come down into Onee's band, so it gets the run of two
-        // dimensions: back off if crowded, amble over if left behind, potter
-        // about if the distance is comfortable.
-        const nx = dx / d;
-        const ny = dy / d;
-        if (d < BUBBLE) {
-          tx = senses.pointer.x + nx * BUBBLE * 1.9;
-          ty = senses.pointer.y + ny * BUBBLE * 1.9;
-        } else if (d > TRAIL) {
-          tx = senses.pointer.x + nx * TRAIL * 0.82;
-          ty = senses.pointer.y + ny * TRAIL * 0.82;
-        } else {
-          tx = pos.x + Math.sin(t / 3_300) * 12;
-          ty = pos.y + Math.sin(t / 2_450 + 1.7) * 9;
-        }
-        // Even backing away from a crowding cursor, it stays in the band —
-        // fleeing upward is how it ended up on the headline in the first place.
-        ty = clamp(ty, ceiling, floor);
+      if (d < BUBBLE) {
+        tx = senses.pointer.x + nx * BUBBLE * 1.9;
+        ty = senses.pointer.y + ny * BUBBLE * 1.9;
+      } else if (d > TRAIL) {
+        tx = senses.pointer.x + nx * TRAIL * 0.82;
+        ty = senses.pointer.y + ny * TRAIL * 0.82;
       } else {
-        // The cursor is up in the reading area. Onee shadows it left and right
-        // but stays low, so it is visibly tracking you without climbing over
-        // the thing you are reading. The side it sits on only flips once the
-        // cursor is well past it, or it would jitter across the cursor every
-        // time the two lined up.
-        if (Math.abs(dx) > 48) side = Math.sign(dx) as 1 | -1;
-        tx = senses.pointer.x + side * TRAIL * 0.6;
-        ty = dragged;
+        tx = pos.x + Math.sin(t / 2_100) * 16;
+        ty = pos.y + Math.sin(t / 1_700 + 1.7) * 12;
       }
+      // It may only settle beside the cursor where the page is empty; if the
+      // spot it wants is on top of something, it holds its current perch and
+      // watches from there instead. Throttled hard: `isFree` is five hit tests,
+      // each of which resolves layout, and running that every frame while the
+      // cursor moves is three hundred forced layouts a second for a decoration.
+      if (t - checkedAt > 200) {
+        checkedAt = t;
+        // Same reason as in beginSearch: the rectangles are viewport-relative and
+        // the page scrolls under them. Clearing also stops the cache holding
+        // references to elements a route change has already thrown away.
+        textCache.clear();
+        spotIsFree = isFree(clamp(tx, 0, vw), clamp(ty, 0, vh));
+      }
+      if (!spotIsFree) {
+        tx = perch.x;
+        ty = perch.y;
+      }
+      perch = { x: pos.x, y: pos.y };
+      perchUntil = t + PERCH_MIN_MS;
     } else {
-      tx = sweepX;
-      ty = dragged;
+      // Left to itself, Onee goes places: it picks an empty spot anywhere in
+      // the window, crosses to it, hangs about for a few seconds and moves on.
+      if (t > perchUntil && !search) beginSearch();
+      const found = stepSearch();
+      if (found !== undefined) {
+        if (found) {
+          perch = found;
+          perchUntil = t + PERCH_MIN_MS + Math.random() * (PERCH_MAX_MS - PERCH_MIN_MS);
+        } else {
+          perchUntil = t + PERCH_RETRY_MS;
+        }
+      }
+      // Fidgets around the spot rather than standing on it. Being perfectly
+      // still between trips is what made it read as a sticker between moves.
+      tx = perch.x + Math.sin(t / 2_300) * 15;
+      // Scrolling drags it behind — down the page pulls it up the screen — and
+      // it glides back once the scrolling stops. That lag is what makes it read
+      // as being carried along rather than pinned to the glass, and on a touch
+      // device it is the only movement cue there is.
+      ty = perch.y + Math.sin(t / 1_900 + 0.8) * 11 - clamp(lag, -LAG_LIMIT, LAG_LIMIT);
     }
 
-    // Scroll momentum is the one thing allowed above the band: it is transient,
-    // and nothing on a page mid-flick is being read anyway. The nav is never
-    // negotiable.
-    tx = clamp(tx, EDGE + size / 2, vw - EDGE - size / 2);
-    ty = clamp(ty, TOP_LIMIT + size / 2, floor);
+    const minX = EDGE + size / 2;
+    const maxX = vw - EDGE - size / 2;
+    const minY = TOP_LIMIT + size / 2;
+    tx = clamp(tx, minX, maxX);
+    ty = clamp(ty, minY, floor);
 
-    vel.x = (vel.x + (tx - pos.x) * PULL) * DRAG;
-    vel.y = (vel.y + (ty - pos.y) * PULL) * DRAG;
+    // --- the trip
+    const gap = Math.hypot(tx - pos.x, ty - pos.y);
+    const wasTravelling = senses.travelling;
+    senses.travelling = gap > ARRIVED_WITHIN * 2.6;
+    if (wasTravelling && !senses.travelling) senses.arrivedAt = t;
+    senses.beat = Math.floor(t / BEAT_MS);
+
+    const pull = senses.travelling ? PULL_TRAVEL : PULL;
+    const drag = senses.travelling ? DRAG_TRAVEL : DRAG;
+    vel.x = (vel.x + (tx - pos.x) * pull) * drag;
+    vel.y = (vel.y + (ty - pos.y) * pull) * drag;
     pos.x += vel.x;
     pos.y += vel.y;
+
+    // The walls are on the position, not just the target. A spring tuned to
+    // overshoot on arrival will sail past a clamped target — which is how Onee
+    // ended up 130px off the right edge and tucked behind the nav. Bouncing
+    // off rather than sticking keeps the overshoot, which is the part that
+    // makes a trip look like a scurry.
+    for (const [key, lo, hi] of [
+      ["x", minX, maxX],
+      ["y", minY, floor],
+    ] as const) {
+      if (pos[key] < lo) {
+        pos[key] = lo;
+        vel[key] *= -0.35;
+      } else if (pos[key] > hi) {
+        pos[key] = hi;
+        vel[key] *= -0.35;
+      }
+    }
 
     // Leans into its own motion, and breathes.
     const tilt = clamp(vel.x * 1.2, -16, 16);

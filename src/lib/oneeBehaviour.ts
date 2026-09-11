@@ -2,9 +2,12 @@
  * Onee's mind.
  *
  * Every one of the 23 animations in the definition is reachable from something
- * a visitor actually does, and each rule below is the only route to its
- * animation unless noted. Kept apart from onee.ts so the state machine can be
- * read as a list of moods rather than picked out of a frame loop.
+ * a visitor actually does — scripts/check-onee-moods.mjs fails the check if one
+ * stops being. Several are reachable more than one way, because the ambient
+ * pools deal most of them out as well; what matters is that none is dead.
+ *
+ * Kept apart from onee.ts so the state machine can be read as a list of moods
+ * rather than picked out of a frame loop.
  */
 import type { OneeAnimation } from "./oneeRuntime";
 
@@ -31,6 +34,12 @@ export type Senses = {
   bornAt: number;
   /** First time the visitor has ever reached the foot of the page this visit. */
   firstFootAt: number;
+  /** True while Onee is crossing the screen to a new spot. */
+  travelling: boolean;
+  /** When it last finished a crossing, so arriving somewhere gets its own beat. */
+  arrivedAt: number;
+  /** Ticks every few seconds. Ambient moods step through their pool on it. */
+  beat: number;
 };
 
 export type Mood = { animation: OneeAnimation; until?: number };
@@ -38,7 +47,7 @@ export type Mood = { animation: OneeAnimation; until?: number };
 // How long a reaction owns the face before the next rule gets a say. Without a
 // floor, a pointer skimming past would flicker Onee through four animations in
 // half a second and read as a glitch rather than a character.
-export const DWELL_MS = 900;
+export const DWELL_MS = 700;
 
 const REACTIONS: OneeAnimation[] = [
   "playful",
@@ -61,15 +70,40 @@ const LUNGE = 1_100; // px/s of pointer speed that reads as a charge
 const STARTLE = 1_900; // px/s that reads as a jump-scare
 const SCAN = 1_500; // px/s of scrolling that reads as hunting for something
 
-const SECTION_MOODS: Record<string, OneeAnimation> = {
-  work: "working",
-  capabilities: "thinking",
-  approach: "thinking",
-  skills: "searching",
-  about: "curious",
-  faq: "listening",
-  contact: "happy",
+// Ambient moods come in pools rather than one animation per situation, and
+// step through them on `beat`. Holding a single animation for as long as
+// somebody reads a section is technically correct and reads as a screensaver;
+// a character sat at a desk fidgets. The first entry is the section's
+// signature mood, so the pools stay legible and the guard can assert them.
+const SECTION_POOLS: Record<string, OneeAnimation[]> = {
+  work: ["working", "thinking", "curious", "working", "proud", "listening"],
+  capabilities: ["thinking", "working", "listening", "curious", "thinking"],
+  approach: ["thinking", "curious", "listening", "thinking", "working"],
+  skills: ["searching", "thinking", "excited", "curious", "searching", "proud"],
+  about: ["curious", "listening", "shy", "happy", "curious", "playful"],
+  faq: ["listening", "thinking", "confused", "curious", "listening"],
+  contact: ["happy", "excited", "playful", "celebrate", "happy", "laughing"],
 };
+
+// Nothing in particular on screen — still no reason to stand perfectly still.
+const AMBIENT: OneeAnimation[] = [
+  "idle",
+  "curious",
+  "listening",
+  "idle",
+  "thinking",
+  "playful",
+  "idle",
+  "searching",
+];
+
+// Landing somewhere new is worth a beat of its own, and crossing the screen
+// should look like going somewhere rather than sliding.
+const ARRIVALS: OneeAnimation[] = ["happy", "playful", "proud", "excited", "surprised", "curious"];
+const TRAVELLING: OneeAnimation[] = ["searching", "curious"];
+const ARRIVAL_MS = 1_500;
+
+const pick = (pool: OneeAnimation[], beat: number) => pool[beat % pool.length];
 
 /**
  * Pick the animation Onee should be holding. Ordered: the first rule that
@@ -131,9 +165,15 @@ export function readMood(s: Senses): Mood {
   if (sinceInput > DROWSY_AFTER) return { animation: "drowsy" };
   if (sinceInput > BORED_AFTER) return { animation: "bored" };
 
-  // Reading something in particular.
-  const section = s.section ? SECTION_MOODS[s.section] : undefined;
-  if (section) return { animation: section };
+  // Just landed somewhere new — a beat of pleasure at having gone there.
+  if (s.now - s.arrivedAt < ARRIVAL_MS) return { animation: pick(ARRIVALS, s.beat) };
 
-  return { animation: "idle" };
+  // On its way across the screen, so it looks like it is going somewhere.
+  if (s.travelling) return { animation: pick(TRAVELLING, s.beat) };
+
+  // Reading something in particular.
+  const pool = s.section ? SECTION_POOLS[s.section] : undefined;
+  if (pool) return { animation: pick(pool, s.beat) };
+
+  return { animation: pick(AMBIENT, s.beat) };
 }
