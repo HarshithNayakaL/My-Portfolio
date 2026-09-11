@@ -50,6 +50,21 @@ const BEAT_MS = 2_900;
 // A perch has to be this far away to be worth the trip.
 const PERCH_TRAVEL_MIN = 170;
 
+// The things on a page worth looking at. Onee treats the site as somewhere it
+// lives rather than a backdrop it floats over: it notices headings, buttons,
+// links, pictures and the stack pills, looks at them, and prefers to settle
+// beside one rather than in the middle of blank space.
+const INTEREST = "a[href], button, h1, h2, h3, img, .stack-pill";
+const INTEREST_REFRESH_MS = 900;
+// Enough of the page to look around; a cap so a long document does not make
+// the scan proportional to how much has been written.
+const INTEREST_MAX = 48;
+// Close enough to a thing that sitting here reads as sitting *with* it.
+const BESIDE = 210;
+// How long it holds its attention on one thing before glancing at another.
+const LOOK_MIN_MS = 1_400;
+const LOOK_MAX_MS = 3_600;
+
 // Gaze. How far the eyes travel at full deflection, in the solver's own units.
 // Deliberately short of what the face can take: the offset is added on top of
 // whatever eye position the current expression already holds, and the two
@@ -211,6 +226,12 @@ export function mountOnee(host: HTMLElement): () => void {
   let perch = { x: 0, y: 0 };
   let perchUntil = 0;
   let checkedAt = 0;
+  let interests: DOMRect[] = [];
+  let interestsAt = 0;
+  let focus: { x: number; y: number } | null = null;
+  let focusUntil = 0;
+  let hovered: Element | null = null;
+  let hoveredAt: { x: number; y: number } | null = null;
   let spotIsFree = true;
   const gaze: Gaze = { x: 0, y: 0 };
 
@@ -277,6 +298,78 @@ export function mountOnee(host: HTMLElement): () => void {
   };
 
   /**
+   * The things on screen worth a look — refreshed on a throttle rather than
+   * per frame, because it is a query plus a rect read for every match and
+   * both resolve layout.
+   */
+  const refreshInterests = (now: number) => {
+    if (now - interestsAt < INTEREST_REFRESH_MS) return;
+    // Mid-flick every rect is stale by the time it is read, and Onee is busy
+    // being dragged along behind the scroll anyway. Skipping the scan keeps
+    // the one expensive thing it does out of the frames that can least afford
+    // it — the p95 of a scrolling frame was the only place this showed up.
+    if (Math.abs(senses.scroll.speed) > 600 && now - senses.scroll.at < 300) return;
+    interestsAt = now;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const found: DOMRect[] = [];
+    for (const el of document.querySelectorAll(INTEREST)) {
+      if (host.contains(el)) continue;
+      const r = el.getBoundingClientRect();
+      // Offscreen, or too small to be a thing rather than a detail.
+      if (r.width < 16 || r.height < 12) continue;
+      if (r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw) continue;
+      found.push(r);
+      if (found.length >= INTEREST_MAX) break;
+    }
+    interests = found;
+    // The page may have scrolled under the cursor since the hover began.
+    if (hovered) hoveredAt = centreOf(hovered);
+  };
+
+  const centreOf = (target: Element) => {
+    const r = target.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  };
+
+  /** How close the nearest thing worth looking at is to a point. */
+  const nearestInterest = (x: number, y: number) => {
+    let best = Infinity;
+    for (const r of interests) {
+      const dx = Math.max(r.left - x, 0, x - r.right);
+      const dy = Math.max(r.top - y, 0, y - r.bottom);
+      best = Math.min(best, Math.hypot(dx, dy));
+    }
+    return best;
+  };
+
+  /**
+   * Choose something to look at, and hold the look for an uneven beat.
+   *
+   * Weighted towards whatever is nearby, so Onee attends to its own corner of
+   * the page rather than staring across the room, but never at only the
+   * closest thing — always fixating on the nearest object is the tell that
+   * something is running a rule rather than looking around.
+   */
+  const glance = (now: number) => {
+    if (now < focusUntil && focus) return;
+    focusUntil = now + LOOK_MIN_MS + Math.random() * (LOOK_MAX_MS - LOOK_MIN_MS);
+    if (interests.length === 0) {
+      focus = null;
+      return;
+    }
+    const ranked = interests
+      .map((r) => {
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        return { x: cx, y: cy, d: Math.hypot(cx - pos.x, cy - pos.y) };
+      })
+      .sort((a, b) => a.d - b.d)
+      .slice(0, 5);
+    focus = ranked[Math.floor(Math.random() * ranked.length)] ?? null;
+  };
+
+  /**
    * What it would cost Onee to stand here — 0 is empty page.
    *
    * Scored rather than pass/fail because a strict test has a failure mode
@@ -320,7 +413,7 @@ export function mountOnee(host: HTMLElement): () => void {
   // per frame costs nothing measurable and the answer is still ready in a
   // fifth of a second, which is faster than anyone can notice Onee deciding.
   const SEARCH_CANDIDATES = 40;
-  const SEARCH_PER_FRAME = 4;
+  const SEARCH_PER_FRAME = 2;
 
   type Spot = { x: number; y: number };
   let search: {
@@ -335,6 +428,8 @@ export function mountOnee(host: HTMLElement): () => void {
     // Rectangles are viewport-relative and the page moves under them, so the
     // measurements only hold for the length of one search.
     textCache.clear();
+    interestsAt = 0;
+    refreshInterests(performance.now());
     search = { tried: 0, best: null, bestCost: Infinity, near: null, nearCost: Infinity };
   };
 
@@ -359,7 +454,13 @@ export function mountOnee(host: HTMLElement): () => void {
       search.tried += 1;
       const x = minX + Math.random() * (maxX - minX);
       const y = minY + Math.random() * (maxY - minY);
-      const cost = spotCost(x, y);
+      // Empty space beside something — a card, a heading, a button — beats
+      // empty space in the middle of nowhere. This is most of what makes Onee
+      // read as living on the page rather than floating above it: it ends up
+      // perched next to things, the way a cat picks the arm of the sofa over
+      // the middle of the floor. One point of penalty, so it only breaks a tie
+      // between otherwise equally clear spots and never pushes it onto text.
+      const cost = spotCost(x, y) + (nearestInterest(x, y) < BESIDE ? 0 : 1);
       // Somewhere far enough away that the trip is worth watching.
       if (Math.hypot(x - pos.x, y - pos.y) > PERCH_TRAVEL_MIN) {
         if (cost < search.bestCost) {
@@ -420,7 +521,16 @@ export function mountOnee(host: HTMLElement): () => void {
 
   const onOver = (e: Event) => {
     const target = e.target as Element | null;
-    senses.overAction = !!target?.closest?.("a[href], button:not(.onee)");
+    const action = target?.closest?.("a[href], button:not(.onee)") ?? null;
+    senses.overAction = !!action;
+    // Kept so Onee can look at the thing you are reaching for rather than at
+    // the cursor on top of it — the difference between a pet watching your
+    // hand and one watching what your hand is doing. The centre is measured
+    // here and when the interests refresh, never per frame: reading a rect
+    // resolves layout, and doing that sixty times a second for the whole time
+    // a cursor rests on a link is a lot of work to learn nothing new.
+    hovered = action;
+    hoveredAt = action ? centreOf(action) : null;
   };
 
   let lastScroll = { y: window.scrollY, t: now0, dir: 0 };
@@ -621,13 +731,28 @@ export function mountOnee(host: HTMLElement): () => void {
     }
 
     // --- what it is watching
-    // With a pointer on screen Onee watches the pointer. Without one it
-    // watches where it is going, so a touch device gets a character that looks
-    // where it is headed rather than one that stares blankly ahead for the
-    // whole visit. Asleep it watches nothing.
+    // In order: the thing you are reaching for, then you, then whatever it has
+    // wandered off to look at on its own. The last one is the point — a
+    // character that only ever tracks the cursor is an instrument, and one
+    // that looks around at the room it is in is an animal. Asleep it watches
+    // nothing.
     const awake = mood !== "sleeping" && mood !== "drowsy";
-    const atX = senses.pointer.inside ? senses.pointer.x - pos.x : vel.x * 34;
-    const atY = senses.pointer.inside ? senses.pointer.y - pos.y : vel.y * 34;
+    refreshInterests(t);
+    glance(t);
+
+    let lookAt: { x: number; y: number } | null = null;
+    if (hoveredAt && senses.pointer.inside) {
+      lookAt = hoveredAt;
+    } else if (senses.pointer.inside) {
+      lookAt = { x: senses.pointer.x, y: senses.pointer.y };
+    } else if (focus) {
+      lookAt = focus;
+    }
+
+    // With nothing to look at it watches where it is going, so a touch device
+    // still gets a character following its own path rather than staring ahead.
+    const atX = lookAt ? lookAt.x - pos.x : vel.x * 34;
+    const atY = lookAt ? lookAt.y - pos.y : vel.y * 34;
     gaze.x += ((awake ? clamp(atX / GAZE_RANGE, -1, 1) * GAZE_X : 0) - gaze.x) * GAZE_EASE;
     gaze.y += ((awake ? clamp(atY / GAZE_RANGE, -1, 1) * GAZE_Y : 0) - gaze.y) * GAZE_EASE;
 
