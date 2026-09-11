@@ -1,8 +1,10 @@
-import type { CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
 import Magnetic from "./Magnetic";
+import OneeAvatar from "./OneeAvatar";
 import { scrollToSection } from "../lib/scrollToSection";
 import { NAME } from "../data/projects";
+import type { OneeAnimation } from "../lib/oneeRuntime";
 
 // Headline split so each word rises on its own beat (CSS mask reveal).
 const HEAD_LEAD = "I build AI systems — agents, RAG, full-stack apps — engineered for".split(
@@ -11,8 +13,27 @@ const HEAD_LEAD = "I build AI systems — agents, RAG, full-stack apps — engin
 const d = (s: number) => ({ "--delay": `${s}s` }) as CSSProperties;
 const wordDelay = (i: number) => 0.15 + i * 0.04;
 
+// Onee reacts to what the visitor is reaching for: leaning in over the work
+// button, pleased over the contact one, and playing up when poked directly.
+// Touch devices never fire hover, so a tap runs the same reaction on a timer.
+const TAP_REACTIONS: OneeAnimation[] = ["playful", "curious", "excited", "laughing"];
+
 export default function Hero() {
   const goTo = (id: string) => scrollToSection(id);
+  const [mood, setMood] = useState<OneeAnimation>("idle");
+  const tapCount = useRef(0);
+  const tapTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Hover reactions settle straight back; a tap holds long enough to read.
+  const react = (next: OneeAnimation) => setMood(next);
+  const rest = () => setMood("idle");
+  const poke = () => {
+    const n = tapCount.current++;
+    setMood(TAP_REACTIONS[n % TAP_REACTIONS.length]);
+    clearTimeout(tapTimer.current);
+    tapTimer.current = setTimeout(rest, 3200);
+  };
+  useEffect(() => () => clearTimeout(tapTimer.current), []);
 
   return (
     <section className="relative flex flex-col overflow-hidden pb-20 pt-32 md:pt-40 landscape:min-h-[100svh] landscape:justify-center">
@@ -80,6 +101,10 @@ export default function Hero() {
           <Magnetic className="inline-block">
             <button
               onClick={() => goTo("work")}
+              onPointerEnter={() => react("excited")}
+              onPointerLeave={rest}
+              onFocus={() => react("excited")}
+              onBlur={rest}
               className="btn-accent group inline-flex items-center gap-2.5 rounded-full py-3 pl-6 pr-3 text-sm font-semibold"
               style={{ touchAction: "manipulation" }}
             >
@@ -92,6 +117,10 @@ export default function Hero() {
           <Magnetic className="inline-block">
             <button
               onClick={() => goTo("contact")}
+              onPointerEnter={() => react("happy")}
+              onPointerLeave={rest}
+              onFocus={() => react("happy")}
+              onBlur={rest}
               className="glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-ink transition-colors hover:text-accent-ink active:translate-y-px"
               style={{ touchAction: "manipulation" }}
             >
@@ -99,6 +128,32 @@ export default function Hero() {
               <ArrowUpRight weight="bold" size={16} className="text-dim" />
             </button>
           </Magnetic>
+        </div>
+
+        {/* Onee.
+            Out of flow on purpose. Anchored to the bottom-right of the text
+            column, it fills the dead space beside the intro paragraph without
+            being able to reflow anything: it cannot push the headline, move
+            the scroll cue below the fold, or shift layout as the runtime
+            loads, at any window shape. Its box is fully sized in the
+            prerendered HTML and the animation only ever repaints inside it. */}
+        <div className="pointer-events-none absolute -bottom-[88px] right-5 flex justify-end sm:bottom-0 md:right-8">
+          <button
+            type="button"
+            onClick={poke}
+            onPointerEnter={() => react("playful")}
+            onPointerLeave={rest}
+            // Decorative, so it stays out of the tab order and out of the
+            // accessibility tree: a control announced as "mascot" that only
+            // changes a mascot's face is noise to a screen reader, and there
+            // is nothing behind it to reach. Keyboard users still get Onee
+            // reacting — both calls to action trigger it on focus.
+            aria-hidden="true"
+            tabIndex={-1}
+            className="onee-poke pointer-events-auto w-[clamp(84px,15vw,232px)] rounded-full"
+          >
+            <OneeAvatar animation={mood} className="aspect-square w-full" />
+          </button>
         </div>
       </div>
 

@@ -43,4 +43,13 @@ function fetchPriorityEntry(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), fetchPriorityEntry()],
+  resolve: {
+    alias: [
+      // @bible-strong/avatar-core compiles its JSON Schema at module scope, so
+      // Ajv is unremovable by tree-shaking even though nothing on this site
+      // calls the validator. See src/lib/ajvStub.ts for why it is safe to
+      // replace and where the definition is actually checked instead.
+      { find: /^ajv\/dist\/2020\.js$/, replacement: "/src/lib/ajvStub.ts" },
+    ],
+  },
 });

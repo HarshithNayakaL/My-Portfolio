@@ -214,6 +214,28 @@
   .anim-nudge {
     animation: nudge 1.8s ease-in-out infinite;
   }
+
+  /* Onee's hit target. The character *is* the button — no chrome, no label —
+     so the affordance is a lean-in on hover and a press on tap. Both live
+     inside a no-preference query rather than being cancelled afterwards, so
+     a visitor who asks for less motion never gets the transition declared at
+     all; that matches the avatar itself, which doesn't even fetch its
+     animation runtime under a reduced-motion preference. */
+  .onee-poke {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .onee-poke {
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .onee-poke:hover {
+      transform: translateY(-5px) rotate(-3deg);
+    }
+    .onee-poke:active {
+      transform: translateY(0) scale(0.95);
+    }
+  }
   /* Route transition: pages fade/slide in on mount. Transform + opacity only,
      so it runs on the compositor. */
   .page-enter {
