@@ -448,11 +448,14 @@
     display: flex;
     width: max-content;
     will-change: transform;
-    animation: marquee-l 42s linear infinite;
+    /* Duration is set per row from its measured width so both rows travel at
+       the same pixels per second — see MARQUEE_SPEED in TechMarquee.tsx. The
+       fallback is about right for the current list, so the strip never starts
+       at an absurd speed in the frame before the measurement lands. */
+    animation: marquee-l var(--marquee-duration, 40s) linear infinite;
   }
   .marquee-track.rev {
     animation-name: marquee-r;
-    animation-duration: 52s;
   }
   .marquee-mask {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);

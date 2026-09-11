@@ -12,7 +12,12 @@
  * to diff. It owns a handful of DOM nodes and writes to them directly.
  */
 import { readMood, DWELL_MS, type Senses } from "./oneeBehaviour";
-import { createOneeRuntime, restingScene, type OneeAnimation } from "./oneeRuntime";
+import {
+  createOneeRuntime,
+  restingScene,
+  type Gaze,
+  type OneeAnimation,
+} from "./oneeRuntime";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -44,6 +49,23 @@ const BEAT_MS = 2_900;
 
 // A perch has to be this far away to be worth the trip.
 const PERCH_TRAVEL_MIN = 170;
+
+// Gaze. How far the eyes travel at full deflection, in the solver's own units.
+// Deliberately short of what the face can take: the offset is added on top of
+// whatever eye position the current expression already holds, and the two
+// stack, so the amplitude that looked right on a neutral face pinned the eyes
+// against the edge of the head on an expression already glancing that way.
+// Full deflection is reached when whatever Onee is watching is GAZE_RANGE
+// away, and the easing matters as much as the numbers: eyes that snap to a
+// cursor read as a readout, eyes that catch up read as attention.
+//
+// Both axes run the same way as the viewport — positive x moves the eyes
+// right, positive y moves them down — so a screen-space delta feeds straight
+// in with no flip.
+const GAZE_X = 18;
+const GAZE_Y = 12;
+const GAZE_RANGE = 460;
+const GAZE_EASE = 0.14;
 
 // Scroll momentum. Each scrolled pixel adds to a lag that bleeds off over
 // about a second. Using the accumulated lag rather than instantaneous speed is
@@ -190,6 +212,7 @@ export function mountOnee(host: HTMLElement): () => void {
   let perchUntil = 0;
   let checkedAt = 0;
   let spotIsFree = true;
+  const gaze: Gaze = { x: 0, y: 0 };
 
   const measure = () => {
     size = shell.offsetWidth || 72;
@@ -597,8 +620,21 @@ export function mountOnee(host: HTMLElement): () => void {
       }
     }
 
-    // Leans into its own motion, and breathes.
-    const tilt = clamp(vel.x * 1.2, -16, 16);
+    // --- what it is watching
+    // With a pointer on screen Onee watches the pointer. Without one it
+    // watches where it is going, so a touch device gets a character that looks
+    // where it is headed rather than one that stares blankly ahead for the
+    // whole visit. Asleep it watches nothing.
+    const awake = mood !== "sleeping" && mood !== "drowsy";
+    const atX = senses.pointer.inside ? senses.pointer.x - pos.x : vel.x * 34;
+    const atY = senses.pointer.inside ? senses.pointer.y - pos.y : vel.y * 34;
+    gaze.x += ((awake ? clamp(atX / GAZE_RANGE, -1, 1) * GAZE_X : 0) - gaze.x) * GAZE_EASE;
+    gaze.y += ((awake ? clamp(atY / GAZE_RANGE, -1, 1) * GAZE_Y : 0) - gaze.y) * GAZE_EASE;
+
+    // Leans into its own motion and towards whatever it is watching, and
+    // breathes. The lean is small on purpose: a tilt of the head, not a turn
+    // of the whole body.
+    const tilt = clamp(vel.x * 1.2 + gaze.x * 0.18, -18, 18);
     const breath = 1 + Math.sin(t / 920) * 0.018;
     shell.style.transform =
       `translate3d(${Math.round(pos.x - size / 2)}px, ${Math.round(pos.y - size / 2)}px, 0)` +
@@ -611,7 +647,7 @@ export function mountOnee(host: HTMLElement): () => void {
     left.setAttribute("opacity", g.leftVisible ? "1" : "0");
     right.setAttribute("d", g.rightPath);
     right.setAttribute("opacity", g.rightVisible ? "1" : "0");
-  }, mood);
+  }, mood, () => gaze);
 
   // Nothing to animate for in a background tab.
   const onVisibility = () => (document.hidden ? runtime.stop() : runtime.start());

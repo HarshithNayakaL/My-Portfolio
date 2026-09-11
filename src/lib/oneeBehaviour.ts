@@ -66,6 +66,7 @@ const ASLEEP_AFTER = 70_000;
 const WAKE_MS = 2_400;
 const BUBBLE = 96; // personal space, px
 const LOOM = 190; // close enough to be watched, px
+const NEARBY = 380; // close enough to be worth playing up to, px
 const LUNGE = 1_100; // px/s of pointer speed that reads as a charge
 const STARTLE = 1_900; // px/s that reads as a jump-scare
 const SCAN = 1_500; // px/s of scrolling that reads as hunting for something
@@ -101,6 +102,8 @@ const AMBIENT: OneeAnimation[] = [
 // should look like going somewhere rather than sliding.
 const ARRIVALS: OneeAnimation[] = ["happy", "playful", "proud", "excited", "surprised", "curious"];
 const TRAVELLING: OneeAnimation[] = ["searching", "curious"];
+// A cursor moving about nearby, without coming close enough to crowd.
+const NEIGHBOURLY: OneeAnimation[] = ["playful", "curious", "listening", "excited"];
 const ARRIVAL_MS = 1_500;
 
 const pick = (pool: OneeAnimation[], beat: number) => pool[beat % pool.length];
@@ -141,6 +144,16 @@ export function readMood(s: Senses): Mood {
     const loitering = s.now - s.pointer.seenAt > 2_000;
     if (loitering && s.pointer.speed < 40) return { animation: "suspicious" };
     return { animation: "listening" };
+  }
+
+  // In the neighbourhood and moving. Between arm's reach and the far side of
+  // the screen there was nothing but whatever section you happened to be
+  // reading, so a cursor circling a few hundred pixels away got no response at
+  // all — and it often sits there, because Onee only closes the distance when
+  // the page beside you is empty. Watching from a distance should still look
+  // like being played with.
+  if (s.pointer.inside && s.reach < NEARBY && s.pointer.speed > 80) {
+    return { animation: pick(NEIGHBOURLY, s.beat) };
   }
 
   // Scrolling. Thrashing up and down reads as lost; one long sweep reads as

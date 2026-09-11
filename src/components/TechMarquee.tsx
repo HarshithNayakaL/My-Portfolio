@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useInView } from "../lib/useInView";
 
 /**
@@ -47,11 +48,46 @@ function Item({ tool }: { tool: Tool }) {
   );
 }
 
+// Pixels per second. Both rows travel at exactly this rate, in opposite
+// directions, which is the whole point of measuring: the two rows hold
+// different words, so they are different widths, and a shared animation
+// duration made the wider row move faster. On a laptop you see a slice of each
+// and the mismatch passes; on a wide display both rows are visible end to end
+// and they visibly race each other. Constant speed makes them read as one
+// mechanism at every width.
+const MARQUEE_SPEED = 28;
+
 function Row({ tools, reverse }: { tools: Tool[]; reverse?: boolean }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const sync = () => {
+      // The list is rendered twice and the keyframe travels -50%, so the loop
+      // distance is half the track.
+      const distance = track.scrollWidth / 2;
+      if (distance > 0) {
+        track.style.setProperty(
+          "--marquee-duration",
+          `${distance / MARQUEE_SPEED}s`,
+        );
+      }
+    };
+    sync();
+    // Web fonts land after first paint and change every pill's width, and a
+    // window resize can rewrap nothing here but still rescale the icons — both
+    // change the distance, so the duration is re-derived rather than measured
+    // once and trusted.
+    const observer = new ResizeObserver(sync);
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, []);
+
   const doubled = [...tools, ...tools];
   return (
     <div className="marquee-mask marquee-group overflow-hidden py-1.5">
-      <div className={`marquee-track ${reverse ? "rev" : ""}`}>
+      <div ref={trackRef} className={`marquee-track ${reverse ? "rev" : ""}`}>
         {doubled.map((t, i) => (
           <Item key={`${t.name}-${i}`} tool={t} />
         ))}

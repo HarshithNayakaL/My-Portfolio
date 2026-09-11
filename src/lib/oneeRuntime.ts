@@ -13,10 +13,13 @@
  */
 import {
   advanceAvatarPlayback,
+  applyAmbientMotion,
+  bodyFromDefinition,
   createAvatarPlaybackState,
   playAvatarAnimation,
+  poseFromExpression,
+  renderAvatar,
   renderAvatarDefinition,
-  renderAvatarFrame,
   sampleAvatarFrame,
   type AvatarDefinition,
   type AvatarFrameSnapshot,
@@ -41,6 +44,9 @@ export type OneeAnimation = keyof typeof definition.animations;
 export const restingScene = (): AvatarScene =>
   renderAvatarDefinition(onee, "neutral");
 
+/** Where the eyes are pointing, in the solver's own units. */
+export type Gaze = { x: number; y: number };
+
 export type OneeRuntime = {
   /** Cross-fade into another looping animation from wherever the face is now. */
   play: (animation: OneeAnimation) => void;
@@ -52,12 +58,53 @@ export type OneeRuntime = {
 
 const environment: AvatarRuntimeEnvironment = { random: Math.random };
 
+// Fixed for the life of the page, so it is solved once instead of rebuilt from
+// the definition on every frame.
+const body = bodyFromDefinition(onee.body);
+
+/**
+ * Solve one frame, with the eyes aimed wherever the caller is pointing them.
+ *
+ * This is avatar-core's own `renderAvatarFrame`, reassembled from the parts it
+ * is built from, because that function gives no way to pass an eye offset
+ * through to the solver — and aiming the eyes is the difference between a
+ * character that plays an animation at you and one that looks at you. Taking
+ * it apart also samples the frame once per tick instead of the twice the
+ * previous arrangement did.
+ */
+const solveFrame = (
+  state: AvatarPlaybackState,
+  now: number,
+  gaze: Gaze,
+): { scene: AvatarScene; snapshot: AvatarFrameSnapshot } => {
+  const frame = sampleAvatarFrame(onee, state, now, environment);
+  const expression = environment.reduceMotion
+    ? frame.expression
+    : applyAmbientMotion(frame.expression, frame.sampledAt);
+
+  return {
+    snapshot: frame,
+    scene: {
+      geometry: renderAvatar(poseFromExpression(expression), body.primary, frame.blink, {
+        bodyNodes: body.nodes,
+        eyeOffset: gaze,
+      }),
+      colors: {
+        body: frame.colors.body ?? expression.bodyColor ?? onee.colors.body,
+        eyes: frame.colors.eyes ?? expression.eyeColor ?? onee.colors.eyes,
+      },
+    },
+  };
+};
+
 /**
  * @param paint receives a fully-solved scene for the current instant.
+ * @param aim is read every frame for where the eyes should be pointing.
  */
 export function createOneeRuntime(
   paint: (scene: AvatarScene) => void,
   initial: OneeAnimation,
+  aim: () => Gaze,
 ): OneeRuntime {
   let state: AvatarPlaybackState = createAvatarPlaybackState();
   // Retained so a change of animation eases out of the pose actually on screen
@@ -66,8 +113,9 @@ export function createOneeRuntime(
   let frame = 0;
 
   const sample = (now: number) => {
-    snapshot = sampleAvatarFrame(onee, state, now, environment);
-    paint(renderAvatarFrame(onee, state, now, environment));
+    const solved = solveFrame(state, now, aim());
+    snapshot = solved.snapshot;
+    paint(solved.scene);
   };
 
   const tick = (now: number) => {
