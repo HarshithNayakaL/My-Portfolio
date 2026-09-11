@@ -215,27 +215,52 @@
     animation: nudge 1.8s ease-in-out infinite;
   }
 
-  /* Onee's hit target. The character *is* the button — no chrome, no label —
-     so the affordance is a lean-in on hover and a press on tap. Both live
-     inside a no-preference query rather than being cancelled afterwards, so
-     a visitor who asks for less motion never gets the transition declared at
-     all; that matches the avatar itself, which doesn't even fetch its
-     animation runtime under a reduced-motion preference. */
-  .onee-poke {
+  /* Onee, the companion.
+     The host is a full-viewport, click-through layer beneath the nav; only the
+     character inside it takes pointer events, so nothing on the page becomes
+     unclickable because a mascot has drifted over it. Position, tilt and
+     breathing are written to `transform` by the frame loop and nothing else,
+     so Onee never triggers layout and never repaints the page under it.
+     There is no reduced-motion variant here because there is no still version
+     of a character whose whole point is that it moves: under that preference
+     the companion is never mounted and this markup never exists. */
+  .onee-host {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    contain: layout style;
+  }
+  .onee {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: clamp(58px, 7.5vw, 96px);
+    aspect-ratio: 1;
+    pointer-events: auto;
+    cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    will-change: transform;
+    /* Fades up over its own waking animation instead of popping in. */
+    opacity: 0;
+    transition: opacity 0.9s ease-out;
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .onee-poke {
-      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .onee-poke:hover {
-      transform: translateY(-5px) rotate(-3deg);
-    }
-    .onee-poke:active {
-      transform: translateY(0) scale(0.95);
-    }
+  .onee.is-awake {
+    opacity: 1;
   }
+  .onee__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    /* Lifts the character off the page enough to read over any section. */
+    filter: drop-shadow(0 10px 22px rgb(18 20 26 / 0.16));
+  }
+  .dark .onee__svg {
+    filter: drop-shadow(0 10px 24px rgb(0 0 0 / 0.5));
+  }
+
   /* Route transition: pages fade/slide in on mount. Transform + opacity only,
      so it runs on the compositor. */
   .page-enter {

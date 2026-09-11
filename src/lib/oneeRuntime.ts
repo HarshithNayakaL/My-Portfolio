@@ -15,6 +15,7 @@ import {
   advanceAvatarPlayback,
   createAvatarPlaybackState,
   playAvatarAnimation,
+  renderAvatarDefinition,
   renderAvatarFrame,
   sampleAvatarFrame,
   type AvatarDefinition,
@@ -35,6 +36,10 @@ import definition from "../data/onee.avatar.json";
 const onee = definition as unknown as AvatarDefinition;
 
 export type OneeAnimation = keyof typeof definition.animations;
+
+/** The pose Onee holds before anything has happened to it. */
+export const restingScene = (): AvatarScene =>
+  renderAvatarDefinition(onee, "neutral");
 
 export type OneeRuntime = {
   /** Cross-fade into another looping animation from wherever the face is now. */

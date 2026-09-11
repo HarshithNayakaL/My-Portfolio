@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import ScrollProgress from "./components/ScrollProgress";
+import OneeCompanion from "./components/OneeCompanion";
 import Home from "./pages/Home";
 import { useWebMcpTools } from "./lib/useWebMcpTools";
 
@@ -73,6 +74,10 @@ export default function App() {
         <AnimatedRoutes />
       </main>
       <Footer />
+      {/* Outside the routes so Onee carries across navigation instead of being
+          torn down and rebuilt — it is one character living on the site, not a
+          decoration belonging to a page. */}
+      <OneeCompanion />
     </>
   );
 }
