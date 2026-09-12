@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInView } from "../lib/useInView";
 
 /**
@@ -49,46 +49,70 @@ function Item({ tool }: { tool: Tool }) {
 }
 
 // Pixels per second. Both rows travel at exactly this rate, in opposite
-// directions, which is the whole point of measuring: the two rows hold
-// different words, so they are different widths, and a shared animation
-// duration made the wider row move faster. On a laptop you see a slice of each
-// and the mismatch passes; on a wide display both rows are visible end to end
-// and they visibly race each other. Constant speed makes them read as one
-// mechanism at every width.
+// directions: the two rows hold different words, so they are different widths,
+// and the hardcoded durations they used to carry made the wider row move
+// faster. Deriving each row's duration from its own measured width is what
+// keeps them reading as one mechanism at every window size.
 const MARQUEE_SPEED = 28;
 
+/**
+ * One row of the strip.
+ *
+ * The loop is the usual trick — render the list twice, slide the track by half
+ * its width, and the second copy lands exactly where the first began. That
+ * only holds while one copy is wider than the window. It wasn't: a copy of the
+ * shorter row is about 830px, so on anything above that the slide ran the
+ * content off the end and left a growing hole of empty page, while the other
+ * row happened to be at a fuller part of its cycle. The rows looked like they
+ * were running independently because one of them was visibly running out.
+ *
+ * So the list is repeated enough times to cover the window first, and *that*
+ * is what gets doubled. The guarantee restored is `repeats * copyWidth >=
+ * window width`, which is what makes the seam impossible to reach.
+ */
 function Row({ tools, reverse }: { tools: Tool[]; reverse?: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [repeats, setRepeats] = useState(1);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
+
     const sync = () => {
-      // The list is rendered twice and the keyframe travels -50%, so the loop
-      // distance is half the track.
-      const distance = track.scrollWidth / 2;
-      if (distance > 0) {
-        track.style.setProperty(
-          "--marquee-duration",
-          `${distance / MARQUEE_SPEED}s`,
-        );
-      }
+      // The track holds `repeats` copies, twice over.
+      const copyWidth = track.scrollWidth / (2 * repeats);
+      if (copyWidth <= 0) return;
+      const needed = Math.max(1, Math.ceil(window.innerWidth / copyWidth));
+      if (needed !== repeats) setRepeats(needed);
+      // The keyframe travels -50%, so the loop distance is whatever half the
+      // track comes to once the repeats are settled.
+      track.style.setProperty(
+        "--marquee-duration",
+        `${(needed * copyWidth) / MARQUEE_SPEED}s`,
+      );
     };
+
     sync();
-    // Web fonts land after first paint and change every pill's width, and a
-    // window resize can rewrap nothing here but still rescale the icons — both
-    // change the distance, so the duration is re-derived rather than measured
-    // once and trusted.
+    // Web fonts land after first paint and change the width of every pill, and
+    // a resize changes how many copies it takes to cover the window. Both
+    // invalidate the measurement, so it is re-derived rather than taken once
+    // and trusted.
     const observer = new ResizeObserver(sync);
     observer.observe(track);
-    return () => observer.disconnect();
-  }, []);
+    window.addEventListener("resize", sync, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", sync);
+    };
+  }, [repeats]);
 
-  const doubled = [...tools, ...tools];
+  const covering = Array.from({ length: repeats }, () => tools).flat();
+  const looped = [...covering, ...covering];
+
   return (
     <div className="marquee-mask marquee-group overflow-hidden py-1.5">
       <div ref={trackRef} className={`marquee-track ${reverse ? "rev" : ""}`}>
-        {doubled.map((t, i) => (
+        {looped.map((t, i) => (
           <Item key={`${t.name}-${i}`} tool={t} />
         ))}
       </div>
