@@ -18,10 +18,17 @@ export default function WorkRow({ project }: { project: Project }) {
         aria-hidden
         className="pointer-events-none absolute inset-x-[-0.85rem] inset-y-1 rounded-[var(--radius-lg)] border border-transparent bg-elevated/0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:border-line group-hover:bg-elevated/45 group-focus-within:border-line group-focus-within:bg-elevated/45"
       />
-      {/* left accent bar grows on hover/active */}
+      {/* Left accent marker, growing from its middle on hover.
+
+          It used to be a full-height bar pinned to the article's left edge,
+          which put it 14px inside the panel above and left it overhanging the
+          panel by 4px at each end — so it crossed the panel's 22px rounded
+          corners and read as a stray line rather than an edge lighting up.
+          It now sits exactly on the panel's left edge and stops well short of
+          the corners, so the curve is never in its way. */}
       <span
         aria-hidden
-        className="absolute left-0 top-0 h-full w-[2px] origin-top scale-y-0 bg-accent transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-y-100 group-focus-within:scale-y-100"
+        className="absolute left-[-0.85rem] top-1/2 h-[calc(100%-4rem)] w-[3px] -translate-y-1/2 scale-y-0 rounded-full bg-accent transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-y-100 group-focus-within:scale-y-100"
       />
 
       <div className="pointer-events-none relative grid gap-6 py-9 pl-5 transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:pl-7 md:grid-cols-[1fr_auto] md:items-end md:gap-12 md:py-11">

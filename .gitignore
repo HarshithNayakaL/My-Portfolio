@@ -14,3 +14,6 @@ npm-debug.log*
 
 # TypeScript incremental build artifact (regenerated on every build)
 *.tsbuildinfo
+
+# scratch space for local browser probes
+.probe/
