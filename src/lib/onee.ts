@@ -15,6 +15,8 @@ import { readMood, DWELL_MS, type Senses } from "./oneeBehaviour";
 import {
   createOneeRuntime,
   restingScene,
+  sceneFor,
+  STILL_FACES,
   type Gaze,
   type OneeAnimation,
 } from "./oneeRuntime";
@@ -144,7 +146,12 @@ function watchSections(onChange: (id: string | null) => void) {
   };
 }
 
-export function mountOnee(host: HTMLElement): () => void {
+/**
+ * @param calm renders a still Onee that never moves, for visitors who have
+ *   asked for reduced motion. They get the character; they don't get the
+ *   roaming, the frame loop or anything else that moves on its own.
+ */
+export function mountOnee(host: HTMLElement, calm = false): () => void {
   const scene = restingScene();
 
   // --- the character ------------------------------------------------------
@@ -190,6 +197,48 @@ export function mountOnee(host: HTMLElement): () => void {
   svg.append(defs, skin, face);
   shell.append(svg);
   host.append(shell);
+
+  const paintScene = (next: typeof scene) => {
+    body.setAttribute("d", next.geometry.headPath);
+    left.setAttribute("d", next.geometry.leftPath);
+    left.setAttribute("opacity", next.geometry.leftVisible ? "1" : "0");
+    right.setAttribute("d", next.geometry.rightPath);
+    right.setAttribute("opacity", next.geometry.rightVisible ? "1" : "0");
+  };
+
+  // --- the still version ---------------------------------------------------
+  // Reduced motion used to mean no Onee at all, which was the wrong reading of
+  // the preference and quietly hid the character from everyone who has
+  // animation effects switched off — a setting plenty of people run without
+  // thinking of themselves as needing it. The preference asks for less motion,
+  // not less site. So Onee sits in the corner, perfectly still, and changes
+  // its face when you tap it. No frame loop, no roaming, no drift.
+  if (calm) {
+    shell.classList.add("onee--still", "is-awake");
+    let faceIndex = 0;
+
+    const place = () => {
+      const size = shell.offsetWidth || 72;
+      const x = window.innerWidth - EDGE - size;
+      const y = window.innerHeight - EDGE - size;
+      shell.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
+    };
+
+    const nextFace = () => {
+      faceIndex = (faceIndex + 1) % STILL_FACES.length;
+      paintScene(sceneFor(STILL_FACES[faceIndex]));
+    };
+
+    place();
+    shell.addEventListener("pointerdown", nextFace);
+    window.addEventListener("resize", place, { passive: true });
+
+    return () => {
+      shell.removeEventListener("pointerdown", nextFace);
+      window.removeEventListener("resize", place);
+      shell.remove();
+    };
+  }
 
   // --- what it knows ------------------------------------------------------
   const now0 = performance.now();
@@ -766,12 +815,7 @@ export function mountOnee(host: HTMLElement): () => void {
       ` rotate(${tilt.toFixed(2)}deg) scale(${breath.toFixed(3)})`;
 
     // --- the face
-    const g = frame.geometry;
-    body.setAttribute("d", g.headPath);
-    left.setAttribute("d", g.leftPath);
-    left.setAttribute("opacity", g.leftVisible ? "1" : "0");
-    right.setAttribute("d", g.rightPath);
-    right.setAttribute("opacity", g.rightVisible ? "1" : "0");
+    paintScene(frame);
   }, mood, () => gaze);
 
   // Nothing to animate for in a background tab.

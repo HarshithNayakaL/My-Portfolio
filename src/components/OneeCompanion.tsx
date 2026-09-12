@@ -17,10 +17,14 @@ export default function OneeCompanion() {
     const host = hostRef.current;
     if (!host) return;
 
-    // Motion is opt-in here, not opt-out. A character whose entire point is
-    // that it moves has no reduced-motion version worth shipping, so under
-    // that preference the chunk is never even fetched.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // A reduced-motion preference asks for less movement, not less site. This
+    // used to skip the mount entirely, which hid Onee from everyone running
+    // with animation effects turned off — a setting plenty of people have on
+    // without ever thinking of themselves as needing it, and the reason it
+    // looked like the mascot had simply stopped working. They get a still
+    // Onee instead: it sits in the corner and changes its face when tapped,
+    // with no frame loop and nothing that moves on its own.
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let teardown: (() => void) | undefined;
     let cancelled = false;
@@ -31,7 +35,7 @@ export default function OneeCompanion() {
     const handle = idle(() => {
       import("../lib/onee")
         .then(({ mountOnee }) => {
-          if (!cancelled) teardown = mountOnee(host);
+          if (!cancelled) teardown = mountOnee(host, calm);
         })
         .catch(() => {
           // A site without its mascot is the site. Nothing to report.

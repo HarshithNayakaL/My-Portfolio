@@ -40,9 +40,27 @@ const onee = definition as unknown as AvatarDefinition;
 
 export type OneeAnimation = keyof typeof definition.animations;
 
+export type OneeExpression = keyof typeof definition.expressions;
+
+/** A single still pose, solved once. No playback, no frame loop. */
+export const sceneFor = (expression: OneeExpression = "neutral" as OneeExpression): AvatarScene =>
+  renderAvatarDefinition(onee, expression);
+
 /** The pose Onee holds before anything has happened to it. */
-export const restingScene = (): AvatarScene =>
-  renderAvatarDefinition(onee, "neutral");
+export const restingScene = (): AvatarScene => sceneFor();
+
+/**
+ * A handful of pleasant faces for the still version of Onee, which has no
+ * animation to cycle and changes expression only when someone taps it.
+ */
+export const STILL_FACES = [
+  "neutral",
+  "joyful-wide",
+  "curious-left",
+  "playful-right",
+  "surprised-left",
+  "joyful-down-right",
+] as OneeExpression[];
 
 /** Where the eyes are pointing, in the solver's own units. */
 export type Gaze = { x: number; y: number };

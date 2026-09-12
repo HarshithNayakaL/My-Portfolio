@@ -223,9 +223,9 @@
      so drawing Onee never triggers layout and never repaints the page beneath
      it. (Choosing where to stand does read layout — it hit-tests the page to
      find empty space — but that runs every few seconds, not every frame.)
-     There is no reduced-motion variant here because there is no still version
-     of a character whose whole point is that it moves: under that preference
-     the companion is never mounted and this markup never exists. */
+     Under a reduced-motion preference Onee still appears — the preference is
+     for less movement, not for less site — but as `.onee--still`: parked in a
+     corner, no frame loop, no drift, and no fade on arrival. */
   .onee-host {
     position: fixed;
     inset: 0;
@@ -250,6 +250,10 @@
   }
   .onee.is-awake {
     opacity: 1;
+  }
+  /* The still version appears rather than fades, since a fade is motion too. */
+  .onee--still {
+    transition: none;
   }
   .onee__svg {
     display: block;
