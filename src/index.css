@@ -72,6 +72,7 @@
   --on-btn: #ffffff;
   --on-accent: #ffffff;
   --glass: rgba(255, 255, 255, 0.5);
+  --nav-glass: rgba(255, 255, 255, 0.78);
   --glass-border: rgba(255, 255, 255, 0.85);
   --glass-edge: rgba(255, 255, 255, 0.9);
   --glass-sheen: 0.5;
@@ -105,6 +106,7 @@
   --on-btn: #ffffff;
   --on-accent: #0a0b0f;
   --glass: rgba(18, 20, 27, 0.46);
+  --nav-glass: rgba(18, 20, 27, 0.74);
   --glass-border: rgba(255, 255, 255, 0.16);
   --glass-edge: rgba(255, 255, 255, 0.14);
   --glass-sheen: 0.06;
@@ -331,14 +333,16 @@
     }
   }
 
-  /* The frost. Apple's regular variant: blur plus a luminosity shift, a rim
-     highlight and a cast shadow. This is the whole effect — see the note in
-     the commit history for why neither WebGL refraction library could run
-     against a page this tall. */
+  /* The frost, and the whole effect — see the commit history for why neither
+     WebGL refraction library could run against a page this tall. Apple's
+     regular variant: blur plus a luminosity shift, a rim highlight and a cast
+     shadow. It is set heavier than the small glass controls because it is the
+     only thing obscuring content now: nothing sits between the bar and the
+     page, so the bar has to hold legibility on its own. */
   .nav-pill {
-    background: var(--color-glass);
-    -webkit-backdrop-filter: blur(22px) saturate(175%) brightness(1.05);
-    backdrop-filter: blur(22px) saturate(175%) brightness(1.05);
+    background: var(--nav-glass);
+    -webkit-backdrop-filter: blur(40px) saturate(190%) brightness(1.08);
+    backdrop-filter: blur(40px) saturate(190%) brightness(1.08);
     border: 1px solid var(--color-glass-border);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
@@ -346,8 +350,8 @@
       0 18px 50px -22px rgba(0, 0, 0, 0.5);
   }
   .dark .nav-pill {
-    -webkit-backdrop-filter: blur(22px) saturate(175%) brightness(0.85);
-    backdrop-filter: blur(22px) saturate(175%) brightness(0.85);
+    -webkit-backdrop-filter: blur(40px) saturate(190%) brightness(0.78);
+    backdrop-filter: blur(40px) saturate(190%) brightness(0.78);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
@@ -369,9 +373,6 @@
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
     }
-    .scroll-edge {
-      display: none;
-    }
   }
   @media (prefers-contrast: more) {
     .nav-pill,
@@ -380,38 +381,6 @@
       background: color-mix(in oklab, var(--color-canvas) 94%, transparent);
       border-color: var(--color-line-strong);
     }
-  }
-
-  /* ---- Scroll edge effect.
-     Apple's answer to content sliding under a bar is not a heavier blur on the
-     bar; it is a band at the edge of the scroll view that obscures content
-     *before* it arrives: "Scroll views offer a scroll edge effect that helps
-     maintain sufficient legibility and contrast for controls by obscuring
-     content that scrolls beneath them. System bars like toolbars adopt this
-     behavior by default." (Adopting Liquid Glass.) The HIG adds that the
-     effect works "by blurring and reducing the opacity of background content",
-     which is the blur and the canvas-coloured wash below.
-
-     Masked so both fade out downward — an unmasked band would read as a solid
-     bar and defeat the point, which is that content stays visible while it
-     passes. */
-  .scroll-edge {
-    position: fixed;
-    inset-inline: 0;
-    top: 0;
-    height: 96px;
-    z-index: 45;
-    pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--color-canvas) 72%, transparent) 0%,
-      color-mix(in oklab, var(--color-canvas) 34%, transparent) 55%,
-      transparent 100%
-    );
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
   }
 
   /* Graceful fallback where backdrop-filter is unsupported: solidify a touch. */

@@ -25,18 +25,6 @@ export default function Nav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [active, setActive] = useState("");
-  // The scroll edge has nothing to obscure until something is under it, and a
-  // full-width backdrop blur is not free, so it is mounted rather than merely
-  // hidden — and only once the page has actually moved. This is also how the
-  // effect behaves on Apple platforms: it appears as content scrolls beneath.
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   // Track which section is in view to light the matching nav link.
   useEffect(() => {
     if (pathname !== "/") {
@@ -72,8 +60,6 @@ export default function Nav() {
 
   return (
     <>
-      {/* Obscures content before it reaches the bar — see .scroll-edge. */}
-      {scrolled && <div className="scroll-edge" aria-hidden />}
       {/* The pill positions itself rather than sitting inside a flex header:
           one element, one place its geometry is defined. */}
       <div className="nav-pill">
