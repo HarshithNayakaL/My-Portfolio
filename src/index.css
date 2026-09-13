@@ -72,7 +72,7 @@
   --on-btn: #ffffff;
   --on-accent: #ffffff;
   --glass: rgba(255, 255, 255, 0.5);
-  --nav-glass: rgba(255, 255, 255, 0.20);
+  --nav-glass: rgba(255, 255, 255, 0.10);
   --glass-border: rgba(255, 255, 255, 0.85);
   --glass-edge: rgba(255, 255, 255, 0.9);
   --glass-sheen: 0.5;
@@ -106,7 +106,7 @@
   --on-btn: #ffffff;
   --on-accent: #0a0b0f;
   --glass: rgba(18, 20, 27, 0.46);
-  --nav-glass: rgba(18, 20, 27, 0.20);
+  --nav-glass: rgba(18, 20, 27, 0.10);
   --glass-border: rgba(255, 255, 255, 0.16);
   --glass-edge: rgba(255, 255, 255, 0.14);
   --glass-sheen: 0.06;
@@ -310,7 +310,7 @@
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.5);
+      0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
   /* The nav pill. It centres itself rather than sitting inside a flex header,
      because the library requires the glass element to be a direct child of the
@@ -341,36 +341,21 @@
      page, so the bar has to hold legibility on its own. */
   .nav-pill {
     background: var(--nav-glass);
-    -webkit-backdrop-filter: blur(26px) saturate(165%) brightness(1.04);
-    backdrop-filter: blur(26px) saturate(165%) brightness(1.04);
+    -webkit-backdrop-filter: blur(10px) saturate(100%) brightness(1.02);
+    backdrop-filter: blur(10px) saturate(100%) brightness(1.02);
     border: 1px solid var(--color-glass-border);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.5);
+      0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
   .dark .nav-pill {
-    -webkit-backdrop-filter: blur(26px) saturate(165%) brightness(0.86);
-    backdrop-filter: blur(26px) saturate(165%) brightness(0.86);
+    -webkit-backdrop-filter: blur(10px) saturate(100%) brightness(0.94);
+    backdrop-filter: blur(10px) saturate(100%) brightness(0.94);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.7);
-  }
-
-  /* A halo on the labels, in the canvas colour.
-     The bar carries almost no fill now, so what sits behind it comes through
-     at close to full strength — including the hero headline, which is near
-     black and passes directly under the links while scrolling. Dark labels on
-     a dark headline is the one case a translucent bar cannot survive on blur
-     alone. liquid-glass-react solves it the same way for its own label, with a
-     shadow; theirs is dark because their text is white, and ours is the canvas
-     colour because ours is not. */
-  .nav-pill nav button,
-  .nav-pill nav a {
-    text-shadow:
-      0 0 4px var(--color-canvas),
-      0 0 10px var(--color-canvas);
+      0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
 
   /* Row sizing. The bar is a fixed-width stadium and the labels have to fit
