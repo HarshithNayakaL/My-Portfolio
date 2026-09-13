@@ -347,14 +347,34 @@
       0 18px 50px -22px rgba(0, 0, 0, 0.7);
   }
 
-  /* The refraction is held back until Nav.tsx has corrected the mask on the
-     package's filter — see the note there. Prerendered HTML carries the
-     uncorrected filter, so without this the first paint is a flat grey slab
-     that turns to glass only once the bundle has hydrated. The inline style
-     the package writes wins over any plain rule, hence `!important` here and
-     an `!important` of its own to hand the filter back. */
-  .nav-glass .glass__warp {
-    filter: none !important;
+  /* The package's refraction layer is off, and stays off.
+     It works by putting `filter: url(#…)` and `backdrop-filter` on one span
+     over the glass. In Chromium that combination breaks twice over. The
+     filter's edge mask is derived by an feColorMatrix that writes luminance to
+     RGB and then read by an feComponentTransfer that samples *alpha*; since
+     every displacement map it ships is opaque, the mask covers the whole
+     surface, the aberration pass is applied everywhere and the clean centre is
+     composited away — the bar renders as flat rgb(159,159,159) at any
+     displacement scale. Correcting the mask fixes that and exposes the second
+     one: any backdrop-filter on that span, `blur(0px)` and `opacity(1)`
+     included, splits the backdrop and leaves a hard seam down roughly the left
+     45% of a 672px bar. Moving the refraction onto `.glass` as
+     `backdrop-filter: url(#…) blur(22px)` drops the seam but Chromium then
+     ignores the blur, and the hero headline reads straight through the labels.
+
+     So the glass here is the frost below — Apple's regular variant, which is
+     what a bar uses anyway: "Use Liquid Glass effects sparingly" and system
+     bars "blur and adjust the luminosity of background content to maintain
+     legibility" (HIG, Materials). The package keeps the pill's structure and
+     its elastic response to the pointer.
+
+     The two trailing highlight spans go with it: a 135deg white gradient at
+     mix-blend-mode screen and the same again at overlay, whose 33% stop
+     resolves as a visible band edge. The rim in the box-shadow is the specular
+     cue. */
+  .nav-glass .glass__warp,
+  .nav-glass ~ span {
+    display: none;
   }
 
   /* Apple: "people can ... turn on accessibility settings that reduce
