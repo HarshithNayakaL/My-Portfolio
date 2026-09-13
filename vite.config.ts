@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -49,7 +50,16 @@ export default defineConfig({
       // Ajv is unremovable by tree-shaking even though nothing on this site
       // calls the validator. See src/lib/ajvStub.ts for why it is safe to
       // replace and where the definition is actually checked instead.
-      { find: /^ajv\/dist\/2020\.js$/, replacement: "/src/lib/ajvStub.ts" },
+      //
+      // Resolved to an absolute path rather than "/src/...": the leading slash
+      // is a project-root URL that Rollup understands during a build, but
+      // esbuild resolves dependency pre-bundling against the filesystem, so in
+      // `vite dev` it looked for /src/lib/ajvStub.ts at the disk root and the
+      // dev server failed to start.
+      {
+        find: /^ajv\/dist\/2020\.js$/,
+        replacement: fileURLToPath(new URL("./src/lib/ajvStub.ts", import.meta.url)),
+      },
     ],
   },
 });

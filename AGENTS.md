@@ -13,7 +13,9 @@ point at both.
 npm install
 npm run build     # tsc -b -> vite build -> vite build --ssr -> prerender -> build-api
 npm run lint      # tsc -b --noEmit
-npm run verify:llms
+npm run verify:negotiation
+npm run verify:onee
+npm run verify:llms   # needs a running server; takes an origin as argv[2]
 ```
 
 `npm run build` is a chain, and every link matters:
@@ -43,14 +45,17 @@ reason to hand-edit the output.
 | Projects (the homepage grid) | `src/data/projects.ts` |
 | Case studies | `src/data/caseStudies.ts` |
 | Per-route title/description/canonical | `src/data/seo.ts` |
+| Agent Skills section | `src/data/skills.ts` |
 | FAQ entries | `src/components/Faq.tsx` (exported as `faqs`) |
+| The mascot's definition | `src/data/onee.avatar.json` |
 | Legal documents | `src/pages/Legal.tsx` |
 | Structured data (JSON-LD) | `index.html` and `scripts/prerender.mjs` |
 
-## Build-time guards
+## Guards
 
-Three checks fail the build rather than shipping something broken. If one
-fires, fix the cause — do not weaken the check.
+Two of these fail the build outright. The other three are scripts you run; they
+exist because each one caught something that had already shipped. If one fires,
+fix the cause — do not weaken the check.
 
 - **Screenshot content hashes.** Every file in `public/shots/` is named
   `<name>.<sha256[0:8]>.webp` and served `immutable` for a year. The build
@@ -61,7 +66,13 @@ fires, fix the cause — do not weaken the check.
   404 page. `scripts/build-api.mjs` fails the build if either set drifts from
   the data. Add a project → add its slug to `middleware.ts`.
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
-  llms.txt v2 spec.
+  llms.txt v2 spec. Needs a server — run `npm run preview` and pass its URL.
+- **Content negotiation.** `npm run verify:negotiation` asserts what 25
+  different client shapes receive. It exists because the rule used to be an
+  allowlist of known agent user-agents, which meant every agent *not* on the
+  list got the full HTML document; the check fails if that behaviour returns.
+- **Mascot coverage.** `npm run verify:onee` asserts all 23 animations stay
+  reachable and that the mood scenarios resolve correctly.
 
 ## Conventions
 
@@ -74,6 +85,10 @@ fires, fix the cause — do not weaken the check.
   number, leave it out.
 - **No commitments the owner has not made.** There are deliberately no rates,
   turnaround times or availability promises anywhere in the content.
+- **Verify against a render, not a metric.** Several bugs here — a grey nav
+  bar, a seam across the glass, unreadable labels — passed an automated check
+  while being obviously wrong in a screenshot. If a number and an image
+  disagree, the image is right and the metric is measuring the wrong pixels.
 - **Accessibility is enforced.** The site scores 100 on axe/Lighthouse
   accessibility. Watch list structure in particular: a `<dl>` may wrap each
   `<dt>`/`<dd>` pair in one `<div>`, never two nested ones.
