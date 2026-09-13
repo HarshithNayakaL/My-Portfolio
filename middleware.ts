@@ -80,6 +80,19 @@ const CASE_STUDY_SLUGS = new Set([
  * human visitors see, and handing them a different representation of the page
  * is the thing search engines call cloaking.
  */
+/**
+ * Clients that genuinely need the HTML document even though they send a
+ * wildcard Accept header: search crawlers, which must see exactly what a
+ * visitor sees, and link unfurlers, which read og: tags out of <head>.
+ *
+ * This list can be enumerated and stays still. The set of "things that are an
+ * AI agent" cannot, which is why the fallback below is framed the other way
+ * round — anything that did not ask for HTML and is not one of these gets the
+ * markdown twin.
+ */
+const WANTS_HTML =
+  /(Googlebot|Google-InspectionTool|Storebot-Google|Bingbot|BingPreview|Slurp|DuckDuckBot|YandexBot|Baiduspider|Sogou|Exabot|ia_archiver|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|Discordbot|TelegramBot|WhatsApp|SkypeUriPreview|redditbot|Pinterest|vkShare|embedly|Iframely|Lighthouse|Chrome-Lighthouse|PageSpeed|GTmetrix|Applebot(?!-Extended))/i;
+
 const MARKDOWN_BOTS =
   /(GPTBot|OAI-SearchBot|ChatGPT-User|ClaudeBot|Claude-User|Claude-SearchBot|PerplexityBot|Perplexity-User|Google-Extended|Applebot-Extended|meta-externalagent|Meta-ExternalFetcher|DuckAssistBot|YouBot|cohere-ai|MistralAI-User|DeepSeekBot|ora-agent|ora-scan)/i;
 
@@ -108,6 +121,39 @@ and this site answers \`Accept: text/markdown\` and \`?mode=agent\` on any page 
  * answering it with a raw document would hand markdown to curl, link
  * previewers and every other client that never asked.
  */
+/**
+ * Should this client get the markdown twin rather than the HTML document?
+ *
+ * Two ways to qualify. Either it asked — `Accept: text/markdown`, `?mode=agent`,
+ * or a named model crawler — or it never asked for HTML in the first place.
+ *
+ * That second clause is the important one. Matching a list of known agent
+ * user-agents meant every agent *not* on the list was handed the full 110KB
+ * HTML document, which is where the truncated-page reports came from: an
+ * allowlist of "things that are an AI agent" is unbounded and permanently out
+ * of date. Turning it around removes the guessing — a browser always names
+ * text/html in Accept, while a scripted client (requests, fetch, curl, an
+ * agent's HTTP layer) sends a bare wildcard or nothing at all. The clients
+ * that send a wildcard and still need real HTML are search crawlers and link
+ * unfurlers, which are a finite, stable set, so those are named explicitly.
+ */
+export function servesMarkdown({
+  accept,
+  ua,
+  mode,
+}: {
+  accept: string | null;
+  ua: string | null;
+  mode: string | null;
+}): boolean {
+  const agent = ua ?? "";
+  if (prefersMarkdown(accept) || mode === "agent" || MARKDOWN_BOTS.test(agent)) {
+    return true;
+  }
+  if (WANTS_HTML.test(agent)) return false;
+  return !(accept ?? "").toLowerCase().includes("text/html");
+}
+
 function prefersMarkdown(accept: string | null): boolean {
   if (!accept) return false;
   let markdown = -1;
@@ -219,12 +265,15 @@ export default function middleware(request: Request) {
 
   if (HAS_EXTENSION.test(path)) return next();
 
-  const asked =
-    prefersMarkdown(request.headers.get("accept")) ||
-    url.searchParams.get("mode") === "agent" ||
-    MARKDOWN_BOTS.test(request.headers.get("user-agent") ?? "");
-
-  if (!asked) return next();
+  if (
+    !servesMarkdown({
+      accept: request.headers.get("accept"),
+      ua: request.headers.get("user-agent"),
+      mode: url.searchParams.get("mode"),
+    })
+  ) {
+    return next();
+  }
 
   if (PAGE_ROUTE.test(path)) {
     return rewrite(new URL(`${path === "/" ? "" : path}/index.md`, url));
