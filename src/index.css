@@ -295,7 +295,11 @@
   /* iOS-style "liquid glass": translucent material + backdrop blur + hairline
      highlight. Only use on FIXED/STICKY elements (nav) — backdrop-filter on
      scrolling content tanks frame rate. */
-  .glass {
+  /* Renamed from `.glass`: liquid-glass-react names its own element `.glass`
+     too, so the nav pill was silently inheriting this treatment on top of the
+     package's. A collision that happens to look right is still a collision —
+     any future edit here would have changed the nav for no visible reason. */
+  .glass-pill {
     background: var(--color-glass);
     -webkit-backdrop-filter: blur(32px) saturate(200%);
     backdrop-filter: blur(32px) saturate(200%);
@@ -306,6 +310,75 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.5);
   }
+  /* liquid-glass-react sizes its inner `.glass` to its content, which leaves
+     the pill's glass stopping short of the layer stack measured around it —
+     a strip of dead glass down the right-hand side. The nav is a full-width
+     bar, so the glass is told to fill it. */
+  .nav-glass > .glass,
+  .nav-glass > .glass > div {
+    width: 100%;
+  }
+
+  /* The frost, applied on purpose rather than inherited.
+     liquid-glass-react supplies displacement and the elastic response; it does
+     not obscure what is behind it, and its own blurAmount is a fraction of
+     what a bar full of text needs — with the package alone the hero headline
+     read straight through the nav labels. Apple's regular variant is the two
+     together: "blurs and adjusts the luminosity of background content to
+     maintain legibility" (HIG, Materials). Written here rather than left to
+     the class collision that was silently supplying it, so a future edit to
+     `.glass-pill` cannot change the nav. */
+  .nav-glass > .glass {
+    background: var(--color-glass);
+    -webkit-backdrop-filter: blur(22px) saturate(175%) brightness(1.05);
+    backdrop-filter: blur(22px) saturate(175%) brightness(1.05);
+    border: 1px solid var(--color-glass-border);
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 18px 50px -22px rgba(0, 0, 0, 0.5);
+  }
+  .dark .nav-glass > .glass {
+    -webkit-backdrop-filter: blur(22px) saturate(175%) brightness(0.85);
+    backdrop-filter: blur(22px) saturate(175%) brightness(0.85);
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 18px 50px -22px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Apple: "people can ... turn on accessibility settings that reduce
+     transparency or motion in the interface. These settings can remove or
+     modify certain effects." A system component adapts for free; a custom one
+     has to be told, and a third-party one has to be told twice — the package
+     paints its refraction onto inner layers that know nothing about this.
+     Placed after the frost above deliberately: these carry the same
+     specificity, so source order is what decides. */
+  @media (prefers-reduced-transparency: reduce) {
+    .nav-glass > .glass,
+    .dark .nav-glass > .glass,
+    .glass-pill {
+      background: var(--color-canvas);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .nav-glass .glass__warp,
+    .nav-glass > svg {
+      display: none;
+    }
+    .scroll-edge {
+      display: none;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .nav-glass > .glass,
+    .dark .nav-glass > .glass,
+    .glass-pill {
+      background: color-mix(in oklab, var(--color-canvas) 94%, transparent);
+      border-color: var(--color-line-strong);
+    }
+  }
+
   /* ---- Scroll edge effect.
      Apple's answer to content sliding under a bar is not a heavier blur on the
      bar; it is a band at the edge of the scroll view that obscures content
@@ -338,121 +411,9 @@
     mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
   }
 
-  /* ---- GlassSurface: refracting glass panel (see GlassSurface.tsx).
-     Keyed off `.dark` rather than the original's light-dark()/
-     prefers-color-scheme, because this site themes by class and would
-     otherwise follow the OS instead of its own toggle. Shadows use the site's
-     glass tokens instead of the component's blue ones. */
-  .glass-surface {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .glass-surface__filter {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    pointer-events: none;
-    z-index: -1;
-  }
-  .glass-surface__content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    border-radius: inherit;
-  }
-
-  /* Chromium: the site's frost, with a displacement filter on top of it.
-     Refraction alone is not glass — it displaces the backdrop without
-     obscuring it, so the hero headline drove straight through the nav and the
-     links became unreadable the moment anything scrolled behind. Blur is what
-     makes a panel legible; the filter is what makes it look like glass rather
-     than frosted plastic. Both, in that order. */
-  .glass-surface--refract {
-    background: var(--color-glass);
-    /* The regular variant "blurs and adjusts the luminosity of background
-       content to maintain legibility" (HIG, Materials) — hence the brightness
-       and contrast terms, not just blur and saturation. */
-    -webkit-backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
-      saturate(var(--glass-sat, 1.8)) brightness(1.06) contrast(1.04);
-    backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
-      saturate(var(--glass-sat, 1.8)) brightness(1.06) contrast(1.04);
-    border: 1px solid var(--color-glass-border);
-    box-shadow:
-      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.5);
-  }
-  .dark .glass-surface--refract {
-    box-shadow:
-      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.7);
-  }
-
-  /* Safari, Firefox, and anything without SVG filters in backdrop-filter:
-     the frosted treatment the site already used. */
-  .glass-surface--frost {
-    background: var(--color-glass);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid var(--color-glass-border);
-    box-shadow:
-      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.5);
-  }
-  .dark .glass-surface--frost {
-    box-shadow:
-      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 18px 50px -22px rgba(0, 0, 0, 0.7);
-  }
-  .dark .glass-surface--refract {
-    /* Dark mode darkens rather than lifts: the same luminosity adjustment,
-       in the direction that keeps light text on the bar readable. */
-    -webkit-backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
-      saturate(var(--glass-sat, 1.8)) brightness(0.82) contrast(1.08);
-    backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
-      saturate(var(--glass-sat, 1.8)) brightness(0.82) contrast(1.08);
-  }
-
-  /* Apple: "people can ... turn on accessibility settings that reduce
-     transparency or motion in the interface. These settings can remove or
-     modify certain effects." A system component adapts for free; a custom one
-     has to be told, so both settings are handled here rather than assumed. */
-  @media (prefers-reduced-transparency: reduce) {
-    .glass-surface--refract,
-    .glass-surface--frost,
-    .dark .glass-surface--refract {
-      background: var(--color-canvas);
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-    }
-    .scroll-edge {
-      display: none;
-    }
-  }
-  @media (prefers-contrast: more) {
-    .glass-surface--refract,
-    .glass-surface--frost,
-    .dark .glass-surface--refract {
-      background: color-mix(in oklab, var(--color-canvas) 94%, transparent);
-      border-color: var(--color-line-strong);
-    }
-  }
-
   /* Graceful fallback where backdrop-filter is unsupported: solidify a touch. */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .glass {
+    .glass-pill {
       background: color-mix(in oklab, var(--color-canvas) 90%, transparent);
     }
   }

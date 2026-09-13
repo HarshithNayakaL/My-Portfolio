@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import GlassSurface from "./GlassSurface";
+import LiquidGlass from "liquid-glass-react";
 import { scrollToSection } from "../lib/scrollToSection";
 import ThemeToggle from "./ThemeToggle";
 
@@ -21,6 +21,19 @@ export default function Nav() {
   // hidden — and only once the page has actually moved. This is also how the
   // effect behaves on Apple platforms: it appears as content scrolls beneath.
   const [scrolled, setScrolled] = useState(false);
+  // The component darkens its plates for light backgrounds via `overLight`.
+  // That has to track the site's own theme, which the toggle flips as a class
+  // on <html> rather than through a media query.
+  const [overLight, setOverLight] = useState(true);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => setOverLight(!root.classList.contains("dark"));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -69,16 +82,25 @@ export default function Nav() {
       <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
       {/* The pill is the one surface the whole page scrolls behind, so it is
           where a refraction filter has something to refract. */}
-      <GlassSurface
-        borderRadius={999}
-        borderWidth={0.09}
-        blur={14}
-        displace={4}
-        distortionScale={-25}
-        redOffset={0}
-        greenOffset={1}
-        blueOffset={2}
-        className="w-full max-w-2xl"
+      {/* liquid-glass-react renders five stacked layers — two shadow plates,
+          the glass itself and two highlight spans — and every one of them takes
+          its position/top/left from the `style` passed in, then centres itself
+          with translate(-50%, -50%). They only line up inside a positioned box
+          that already has the pill's size; dropped into flow they scatter, two
+          of them landing outside the viewport entirely. Hence the explicit
+          wrapper and height rather than letting the pill size itself. */}
+      <div className="relative h-[54px] w-full max-w-2xl">
+      <LiquidGlass
+        cornerRadius={999}
+        padding="0"
+        displacementScale={64}
+        blurAmount={0.07}
+        saturation={150}
+        aberrationIntensity={2}
+        elasticity={0.22}
+        overLight={overLight}
+        className="nav-glass"
+        style={{ position: "absolute", top: "50%", left: "50%", width: "100%" }}
       >
       <nav className="flex w-full items-center justify-between gap-2 rounded-full py-2 pl-4 pr-2">
         <Link
@@ -121,7 +143,8 @@ export default function Nav() {
           <ThemeToggle />
         </div>
       </nav>
-      </GlassSurface>
+      </LiquidGlass>
+      </div>
       </header>
     </>
   );
