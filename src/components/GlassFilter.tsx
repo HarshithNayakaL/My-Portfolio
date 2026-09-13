@@ -42,8 +42,8 @@ function Glass({ id, brightness }: { id: string; brightness: number }) {
       colorInterpolationFilters="sRGB"
     >
       <feImage href={MAP} result="MAP" preserveAspectRatio="none" />
-      <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="BLUR" />
-      <feColorMatrix in="BLUR" type="saturate" values="1.9" result="RICH" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="BLUR" />
+      <feColorMatrix in="BLUR" type="saturate" values="1.65" result="RICH" />
       {/* The luminosity half of Apple's regular variant. The CSS fallback does
           this with brightness(); inside the filter it has to be a matrix. */}
       <feColorMatrix
@@ -67,8 +67,8 @@ export default function GlassFilter() {
   return (
     <svg width="0" height="0" aria-hidden focusable="false" className="sr-filter">
       <defs>
-        <Glass id="nav-glass" brightness={1.06} />
-        <Glass id="nav-glass-dark" brightness={0.82} />
+        <Glass id="nav-glass" brightness={1.04} />
+        <Glass id="nav-glass-dark" brightness={0.86} />
       </defs>
     </svg>
   );

@@ -6,7 +6,7 @@ import { EMAIL, LINKEDIN, GITHUB, NAME } from "../data/projects";
 const nav = [
   { id: "work", label: "Work" },
   { id: "capabilities", label: "Capabilities" },
-  { id: "skills", label: "Skills" },
+  { id: "skills", label: "Agent Skills" },
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ];
