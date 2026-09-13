@@ -396,6 +396,9 @@
     .nav-glass > svg {
       display: none;
     }
+    .scroll-edge {
+      display: none;
+    }
   }
   @media (prefers-contrast: more) {
     .nav-glass > .glass,
@@ -404,6 +407,38 @@
       background: color-mix(in oklab, var(--color-canvas) 94%, transparent);
       border-color: var(--color-line-strong);
     }
+  }
+
+  /* ---- Scroll edge effect.
+     Apple's answer to content sliding under a bar is not a heavier blur on the
+     bar; it is a band at the edge of the scroll view that obscures content
+     *before* it arrives: "Scroll views offer a scroll edge effect that helps
+     maintain sufficient legibility and contrast for controls by obscuring
+     content that scrolls beneath them. System bars like toolbars adopt this
+     behavior by default." (Adopting Liquid Glass.) The HIG adds that the
+     effect works "by blurring and reducing the opacity of background content",
+     which is the blur and the canvas-coloured wash below.
+
+     Masked so both fade out downward — an unmasked band would read as a solid
+     bar and defeat the point, which is that content stays visible while it
+     passes. */
+  .scroll-edge {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    height: 96px;
+    z-index: 45;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-canvas) 72%, transparent) 0%,
+      color-mix(in oklab, var(--color-canvas) 34%, transparent) 55%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
   }
 
   /* Graceful fallback where backdrop-filter is unsupported: solidify a touch. */
