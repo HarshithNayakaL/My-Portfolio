@@ -85,7 +85,7 @@ export default function Nav() {
               aria-current={active === s.id ? "true" : undefined}
               className={`relative rounded-full py-2 font-semibold transition-colors duration-300 ${
                 s.from
-              } ${active === s.id ? "text-accent-ink" : "text-dim hover:text-ink"}`}
+              } ${active === s.id ? "text-accent-ink" : "text-ink"}`}
               style={{ touchAction: "manipulation" }}
             >
               {active === s.id && (

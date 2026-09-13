@@ -22,6 +22,9 @@ export type Bevel = {
   bevelMode: 0 | 1;
 };
 
+/** How wide the rim light is, in px. */
+const RIM_PX = 3;
+
 /** Signed distance to a rounded rectangle: negative inside, zero on the edge. */
 function distance(px: number, py: number, hw: number, hh: number, r: number) {
   const qx = Math.abs(px) - hw + r;
@@ -90,7 +93,13 @@ export function bevelMap(
       // collide at the bar's waist, leaving a hard horizontal seam.
       img.data[i] = Math.round(128 + nx * tilt * 127);
       img.data[i + 1] = Math.round(128 + ny * tilt * 127);
-      img.data[i + 2] = Math.round(tilt * 255);
+      // Blue is the rim light's mask, and it is deliberately not the tilt.
+      // The tilt spans the whole bevel — 22px of a 54px bar — so lighting it
+      // washes out half the bar's height instead of catching an edge. The
+      // highlight rides the outermost few pixels, where glass actually
+      // catches the light.
+      const rim = Math.max(0, 1 - inward / RIM_PX);
+      img.data[i + 2] = Math.round(rim * rim * 255);
       img.data[i + 3] = 255;
     }
   }
