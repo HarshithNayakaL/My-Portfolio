@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import GlassSurface from "./GlassSurface";
 import { scrollToSection } from "../lib/scrollToSection";
 import ThemeToggle from "./ThemeToggle";
 
@@ -51,7 +52,20 @@ export default function Nav() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
-      <nav className="glass flex w-full max-w-2xl items-center justify-between gap-2 rounded-full py-2 pl-4 pr-2">
+      {/* The pill is the one surface the whole page scrolls behind, so it is
+          where a refraction filter has something to refract. */}
+      <GlassSurface
+        borderRadius={999}
+        borderWidth={0.09}
+        blur={14}
+        displace={4}
+        distortionScale={-25}
+        redOffset={0}
+        greenOffset={1}
+        blueOffset={2}
+        className="w-full max-w-2xl"
+      >
+      <nav className="flex w-full items-center justify-between gap-2 rounded-full py-2 pl-4 pr-2">
         <Link
           to="/"
           onClick={() => pathname === "/" && goTo("top")}
@@ -92,6 +106,7 @@ export default function Nav() {
           <ThemeToggle />
         </div>
       </nav>
+      </GlassSurface>
     </header>
   );
 }

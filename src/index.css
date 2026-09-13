@@ -306,6 +306,82 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.5);
   }
+  /* ---- GlassSurface: refracting glass panel (see GlassSurface.tsx).
+     Keyed off `.dark` rather than the original's light-dark()/
+     prefers-color-scheme, because this site themes by class and would
+     otherwise follow the OS instead of its own toggle. Shadows use the site's
+     glass tokens instead of the component's blue ones. */
+  .glass-surface {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .glass-surface__filter {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .glass-surface__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+  }
+
+  /* Chromium: the site's frost, with a displacement filter on top of it.
+     Refraction alone is not glass — it displaces the backdrop without
+     obscuring it, so the hero headline drove straight through the nav and the
+     links became unreadable the moment anything scrolled behind. Blur is what
+     makes a panel legible; the filter is what makes it look like glass rather
+     than frosted plastic. Both, in that order. */
+  .glass-surface--refract {
+    background: var(--color-glass);
+    -webkit-backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
+      saturate(var(--glass-sat, 1.8));
+    backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
+      saturate(var(--glass-sat, 1.8));
+    border: 1px solid var(--color-glass-border);
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 18px 50px -22px rgba(0, 0, 0, 0.5);
+  }
+  .dark .glass-surface--refract {
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 18px 50px -22px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Safari, Firefox, and anything without SVG filters in backdrop-filter:
+     the frosted treatment the site already used. */
+  .glass-surface--frost {
+    background: var(--color-glass);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid var(--color-glass-border);
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 18px 50px -22px rgba(0, 0, 0, 0.5);
+  }
+  .dark .glass-surface--frost {
+    box-shadow:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 18px 50px -22px rgba(0, 0, 0, 0.7);
+  }
+
   /* Graceful fallback where backdrop-filter is unsupported: solidify a touch. */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .glass {
