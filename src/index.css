@@ -306,6 +306,38 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.5);
   }
+  /* ---- Scroll edge effect.
+     Apple's answer to content sliding under a bar is not a heavier blur on the
+     bar; it is a band at the edge of the scroll view that obscures content
+     *before* it arrives: "Scroll views offer a scroll edge effect that helps
+     maintain sufficient legibility and contrast for controls by obscuring
+     content that scrolls beneath them. System bars like toolbars adopt this
+     behavior by default." (Adopting Liquid Glass.) The HIG adds that the
+     effect works "by blurring and reducing the opacity of background content",
+     which is the blur and the canvas-coloured wash below.
+
+     Masked so both fade out downward — an unmasked band would read as a solid
+     bar and defeat the point, which is that content stays visible while it
+     passes. */
+  .scroll-edge {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    height: 96px;
+    z-index: 45;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-canvas) 72%, transparent) 0%,
+      color-mix(in oklab, var(--color-canvas) 34%, transparent) 55%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 100%);
+  }
+
   /* ---- GlassSurface: refracting glass panel (see GlassSurface.tsx).
      Keyed off `.dark` rather than the original's light-dark()/
      prefers-color-scheme, because this site themes by class and would
@@ -346,10 +378,13 @@
      than frosted plastic. Both, in that order. */
   .glass-surface--refract {
     background: var(--color-glass);
+    /* The regular variant "blurs and adjusts the luminosity of background
+       content to maintain legibility" (HIG, Materials) — hence the brightness
+       and contrast terms, not just blur and saturation. */
     -webkit-backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
-      saturate(var(--glass-sat, 1.8));
+      saturate(var(--glass-sat, 1.8)) brightness(1.06) contrast(1.04);
     backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
-      saturate(var(--glass-sat, 1.8));
+      saturate(var(--glass-sat, 1.8)) brightness(1.06) contrast(1.04);
     border: 1px solid var(--color-glass-border);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
@@ -380,6 +415,39 @@
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.7);
+  }
+  .dark .glass-surface--refract {
+    /* Dark mode darkens rather than lifts: the same luminosity adjustment,
+       in the direction that keeps light text on the bar readable. */
+    -webkit-backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
+      saturate(var(--glass-sat, 1.8)) brightness(0.82) contrast(1.08);
+    backdrop-filter: var(--glass-filter) blur(var(--glass-blur, 28px))
+      saturate(var(--glass-sat, 1.8)) brightness(0.82) contrast(1.08);
+  }
+
+  /* Apple: "people can ... turn on accessibility settings that reduce
+     transparency or motion in the interface. These settings can remove or
+     modify certain effects." A system component adapts for free; a custom one
+     has to be told, so both settings are handled here rather than assumed. */
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-surface--refract,
+    .glass-surface--frost,
+    .dark .glass-surface--refract {
+      background: var(--color-canvas);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .scroll-edge {
+      display: none;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .glass-surface--refract,
+    .glass-surface--frost,
+    .dark .glass-surface--refract {
+      background: color-mix(in oklab, var(--color-canvas) 94%, transparent);
+      border-color: var(--color-line-strong);
+    }
   }
 
   /* Graceful fallback where backdrop-filter is unsupported: solidify a touch. */

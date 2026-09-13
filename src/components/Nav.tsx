@@ -16,6 +16,18 @@ export default function Nav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [active, setActive] = useState("");
+  // The scroll edge has nothing to obscure until something is under it, and a
+  // full-width backdrop blur is not free, so it is mounted rather than merely
+  // hidden — and only once the page has actually moved. This is also how the
+  // effect behaves on Apple platforms: it appears as content scrolls beneath.
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Track which section is in view to light the matching nav link.
   useEffect(() => {
@@ -51,7 +63,10 @@ export default function Nav() {
   );
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
+    <>
+      {/* Obscures content before it reaches the bar — see .scroll-edge. */}
+      {scrolled && <div className="scroll-edge" aria-hidden />}
+      <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
       {/* The pill is the one surface the whole page scrolls behind, so it is
           where a refraction filter has something to refract. */}
       <GlassSurface
@@ -107,6 +122,7 @@ export default function Nav() {
         </div>
       </nav>
       </GlassSurface>
-    </header>
+      </header>
+    </>
   );
 }
