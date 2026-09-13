@@ -4,12 +4,22 @@ import LiquidGlass from "liquid-glass-react";
 import { scrollToSection } from "../lib/scrollToSection";
 import ThemeToggle from "./ThemeToggle";
 
+/**
+ * `from` is the width at which a link earns its place in the bar. The pill is
+ * a fixed-height stadium with a circular control pinned to its right end, and
+ * `overflow: hidden` on the glass, so a row that does not fit does not wrap or
+ * scroll — it is cut off. At 320px the full row measures 341px against 262px
+ * of usable width, which put the theme toggle 70px outside the pill.
+ *
+ * Widest labels drop first: Capabilities is covered by Skills, and Skills by
+ * the Work entries, so the phone bar keeps Work, About and Contact.
+ */
 const sections = [
-  { id: "work", label: "Work" },
-  { id: "capabilities", label: "Capabilities" },
-  { id: "skills", label: "Skills" },
-  { id: "about", label: "About" },
-  { id: "contact", label: "Contact" },
+  { id: "work", label: "Work", from: "" },
+  { id: "capabilities", label: "Capabilities", from: "hidden md:inline-block" },
+  { id: "skills", label: "Skills", from: "hidden sm:inline-block" },
+  { id: "about", label: "About", from: "" },
+  { id: "contact", label: "Contact", from: "" },
 ];
 
 export default function Nav() {
@@ -107,8 +117,8 @@ export default function Nav() {
               key={s.id}
               onClick={() => goTo(s.id)}
               aria-current={active === s.id ? "true" : undefined}
-              className={`relative rounded-full px-3 py-2 text-[13px] font-semibold transition-colors duration-300 ${
-                s.id === "capabilities" ? "hidden md:inline-block" : ""
+              className={`relative rounded-full px-2 py-2 text-[13px] font-semibold transition-colors duration-300 sm:px-3 ${
+                s.from
               } ${active === s.id ? "text-accent-ink" : "text-dim hover:text-ink"}`}
               style={{ touchAction: "manipulation" }}
             >
