@@ -49,19 +49,6 @@ export const sceneFor = (expression: OneeExpression = "neutral" as OneeExpressio
 /** The pose Onee holds before anything has happened to it. */
 export const restingScene = (): AvatarScene => sceneFor();
 
-/**
- * A handful of pleasant faces for the still version of Onee, which has no
- * animation to cycle and changes expression only when someone taps it.
- */
-export const STILL_FACES = [
-  "neutral",
-  "joyful-wide",
-  "curious-left",
-  "playful-right",
-  "surprised-left",
-  "joyful-down-right",
-] as OneeExpression[];
-
 /** Where the eyes are pointing, in the solver's own units. */
 export type Gaze = { x: number; y: number };
 

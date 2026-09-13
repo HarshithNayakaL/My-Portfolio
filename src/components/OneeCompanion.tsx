@@ -17,13 +17,18 @@ export default function OneeCompanion() {
     const host = hostRef.current;
     if (!host) return;
 
-    // A reduced-motion preference asks for less movement, not less site. This
-    // used to skip the mount entirely, which hid Onee from everyone running
-    // with animation effects turned off — a setting plenty of people have on
-    // without ever thinking of themselves as needing it, and the reason it
-    // looked like the mascot had simply stopped working. They get a still
-    // Onee instead: it sits in the corner and changes its face when tapped,
-    // with no frame loop and nothing that moves on its own.
+    // A reduced-motion preference asks for less movement, not less site, and
+    // not a less alive character. Onee mounts either way; with the preference
+    // set it stays parked in its corner instead of crossing the window, but it
+    // still blinks, changes expression, watches the cursor and breathes.
+    //
+    // Two wrong calls got here. First this skipped the mount entirely, so the
+    // mascot did not exist for anyone running with Windows animation effects
+    // off — a setting people turn on for snappiness, not as a declaration
+    // about vestibular sensitivity. Then it mounted something frozen, which
+    // reads as broken rather than considerate. Travel across the viewport is
+    // the part a motion preference is really about; blinking in the corner is
+    // not what makes anyone queasy.
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let teardown: (() => void) | undefined;

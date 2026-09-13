@@ -15,8 +15,6 @@ import { readMood, DWELL_MS, type Senses } from "./oneeBehaviour";
 import {
   createOneeRuntime,
   restingScene,
-  sceneFor,
-  STILL_FACES,
   type Gaze,
   type OneeAnimation,
 } from "./oneeRuntime";
@@ -147,9 +145,14 @@ function watchSections(onChange: (id: string | null) => void) {
 }
 
 /**
- * @param calm renders a still Onee that never moves, for visitors who have
- *   asked for reduced motion. They get the character; they don't get the
- *   roaming, the frame loop or anything else that moves on its own.
+ * @param calm keeps Onee in its corner for visitors who have asked for reduced
+ *   motion. It is still alive — it blinks, changes expression, watches the
+ *   cursor and breathes — but it never travels across the screen. Crossing the
+ *   viewport is the part of this that a motion preference is actually about;
+ *   a character that blinks in the corner is not what makes anybody queasy.
+ *
+ *   The first version of this froze Onee completely, which read as broken
+ *   rather than considerate: a mascot that never moves is a sticker.
  */
 export function mountOnee(host: HTMLElement, calm = false): () => void {
   const scene = restingScene();
@@ -205,40 +208,6 @@ export function mountOnee(host: HTMLElement, calm = false): () => void {
     right.setAttribute("d", next.geometry.rightPath);
     right.setAttribute("opacity", next.geometry.rightVisible ? "1" : "0");
   };
-
-  // --- the still version ---------------------------------------------------
-  // Reduced motion used to mean no Onee at all, which was the wrong reading of
-  // the preference and quietly hid the character from everyone who has
-  // animation effects switched off — a setting plenty of people run without
-  // thinking of themselves as needing it. The preference asks for less motion,
-  // not less site. So Onee sits in the corner, perfectly still, and changes
-  // its face when you tap it. No frame loop, no roaming, no drift.
-  if (calm) {
-    shell.classList.add("onee--still", "is-awake");
-    let faceIndex = 0;
-
-    const place = () => {
-      const size = shell.offsetWidth || 72;
-      const x = window.innerWidth - EDGE - size;
-      const y = window.innerHeight - EDGE - size;
-      shell.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
-    };
-
-    const nextFace = () => {
-      faceIndex = (faceIndex + 1) % STILL_FACES.length;
-      paintScene(sceneFor(STILL_FACES[faceIndex]));
-    };
-
-    place();
-    shell.addEventListener("pointerdown", nextFace);
-    window.addEventListener("resize", place, { passive: true });
-
-    return () => {
-      shell.removeEventListener("pointerdown", nextFace);
-      window.removeEventListener("resize", place);
-      shell.remove();
-    };
-  }
 
   // --- what it knows ------------------------------------------------------
   const now0 = performance.now();
@@ -671,7 +640,10 @@ export function mountOnee(host: HTMLElement, calm = false): () => void {
     // to its own business instead of hovering at their elbow for the rest of
     // the page. This one condition is most of what makes it feel alive rather
     // than tethered.
-    const engaged = roams && senses.pointer.inside && t - lastMove.t < 2_400;
+    // Chasing the cursor is travel too, so a calm Onee watches from its corner
+    // rather than coming over.
+    const engaged =
+      roams && !calm && senses.pointer.inside && t - lastMove.t < 2_400;
 
     let tx: number;
     let ty: number;
@@ -718,6 +690,12 @@ export function mountOnee(host: HTMLElement, calm = false): () => void {
       }
       perch = { x: pos.x, y: pos.y };
       perchUntil = t + PERCH_MIN_MS;
+    } else if (calm) {
+      // Parked. It still fidgets a little on the spot so it reads as alive,
+      // but it never crosses the screen and the scroll never drags it around.
+      const rest = home();
+      tx = rest.x + Math.sin(t / 2_600) * 6;
+      ty = rest.y + Math.sin(t / 2_050 + 0.8) * 5;
     } else {
       // Left to itself, Onee goes places: it picks an empty spot anywhere in
       // the window, crosses to it, hangs about for a few seconds and moves on.
