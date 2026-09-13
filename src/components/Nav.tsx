@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import LiquidGlass from "liquid-glass-react";
 import { scrollToSection } from "../lib/scrollToSection";
@@ -12,6 +12,29 @@ const sections = [
   { id: "contact", label: "Contact" },
 ];
 
+/**
+ * liquid-glass-react builds its refraction around an "edge mask": the
+ * displacement map's luminance says how close a pixel is to the rim, so the
+ * chromatic-aberration pass can be confined to the edge and the centre left
+ * clean. The feColorMatrix that derives the mask writes luminance into RGB but
+ * passes alpha through unchanged, and the feComponentTransfer immediately after
+ * it reads *alpha*. Every displacement map the package ships is a fully opaque
+ * image, so the mask comes out opaque everywhere: the aberration pass covers
+ * the whole surface and the composite that would restore the clean centre
+ * erases it instead. The three per-channel passes do not recombine to the
+ * original, and the pill renders as a flat grey slab — rgb(159,159,159) over
+ * this page — with no refraction at any displacement scale.
+ *
+ * Writing luminance into alpha instead makes the mask mean what the rest of the
+ * graph already assumes it means.
+ */
+const LUMINANCE_TO_ALPHA = [
+  "0 0 0 0 0",
+  "0 0 0 0 0",
+  "0 0 0 0 0",
+  "0.3 0.3 0.3 0 0",
+].join(" ");
+
 export default function Nav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -21,25 +44,30 @@ export default function Nav() {
   // hidden — and only once the page has actually moved. This is also how the
   // effect behaves on Apple platforms: it appears as content scrolls beneath.
   const [scrolled, setScrolled] = useState(false);
-  // The component darkens its plates for light backgrounds via `overLight`.
-  // That has to track the site's own theme, which the toggle flips as a class
-  // on <html> rather than through a media query.
-  const [overLight, setOverLight] = useState(true);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const sync = () => setOverLight(!root.classList.contains("dark"));
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Correct the mask on the filter the package mounts, then hand the filter
+  // back to the layer the stylesheet is holding it off. If the package's graph
+  // is ever reshaped and the primitive no longer matches, the filter simply
+  // stays off: a plainly frosted pill is a lesser effect but still a correct
+  // one, where the grey slab is neither.
+  const glass = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = glass.current;
+    if (!root) return;
+    const edge = root.querySelector(
+      'filter feColorMatrix[result="EDGE_INTENSITY"]',
+    );
+    if (!edge) return; // the stylesheet already holds the filter back
+    edge.setAttribute("values", LUMINANCE_TO_ALPHA);
+    root.querySelectorAll<HTMLElement>(".glass__warp").forEach((el) => {
+      el.style.setProperty("filter", el.style.filter, "important");
+    });
   }, []);
 
   // Track which section is in view to light the matching nav link.
@@ -89,7 +117,7 @@ export default function Nav() {
           that already has the pill's size; dropped into flow they scatter, two
           of them landing outside the viewport entirely. Hence the explicit
           wrapper and height rather than letting the pill size itself. */}
-      <div className="relative h-[54px] w-full max-w-2xl">
+      <div ref={glass} className="relative h-[54px] w-full max-w-2xl">
       <LiquidGlass
         cornerRadius={999}
         padding="0"
@@ -98,7 +126,6 @@ export default function Nav() {
         saturation={150}
         aberrationIntensity={2}
         elasticity={0.22}
-        overLight={overLight}
         className="nav-glass"
         style={{ position: "absolute", top: "50%", left: "50%", width: "100%" }}
       >

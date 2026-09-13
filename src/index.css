@@ -347,6 +347,16 @@
       0 18px 50px -22px rgba(0, 0, 0, 0.7);
   }
 
+  /* The refraction is held back until Nav.tsx has corrected the mask on the
+     package's filter — see the note there. Prerendered HTML carries the
+     uncorrected filter, so without this the first paint is a flat grey slab
+     that turns to glass only once the bundle has hydrated. The inline style
+     the package writes wins over any plain rule, hence `!important` here and
+     an `!important` of its own to hand the filter back. */
+  .nav-glass .glass__warp {
+    filter: none !important;
+  }
+
   /* Apple: "people can ... turn on accessibility settings that reduce
      transparency or motion in the interface. These settings can remove or
      modify certain effects." A system component adapts for free; a custom one
