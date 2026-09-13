@@ -600,89 +600,6 @@ const novaAi: CaseStudy = {
   ],
 };
 
-const blogspace: CaseStudy = {
-  slug: "blogspace",
-  title: "BlogSpace",
-  kicker: "Live & deployed full-stack",
-  outcome:
-    "A complete blogging platform with authentication, roles, and an admin panel, built end to end and running in production.",
-  meta: [
-    { label: "Type", value: "Full-stack web app" },
-    { label: "Stack", value: "React + Node + MongoDB" },
-    { label: "Role", value: "Solo, front to back" },
-  ],
-  problem: [
-    "A blogging platform sounds simple until you list what it actually needs: accounts, secure login, two kinds of users, content that only the right people can edit, and an admin who can moderate all of it. That's a real application, not a toy.",
-    "I built it solo, end to end, as proof I can take a full-stack product from auth to deployment without hand-waving the hard parts.",
-  ],
-  build: [
-    "BlogSpace handles the full lifecycle: register and log in with JWT-based auth and hashed passwords, write and publish posts in a rich-text editor, and manage everything through an admin panel with role-based access.",
-    "Users get drafts, published states, tags, auto-generated excerpts and read-time. Admins get user promotion/demotion and post moderation. It's deployed across Netlify, Render, and MongoDB Atlas, and it's live, not a localhost screenshot.",
-  ],
-  pipeline: [
-    {
-      title: "Auth",
-      nodes: [
-        { id: "register", label: "Register / login", detail: "JWT + bcrypt", kind: "input" },
-        { id: "role", label: "Role assignment", detail: "User vs admin", kind: "logic" },
-      ],
-    },
-    {
-      title: "Content",
-      nodes: [
-        { id: "editor", label: "Rich-text editor", detail: "Draft / publish", kind: "input" },
-        { id: "crud", label: "Post CRUD", detail: "Owned by author", kind: "logic" },
-      ],
-    },
-    {
-      title: "Guard",
-      nodes: [
-        { id: "protect", label: "Protected routes", detail: "Access by role", kind: "gate" },
-      ],
-    },
-    {
-      title: "Admin",
-      nodes: [
-        { id: "moderate", label: "Moderation panel", detail: "Manage users & posts", kind: "output" },
-      ],
-    },
-  ],
-  howItWorks: [
-    {
-      title: "Auth done properly, not faked",
-      body: "JWT tokens, bcrypt-hashed passwords, protected routes, and role-based access control. The boring security fundamentals that separate a real app from a tutorial, implemented rather than skipped.",
-    },
-    {
-      title: "Two user classes, enforced server-side",
-      body: "Users manage their own content; admins manage everyone's. The boundary is enforced on the backend, not hidden in the UI, so the permission model actually holds.",
-    },
-    {
-      title: "Deployed across three services",
-      body: "Frontend on Netlify, backend on Render, database on MongoDB Atlas. Wiring those together and keeping them talking in production is its own skill, and it's live.",
-    },
-  ],
-  results: [
-    {
-      label: "What it proves",
-      body: "End-to-end full-stack capability: a working auth system, a real permission model, and a deployment that strangers can actually use.",
-    },
-    {
-      label: "Try it",
-      body: "It's live and clickable, with demo accounts available, the strongest kind of proof: not a description, a working thing.",
-    },
-  ],
-  tech: [
-    "React",
-    "Node.js / Express",
-    "MongoDB / Mongoose",
-    "JWT + bcrypt",
-    "Netlify + Render",
-  ],
-  metaDescription:
-    "Full-stack blogging platform with JWT authentication, role-based access and an admin panel, built on React, Node and MongoDB, and live in production.",
-  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/blogspace-internship" }],
-};
-
 const aiNotes: CaseStudy = {
   slug: "ai-notes",
   title: "AI Notes",
@@ -1128,7 +1045,6 @@ export const caseStudies: Record<string, CaseStudy> = {
   cannon,
   replydesk,
   "nova-ai": novaAi,
-  blogspace,
   "ai-notes": aiNotes,
 };
 

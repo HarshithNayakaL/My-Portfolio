@@ -131,18 +131,6 @@ export const projects: Project[] = [
     links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/AI-Notes-App" }],
     hasCaseStudy: true,
   },
-  {
-    slug: "blogspace",
-    title: "BlogSpace",
-    kicker: "Live & deployed",
-    outcome:
-      "A full-stack blogging platform with JWT auth and an admin panel, live in production.",
-    tags: ["React", "Node", "MongoDB", "JWT"],
-    links: [
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/blogspace-internship" },
-    ],
-    hasCaseStudy: true,
-  },
 ];
 
 export const getProject = (slug: string) =>

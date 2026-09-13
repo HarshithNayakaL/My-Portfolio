@@ -36,7 +36,6 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 - [Cannon](https://harshith-nayaka-l-portfolio.vercel.app/work/cannon/index.md): A daily-driver multi-agent personal assistant — each domain (fitness, work) is an independent specialist with its own persona, tools, and retrieval scope, isolation enforced at the query rather than by convention. Typed provider fallback (Groq→Gemini) makes the whole stack degrade gracefully, including in CI. Live at https://cannon-multi-agents.vercel.app
 - [ReplyDesk](https://harshith-nayaka-l-portfolio.vercel.app/work/replydesk/index.md): A WhatsApp lead agent that answers every inbound message in ~8 seconds, with a live operations dashboard for the lead feed, pipeline, and response-time KPIs.
 - [Nova](https://harshith-nayaka-l-portfolio.vercel.app/work/nova-ai/index.md): A chat app that routes by difficulty rather than by model picker. Every turn is scored on four axes, an arbiter model confirms or overrides the lane, and the turn goes to the smallest of three models that can carry it — with the lane, the reasoning and the cost stamped on the answer. Live at https://custom-gpt-silk.vercel.app/
-- [BlogSpace](https://harshith-nayaka-l-portfolio.vercel.app/work/blogspace/index.md): A full-stack blogging platform with JWT auth, role-based access, and an admin panel (React, Node, MongoDB).
 - [AI Notes](https://harshith-nayaka-l-portfolio.vercel.app/work/ai-notes/index.md): A notes app running DeepSeek R1 locally through Ollama, so inference never leaves the machine.
 
 ## Published research

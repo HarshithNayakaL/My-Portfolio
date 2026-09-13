@@ -57,7 +57,6 @@ const PROJECT_SLUGS = new Set([
   "cannon",
   "replydesk",
   "nova-ai",
-  "blogspace",
   "ai-notes",
 ]);
 const CASE_STUDY_SLUGS = new Set([
@@ -66,7 +65,6 @@ const CASE_STUDY_SLUGS = new Set([
   "brand-audit-platform",
   "creative-ops-pipeline",
   "replydesk",
-  "blogspace",
   "cannon",
   "nova-ai",
   "ai-notes",
