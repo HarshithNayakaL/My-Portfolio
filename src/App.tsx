@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Nav from "./components/Nav";
+import GlassFilter from "./components/GlassFilter";
 import Footer from "./components/Footer";
 import ScrollProgress from "./components/ScrollProgress";
 import OneeCompanion from "./components/OneeCompanion";
@@ -69,6 +70,7 @@ export default function App() {
     <>
       <ScrollManager />
       <ScrollProgress />
+      <GlassFilter />
       <Nav />
       <main id="top" className="w-full max-w-full overflow-x-hidden">
         <AnimatedRoutes />
