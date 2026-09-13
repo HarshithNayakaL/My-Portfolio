@@ -6,13 +6,20 @@
  * the SVG filter keeps both, so the whole effect is one reference: blur the
  * backdrop, lift its saturation, then bend it through a displacement map.
  *
- * The map is a vertical gradient. feDisplacementMap reads 128 as "no offset",
- * so green at 255 along the top rim pulls the sample downward and 0 along the
- * bottom pulls it up — content compresses into both edges the way it does
- * through the rim of a real lens, and the middle, where the map sits at 128,
- * stays put. It is uniform horizontally, so it stretches to any bar width
- * without distorting; the bar's height is fixed, which is the axis that
- * matters.
+ * The map is a vertical gradient. feDisplacementMap samples at
+ * `y + scale * (G/255 - 0.5)`, so each rim has to reach *outward* for its
+ * content: G=0 at the top samples from above the bar, G=255 at the bottom
+ * samples from below it, and the middle sits at 128 and stays put. Both edges
+ * then draw the outside world in and compress it against the rim, which is
+ * what a lens does.
+ *
+ * The signs were the other way round before, which made the top rim sample
+ * from below and the bottom rim from above. The two halves reached across each
+ * other and met head-on at the bar's waist, leaving a hard horizontal seam
+ * with the image mirrored either side of it.
+ *
+ * Uniform horizontally, so it stretches to any bar width without distorting;
+ * the bar's height is fixed, which is the axis that matters.
  *
  * Rendered once, in the prerendered HTML, so the filter exists before the
  * bundle arrives. Browsers that do not take a filter reference in
@@ -24,10 +31,10 @@ const MAP =
   encodeURIComponent(
     `<svg xmlns='http://www.w3.org/2000/svg' width='64' height='54' preserveAspectRatio='none'>` +
       `<defs><linearGradient id='b' x1='0' y1='0' x2='0' y2='1'>` +
-      `<stop offset='0' stop-color='rgb(128,255,128)'/>` +
+      `<stop offset='0' stop-color='rgb(128,0,128)'/>` +
       `<stop offset='${BAND}' stop-color='rgb(128,128,128)'/>` +
       `<stop offset='${1 - BAND}' stop-color='rgb(128,128,128)'/>` +
-      `<stop offset='1' stop-color='rgb(128,0,128)'/>` +
+      `<stop offset='1' stop-color='rgb(128,255,128)'/>` +
       `</linearGradient></defs><rect width='64' height='54' fill='url(%23b)'/></svg>`,
   );
 
@@ -35,10 +42,17 @@ function Glass({ id, brightness }: { id: string; brightness: number }) {
   return (
     <filter
       id={id}
-      x="0"
-      y="0"
-      width="100%"
-      height="100%"
+      /* The region has to reach well past the bar. Each rim samples from
+         outside it, and where the region stops the source is empty, so a
+         region clipped to the element leaves a hard horizontal seam across the
+         bar where the displaced band runs out of pixels. Measured on a
+         text-free strip, worst row-to-row jump: 17.1 at the element bounds,
+         13.8 at 130%, 1.2 at 220% — against 1.2 for a plain blur with no
+         displacement at all. */
+      x="-60%"
+      y="-60%"
+      width="220%"
+      height="220%"
       colorInterpolationFilters="sRGB"
     >
       <feImage href={MAP} result="MAP" preserveAspectRatio="none" />

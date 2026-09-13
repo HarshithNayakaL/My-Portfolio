@@ -72,7 +72,7 @@
   --on-btn: #ffffff;
   --on-accent: #ffffff;
   --glass: rgba(255, 255, 255, 0.5);
-  --nav-glass: rgba(255, 255, 255, 0.50);
+  --nav-glass: rgba(255, 255, 255, 0.58);
   --glass-border: rgba(255, 255, 255, 0.85);
   --glass-edge: rgba(255, 255, 255, 0.9);
   --glass-sheen: 0.5;
@@ -106,7 +106,7 @@
   --on-btn: #ffffff;
   --on-accent: #0a0b0f;
   --glass: rgba(18, 20, 27, 0.46);
-  --nav-glass: rgba(18, 20, 27, 0.46);
+  --nav-glass: rgba(18, 20, 27, 0.54);
   --glass-border: rgba(255, 255, 255, 0.16);
   --glass-edge: rgba(255, 255, 255, 0.14);
   --glass-sheen: 0.06;
