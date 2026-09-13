@@ -295,7 +295,7 @@
   /* iOS-style "liquid glass": translucent material + backdrop blur + hairline
      highlight. Only use on FIXED/STICKY elements (nav) — backdrop-filter on
      scrolling content tanks frame rate. */
-  /* Renamed from `.glass`: liquid-glass-react names its own element `.glass`
+  /* Renamed from `.glass`: both glass libraries name their own element `.glass`
      too, so the nav pill was silently inheriting this treatment on top of the
      package's. A collision that happens to look right is still a collision —
      any future edit here would have changed the nav for no visible reason. */
@@ -310,25 +310,32 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.5);
   }
-  /* liquid-glass-react sizes its inner `.glass` to its content, which leaves
-     the pill's glass stopping short of the layer stack measured around it —
-     a strip of dead glass down the right-hand side. The nav is a full-width
-     bar, so the glass is told to fill it. */
-  .nav-glass > .glass,
-  .nav-glass > .glass > div {
-    width: 100%;
+  /* The nav pill. It centres itself rather than sitting inside a flex header,
+     because the library requires the glass element to be a direct child of the
+     root — and it does so without a transform, so the rect the shader samples
+     is the rect actually on screen. */
+  .nav-pill {
+    position: fixed;
+    top: 1rem;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    margin-inline: auto;
+    width: min(42rem, calc(100% - 2rem));
+    height: 54px;
+    border-radius: 999px;
+  }
+  @media (min-width: 768px) {
+    .nav-pill {
+      top: 1.25rem;
+    }
   }
 
-  /* The frost, applied on purpose rather than inherited.
-     liquid-glass-react supplies displacement and the elastic response; it does
-     not obscure what is behind it, and its own blurAmount is a fraction of
-     what a bar full of text needs — with the package alone the hero headline
-     read straight through the nav labels. Apple's regular variant is the two
-     together: "blurs and adjusts the luminosity of background content to
-     maintain legibility" (HIG, Materials). Written here rather than left to
-     the class collision that was silently supplying it, so a future edit to
-     `.glass-pill` cannot change the nav. */
-  .nav-glass > .glass {
+  /* The frost. Apple's regular variant: blur plus a luminosity shift, a rim
+     highlight and a cast shadow. This is the whole effect — see the note in
+     the commit history for why neither WebGL refraction library could run
+     against a page this tall. */
+  .nav-pill {
     background: var(--color-glass);
     -webkit-backdrop-filter: blur(22px) saturate(175%) brightness(1.05);
     backdrop-filter: blur(22px) saturate(175%) brightness(1.05);
@@ -338,43 +345,13 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.5);
   }
-  .dark .nav-glass > .glass {
+  .dark .nav-pill {
     -webkit-backdrop-filter: blur(22px) saturate(175%) brightness(0.85);
     backdrop-filter: blur(22px) saturate(175%) brightness(0.85);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 18px 50px -22px rgba(0, 0, 0, 0.7);
-  }
-
-  /* The package's refraction layer is off, and stays off.
-     It works by putting `filter: url(#…)` and `backdrop-filter` on one span
-     over the glass. In Chromium that combination breaks twice over. The
-     filter's edge mask is derived by an feColorMatrix that writes luminance to
-     RGB and then read by an feComponentTransfer that samples *alpha*; since
-     every displacement map it ships is opaque, the mask covers the whole
-     surface, the aberration pass is applied everywhere and the clean centre is
-     composited away — the bar renders as flat rgb(159,159,159) at any
-     displacement scale. Correcting the mask fixes that and exposes the second
-     one: any backdrop-filter on that span, `blur(0px)` and `opacity(1)`
-     included, splits the backdrop and leaves a hard seam down roughly the left
-     45% of a 672px bar. Moving the refraction onto `.glass` as
-     `backdrop-filter: url(#…) blur(22px)` drops the seam but Chromium then
-     ignores the blur, and the hero headline reads straight through the labels.
-
-     So the glass here is the frost below — Apple's regular variant, which is
-     what a bar uses anyway: "Use Liquid Glass effects sparingly" and system
-     bars "blur and adjust the luminosity of background content to maintain
-     legibility" (HIG, Materials). The package keeps the pill's structure and
-     its elastic response to the pointer.
-
-     The two trailing highlight spans go with it: a 135deg white gradient at
-     mix-blend-mode screen and the same again at overlay, whose 33% stop
-     resolves as a visible band edge. The rim in the box-shadow is the specular
-     cue. */
-  .nav-glass .glass__warp,
-  .nav-glass ~ span {
-    display: none;
   }
 
   /* Apple: "people can ... turn on accessibility settings that reduce
@@ -385,24 +362,20 @@
      Placed after the frost above deliberately: these carry the same
      specificity, so source order is what decides. */
   @media (prefers-reduced-transparency: reduce) {
-    .nav-glass > .glass,
-    .dark .nav-glass > .glass,
+    .nav-pill,
+    .dark .nav-pill,
     .glass-pill {
       background: var(--color-canvas);
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
-    }
-    .nav-glass .glass__warp,
-    .nav-glass > svg {
-      display: none;
     }
     .scroll-edge {
       display: none;
     }
   }
   @media (prefers-contrast: more) {
-    .nav-glass > .glass,
-    .dark .nav-glass > .glass,
+    .nav-pill,
+    .dark .nav-pill,
     .glass-pill {
       background: color-mix(in oklab, var(--color-canvas) 94%, transparent);
       border-color: var(--color-line-strong);

@@ -43,12 +43,6 @@ function fetchPriorityEntry(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), fetchPriorityEntry()],
-  ssr: {
-    // Vite externalises dependencies for the SSR build and would resolve this
-    // package to its CJS entry, handing the prerenderer `{ default: Component }`
-    // instead of a component. Bundling its ESM build fixes the interop.
-    noExternal: ["liquid-glass-react"],
-  },
   resolve: {
     alias: [
       // @bible-strong/avatar-core compiles its JSON Schema at module scope, so

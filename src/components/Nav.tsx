@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import LiquidGlass from "liquid-glass-react";
 import { scrollToSection } from "../lib/scrollToSection";
 import ThemeToggle from "./ThemeToggle";
 
@@ -75,28 +74,9 @@ export default function Nav() {
     <>
       {/* Obscures content before it reaches the bar — see .scroll-edge. */}
       {scrolled && <div className="scroll-edge" aria-hidden />}
-      <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5">
-      {/* The pill is the one surface the whole page scrolls behind, so it is
-          where a refraction filter has something to refract. */}
-      {/* liquid-glass-react renders five stacked layers — two shadow plates,
-          the glass itself and two highlight spans — and every one of them takes
-          its position/top/left from the `style` passed in, then centres itself
-          with translate(-50%, -50%). They only line up inside a positioned box
-          that already has the pill's size; dropped into flow they scatter, two
-          of them landing outside the viewport entirely. Hence the explicit
-          wrapper and height rather than letting the pill size itself. */}
-      <div className="relative h-[54px] w-full max-w-2xl">
-      <LiquidGlass
-        cornerRadius={999}
-        padding="0"
-        displacementScale={64}
-        blurAmount={0.07}
-        saturation={150}
-        aberrationIntensity={2}
-        elasticity={0.22}
-        className="nav-glass"
-        style={{ position: "absolute", top: "50%", left: "50%", width: "100%" }}
-      >
+      {/* The pill positions itself rather than sitting inside a flex header:
+          one element, one place its geometry is defined. */}
+      <div className="nav-pill">
       <nav className="flex w-full items-center justify-between gap-2 rounded-full py-2 pl-4 pr-2">
         <Link
           to="/"
@@ -138,9 +118,7 @@ export default function Nav() {
           <ThemeToggle />
         </div>
       </nav>
-      </LiquidGlass>
       </div>
-      </header>
     </>
   );
 }
