@@ -223,9 +223,8 @@
      so drawing Onee never triggers layout and never repaints the page beneath
      it. (Choosing where to stand does read layout — it hit-tests the page to
      find empty space — but that runs every few seconds, not every frame.)
-     Under a reduced-motion preference Onee still appears and is still alive —
-     the preference is for less movement, not for less site — but it stays
-     parked in its corner instead of crossing the window. */
+     Onee behaves identically whatever the visitor's motion preference is; see
+     OneeCompanion for why it is deliberately not wired to that media query. */
   .onee-host {
     position: fixed;
     inset: 0;

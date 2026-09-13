@@ -144,17 +144,7 @@ function watchSections(onChange: (id: string | null) => void) {
   };
 }
 
-/**
- * @param calm keeps Onee in its corner for visitors who have asked for reduced
- *   motion. It is still alive — it blinks, changes expression, watches the
- *   cursor and breathes — but it never travels across the screen. Crossing the
- *   viewport is the part of this that a motion preference is actually about;
- *   a character that blinks in the corner is not what makes anybody queasy.
- *
- *   The first version of this froze Onee completely, which read as broken
- *   rather than considerate: a mascot that never moves is a sticker.
- */
-export function mountOnee(host: HTMLElement, calm = false): () => void {
+export function mountOnee(host: HTMLElement): () => void {
   const scene = restingScene();
 
   // --- the character ------------------------------------------------------
@@ -640,10 +630,7 @@ export function mountOnee(host: HTMLElement, calm = false): () => void {
     // to its own business instead of hovering at their elbow for the rest of
     // the page. This one condition is most of what makes it feel alive rather
     // than tethered.
-    // Chasing the cursor is travel too, so a calm Onee watches from its corner
-    // rather than coming over.
-    const engaged =
-      roams && !calm && senses.pointer.inside && t - lastMove.t < 2_400;
+    const engaged = roams && senses.pointer.inside && t - lastMove.t < 2_400;
 
     let tx: number;
     let ty: number;
@@ -690,12 +677,6 @@ export function mountOnee(host: HTMLElement, calm = false): () => void {
       }
       perch = { x: pos.x, y: pos.y };
       perchUntil = t + PERCH_MIN_MS;
-    } else if (calm) {
-      // Parked. It still fidgets a little on the spot so it reads as alive,
-      // but it never crosses the screen and the scroll never drags it around.
-      const rest = home();
-      tx = rest.x + Math.sin(t / 2_600) * 6;
-      ty = rest.y + Math.sin(t / 2_050 + 0.8) * 5;
     } else {
       // Left to itself, Onee goes places: it picks an empty spot anywhere in
       // the window, crosses to it, hangs about for a few seconds and moves on.
