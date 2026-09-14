@@ -341,8 +341,8 @@
      page, so the bar has to hold legibility on its own. */
   .nav-pill {
     background: var(--nav-glass);
-    -webkit-backdrop-filter: blur(6.4px) saturate(100%) brightness(1.02);
-    backdrop-filter: blur(6.4px) saturate(100%) brightness(1.02);
+    -webkit-backdrop-filter: blur(4.8px) saturate(100%) brightness(1.02);
+    backdrop-filter: blur(4.8px) saturate(100%) brightness(1.02);
     border: 1px solid var(--color-glass-border);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.55),
@@ -350,8 +350,8 @@
       0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
   .dark .nav-pill {
-    -webkit-backdrop-filter: blur(6.4px) saturate(100%) brightness(0.94);
-    backdrop-filter: blur(6.4px) saturate(100%) brightness(0.94);
+    -webkit-backdrop-filter: blur(4.8px) saturate(100%) brightness(0.94);
+    backdrop-filter: blur(4.8px) saturate(100%) brightness(0.94);
     box-shadow:
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.14),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),

@@ -13,7 +13,7 @@ import { bevelMap } from "../lib/bevelMap";
  */
 const CONFIG = {
   /** 0 = sharp, 1 = maximum blur. */
-  blurAmount: 0.16,
+  blurAmount: 0.12,
   /** How much the glass bends light. */
   refraction: 0.69,
   /** Colour fringing at the edges. */
