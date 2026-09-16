@@ -49,6 +49,8 @@ const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";
  */
 const API_COLLECTIONS = new Set(["profile", "projects", "case-studies", "faqs", "skills"]);
 const PROJECT_SLUGS = new Set([
+  "spectra",
+  "personal-os-mcp",
   "brandforge",
   "brand-audit-platform",
   "creative-ops-pipeline",
@@ -60,6 +62,8 @@ const PROJECT_SLUGS = new Set([
   "ai-notes",
 ]);
 const CASE_STUDY_SLUGS = new Set([
+  "spectra",
+  "personal-os-mcp",
   "craftconnect",
   "brandforge",
   "brand-audit-platform",

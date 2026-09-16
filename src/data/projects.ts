@@ -35,6 +35,28 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
+    slug: "spectra",
+    title: "SPECTRA",
+    kicker: "AI-search perception platform",
+    outcome:
+      "Shows what an AI system actually understands about a website, and at which stage a fact disappears \u2014 the model emits typed observations, a deterministic engine does the scoring.",
+    tags: ["Rust crawler", "Gemini", "Evidence-backed", "Deterministic scoring"],
+    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/spectra" }],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "personal-os-mcp",
+    title: "Personal MCP OS",
+    kicker: "85-tool local execution layer",
+    outcome:
+      "Gives an MCP client real hands on a machine \u2014 filesystem, shell, Git, browser, Android \u2014 behind risk-based policy and one-use approvals a human has to grant.",
+    tags: ["MCP", "Local-first", "Policy + approvals", "Kotlin + TypeScript"],
+    links: [
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/personal-os-mcp" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
     slug: "creative-ops-pipeline",
     title: "Creative-Ops Pipeline",
     kicker: "~90-node n8n workflow",

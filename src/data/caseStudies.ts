@@ -1036,7 +1036,241 @@ const replydesk: CaseStudy = {
   ],
 };
 
+const spectra: CaseStudy = {
+  slug: "spectra",
+  title: "SPECTRA",
+  kicker: "AI-search perception platform",
+  outcome:
+    "Answers a narrower question than an SEO audit: what does an AI system actually understand about this site, what evidence supports that, and at which stage does a fact disappear?",
+  meta: [
+    { label: "Role", value: "Sole architect and engineer" },
+    { label: "Stack", value: "Rust crawler, Bun/Hono API, React report" },
+    { label: "Scoring", value: "spectra-v0.1, deterministic and versioned" },
+    { label: "Status", value: "Built; deployment in progress" },
+  ],
+  problem: [
+    "Search visibility is a pipeline, not a page score. A fact can sit in the HTML and still vanish on the way to an answer — dropped by the crawler, lost in extraction, flattened in the semantic representation, misread by the model, or never retrieved. By the time you see the output, you cannot tell which of those happened.",
+    "The tools on either side of this are unsatisfying. Conventional SEO tools inspect technical health and rankings, which is a different question. Generic AI-visibility checkers ask a model to grade a site and hand back a number nobody can audit — the score is the model's opinion, and there is no way to check its work.",
+  ],
+  build: [
+    "SPECTRA keeps the evidence through every stage and measures deterministically on top of it. A Rust crawler does the hostile network work and emits structured evidence; TypeScript validates that at the process boundary; Gemini produces typed observations; and a separate scoring engine computes the numbers from registered checks only.",
+    "The load-bearing rule is that the model never produces a score. It classifies the site and emits observations against a schema, and those become entities, relationships and claims that each reference the evidence they came from. Scoring consumes measured checks, never prose and never a model-authored number. That is what makes a result arguable rather than something you either believe or don't.",
+    "Classification runs first and decides what is even worth checking. The system establishes the primary entity, archetype and purpose before selecting evaluation dimensions, so a restaurant is not marked down against checks meant for a B2B SaaS site. Irrelevant checks come back N/A and contribute to neither the earned points nor the denominator.",
+  ],
+  pipeline: [
+    {
+      title: "Crawl",
+      nodes: [
+        { id: "target", label: "Target URL", detail: "Validated and normalized", kind: "input" },
+        { id: "dns", label: "DNS / IP safety", detail: "Rejects loopback, private, link-local, metadata", kind: "gate" },
+        { id: "fetch", label: "Bounded fetch", detail: "Rust; 20 pages, depth 2, 2 MiB, 10s", kind: "logic" },
+      ],
+    },
+    {
+      title: "Evidence",
+      nodes: [
+        { id: "extract", label: "Extraction", detail: "Metadata, headings, JSON-LD, links, fingerprints", kind: "logic" },
+        { id: "normalize", label: "Normalization", detail: "De-noise, keep evidence references", kind: "logic" },
+        { id: "boundary", label: "Schema validation", detail: "Crawler output untrusted until validated", kind: "gate" },
+      ],
+    },
+    {
+      title: "Interpret",
+      nodes: [
+        { id: "classify", label: "Classification", detail: "Entity, archetype, purpose", kind: "model" },
+        { id: "observe", label: "Typed observations", detail: "Schema-constrained; never scores", kind: "model" },
+        { id: "graph", label: "Semantic graph", detail: "Entities, relationships, claims → evidence IDs", kind: "logic" },
+      ],
+    },
+    {
+      title: "Retrieve",
+      nodes: [
+        { id: "questions", label: "Question generation", detail: "From evidence-backed claims", kind: "model" },
+        { id: "direct", label: "Direct evaluation", detail: "What the model understands unaided", kind: "model" },
+        { id: "grounded", label: "Grounded retrieval", detail: "Optional; stored separately", kind: "model" },
+      ],
+    },
+    {
+      title: "Measure",
+      nodes: [
+        { id: "registry", label: "Dimension registry", detail: "Only registered checks can score", kind: "gate" },
+        { id: "score", label: "spectra-v0.1", detail: "Weighted checks over a visible denominator", kind: "logic" },
+        { id: "report", label: "Evidence-backed report", detail: "Survival stages, issues, repairs", kind: "output" },
+      ],
+    },
+  ],
+  howItWorks: [
+    {
+      title: "The model observes; it never scores",
+      body: "Gemini classifies the site and emits observations against a response schema. Those are validated before anything downstream sees them, and the scoring engine accepts only typed checks from a controlled registry. An observation the registry does not know about cannot move the number. This is the difference between a score you can argue with and a score you can only accept.",
+    },
+    {
+      title: "Every claim records where it died",
+      body: "Each important claim carries a survival record across source, crawler, extraction, semantic graph, model understanding and retrieval — including the first stage that failed and why. That is the actual product: not 'your score is 62' but 'this fact is in your HTML and does not survive extraction'.",
+    },
+    {
+      title: "Partial results stay useful",
+      body: "A crawler failure is fatal, because without evidence there is nothing to measure. A model or grounding failure is not: the audit keeps the pages, metadata, structured data and every deterministic metric, and marks semantic evaluation unavailable. Without a Gemini key at all, the deterministic half still runs. Degrading to a blank page because one provider was down would have been the easy build and the useless one.",
+    },
+    {
+      title: "The crawler is the security boundary, so it is Rust and it is paranoid",
+      body: "It resolves and validates every destination and every redirect hop, rejecting non-HTTP schemes, embedded credentials, non-public addresses, oversized bodies and unsupported content types. Raw HTML never reaches the model. The defaults — 10s timeout, 2 MiB per response, 5 redirects, 20 pages, depth 2, concurrency 4 — are defense in depth, not a claim that arbitrary remote content is safe.",
+    },
+    {
+      title: "Audits are immutable snapshots",
+      body: "An audit is sealed on completion with its scoring version, so a re-scan is a second snapshot rather than an overwrite. Comparison aligns claims by normalized subject/predicate/object and evidence fingerprints and reports the deltas. Scores computed under different versions stay distinguishable instead of being silently mixed.",
+    },
+  ],
+  results: [
+    {
+      label: "What it produces",
+      body: "An evidence-linked report: the site's interpreted identity and purpose, an entity map, per-claim information-survival stages, retrievability and paraphrase stability, structured-evidence coverage, positioning bugs and the repairs for them — each traceable back to the source it came from.",
+    },
+    {
+      label: "Why the scoring is deliberately dull",
+      body: "spectra-v0.1 is weighted binary and ratio checks over a visible denominator. Each metric reports its version, calculation, applied and N/A checks, earned points and limitations. The initial weights are stated as engineering assumptions to be calibrated against labeled fixtures — not presented as science.",
+    },
+    {
+      label: "Honest scope",
+      body: "V1 has one production model provider, and search-grounded retrieval only runs where the configured Gemini API and model support it. The fixtures are test evidence, labeled as such, not dashboard metrics. Deployment is in progress; the live link and interface capture go here once it is up.",
+    },
+  ],
+  tech: [
+    "Rust",
+    "Bun + Hono",
+    "React + Vite",
+    "Gemini (schema-constrained)",
+    "TypeScript monorepo",
+    "PostgreSQL (production model)",
+    "Deterministic scoring engine",
+  ],
+  metaDescription:
+    "AI-search perception platform: what an AI actually understands about a site, which facts disappear at which stage, and deterministic scoring backed by evidence.",
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/spectra" }],
+};
+
+const personalOsMcp: CaseStudy = {
+  slug: "personal-os-mcp",
+  title: "Personal MCP OS",
+  kicker: "85-tool local execution layer",
+  outcome:
+    "Gives an MCP client real hands on a machine — filesystem, shell, Git, browser, Android — behind a policy and approval layer that assumes the model will eventually ask for something it shouldn't.",
+  meta: [
+    { label: "Role", value: "Sole architect and engineer" },
+    { label: "Surface", value: "85 MCP tools across Windows and Android" },
+    { label: "Transport", value: "stdio adapter, loopback core, paired devices" },
+    { label: "Status", value: "Runnable; local-first, no cloud dependency" },
+  ],
+  problem: [
+    "An AI client that can only talk is limited to advice. One that can act is useful — and immediately dangerous, because the thing deciding what to run is a language model and the thing running it is your actual computer, with your files and your logged-in sessions.",
+    "The usual answers are both bad. Lock it down to a toy sandbox and it cannot do the work you wanted. Give it unrestricted execution and you have handed a probabilistic system your user account. The interesting engineering is in the middle: full capability, with a boundary that a human controls and can inspect.",
+  ],
+  build: [
+    "Personal MCP OS is a local execution layer with three processes. An MCP adapter speaks stdio to the client, one session per connection. A platform-independent core owns the device registry, routing, policy, approvals and audit. Separate agents — a Windows process and a native Kotlin Android companion — do the actual execution and are reached over authenticated transports.",
+    "Capability is broad on purpose: 85 tools covering filesystem, shell and PowerShell, Git, a persistent Playwright Chromium, HTTP, clipboard, applications, and on Android the storage-access framework, intents, MediaStore and notification access. The tool reference is generated from the validated capability catalog rather than written by hand, so the documentation cannot drift from what the server actually exposes.",
+    "Every capability declares a risk level — READ, WRITE, SENSITIVE or EXECUTE — and every argument shape is a Zod schema with unknown arguments rejected. Policy maps names or risk levels to allow, required or deny, with a capability override beating its risk level, and a missing policy entry requiring approval rather than defaulting open.",
+  ],
+  pipeline: [
+    {
+      title: "Client",
+      nodes: [
+        { id: "mcp", label: "MCP client", detail: "Any MCP-compatible client", kind: "input" },
+        { id: "adapter", label: "stdio adapter", detail: "One session per connection", kind: "logic" },
+      ],
+    },
+    {
+      title: "Core",
+      nodes: [
+        { id: "validate", label: "Validate", detail: "Zod schema; unknown args rejected", kind: "gate" },
+        { id: "route", label: "Route", detail: "Session preference; ambiguity rejected", kind: "logic" },
+        { id: "policy", label: "Policy", detail: "Risk level and per-capability overrides", kind: "gate" },
+      ],
+    },
+    {
+      title: "Approval",
+      nodes: [
+        { id: "pending", label: "Approval required", detail: "Returns a request ID, not a result", kind: "gate" },
+        { id: "human", label: "Human approves", detail: "Separate admin CLI and credential", kind: "input" },
+        { id: "bound", label: "One-use grant", detail: "Bound to args, session, device; 5 min", kind: "gate" },
+      ],
+    },
+    {
+      title: "Execute",
+      nodes: [
+        { id: "windows", label: "Windows agent", detail: "Filesystem, shell, Git, Playwright, HTTP", kind: "logic" },
+        { id: "android", label: "Android companion", detail: "SAF, intents, MediaStore, notifications", kind: "logic" },
+      ],
+    },
+    {
+      title: "Record",
+      nodes: [
+        { id: "audit", label: "SQLite audit", detail: "Mandatory; payload bodies omitted", kind: "output" },
+        { id: "result", label: "Structured result", detail: "ok/data or typed error", kind: "output" },
+      ],
+    },
+  ],
+  howItWorks: [
+    {
+      title: "The model cannot approve its own request",
+      body: "When a capability needs approval the call returns a request ID instead of a result. A human inspects the sanitized arguments in a terminal and approves through a separate admin CLI with its own credential — there is no MCP tool that grants approval. The grant is bound to the exact arguments, session, device and capability, expires in five minutes, and is consumed once. Re-running the same call needs a new one.",
+    },
+    {
+      title: "Browser interaction is SENSITIVE by default, on principle",
+      body: "Every click, key press, submit and download-triggering click requires approval, because a generic executor cannot infer what a website action does. There is deliberately no heuristic reading button text to decide a control looks harmless. `browser.evaluate` is implemented and denied by default: arbitrary page JavaScript removes the browser's confidentiality boundary and can reach page credentials.",
+    },
+    {
+      title: "The security doc says what the boundary is not",
+      body: "It states plainly that the program runs with the user's permissions, that approved shell commands, executable launches, Git hooks and page JavaScript can exceed the filesystem roots, and that command deny patterns are not a security boundary. Redaction is described as best effort. An execution layer that allows arbitrary commands cannot promise never to surface an unknown secret, and claiming otherwise would be the actual vulnerability.",
+    },
+    {
+      title: "There are no credential-extraction tools, by omission",
+      body: "Nothing exports cookies, passwords, storage state or auth headers. A persistent browser profile lets the browser use existing sessions without the server ever handing them over. Credentials are encrypted at rest — Windows DPAPI, Android Keystore AES-GCM — and the directories holding them are denied to the filesystem tools. Android notification retrieval returns metadata only, which keeps message bodies and OTPs out of reach.",
+    },
+    {
+      title: "Nothing listens beyond loopback",
+      body: "The core binds to loopback and requires a token on every endpoint except a one-use pairing route gated by a 128-bit, five-minute code. Browser-origin requests are rejected outright. The phone reaches the core through an adb reverse tunnel, so there is no LAN listener and no cloud relay. HTTP primitives resolve, validate and pin the destination address, block private ranges unless explicitly listed, and do not follow redirects.",
+    },
+    {
+      title: "Timeout is not rollback",
+      body: "The docs are explicit that a timed-out command, request or browser action may already have had an effect, and that the caller should check state before retrying a mutation. For a system whose whole job is side effects on a real machine, pretending a deadline undoes work would be the more dangerous simplification.",
+    },
+  ],
+  results: [
+    {
+      label: "What it enables",
+      body: "An MCP client can work a real machine end to end — read and edit files inside configured roots, run commands, drive Git, operate a persistent browser, and reach across to a paired Android device — without any of it leaving the machine or passing through a hosted service.",
+    },
+    {
+      label: "Where the effort actually went",
+      body: "Not the 85 tools; those are a catalog. The work is the boundary around them: risk classification, policy resolution, one-use approvals bound to exact arguments, canonical path checks for traversal and symlink escape, redaction, and a mandatory audit that records the action while omitting the payload.",
+    },
+    {
+      label: "Honest scope",
+      body: "This is a personal automation tool, not a hostile-code sandbox, and the documentation leads with that. Pairing tokens stay valid until local state is cleared and the daemon restarts — there is no remote revocation in V1. Path checks are not OS-level isolation against a local attacker racing filesystem operations.",
+    },
+  ],
+  tech: [
+    "Model Context Protocol (TypeScript SDK 1.30.0)",
+    "TypeScript monorepo",
+    "Kotlin (Android companion)",
+    "Playwright Chromium",
+    "Zod-validated capability catalog",
+    "SQLite audit",
+    "Windows DPAPI / Android Keystore",
+  ],
+  metaDescription:
+    "Local-first MCP execution layer: 85 tools across Windows and Android behind risk-based policy, one-use human approvals and a mandatory audit trail.",
+  links: [
+    {
+      label: "View on GitHub",
+      href: "https://github.com/HarshithNayakaL/personal-os-mcp",
+    },
+  ],
+};
+
 export const caseStudies: Record<string, CaseStudy> = {
+  spectra,
+  "personal-os-mcp": personalOsMcp,
   craftconnect,
   brandforge,
   "brand-audit-platform": brandAuditPlatform,
