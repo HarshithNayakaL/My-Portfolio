@@ -41,7 +41,10 @@ export const projects: Project[] = [
     outcome:
       "Shows what an AI system actually understands about a website, and at which stage a fact disappears \u2014 the model emits typed observations, a deterministic engine does the scoring.",
     tags: ["Rust crawler", "Gemini", "Evidence-backed", "Deterministic scoring"],
-    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/spectra" }],
+    links: [
+      { label: "Live", href: "https://spectra-ai-aeo.vercel.app/" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/spectra" },
+    ],
     hasCaseStudy: true,
   },
   {

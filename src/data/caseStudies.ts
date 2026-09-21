@@ -1046,7 +1046,7 @@ const spectra: CaseStudy = {
     { label: "Role", value: "Sole architect and engineer" },
     { label: "Stack", value: "Rust crawler, Bun/Hono API, React report" },
     { label: "Scoring", value: "spectra-v0.1, deterministic and versioned" },
-    { label: "Status", value: "Built; deployment in progress" },
+    { label: "Status", value: "Deployed and public" },
   ],
   problem: [
     "Search visibility is a pipeline, not a page score. A fact can sit in the HTML and still vanish on the way to an answer — dropped by the crawler, lost in extraction, flattened in the semantic representation, misread by the model, or never retrieved. By the time you see the output, you cannot tell which of those happened.",
@@ -1132,7 +1132,7 @@ const spectra: CaseStudy = {
     },
     {
       label: "Honest scope",
-      body: "V1 has one production model provider, and search-grounded retrieval only runs where the configured Gemini API and model support it. The fixtures are test evidence, labeled as such, not dashboard metrics. Deployment is in progress; the live link and interface capture go here once it is up.",
+      body: "V1 has one production model provider, and search-grounded retrieval only runs where the configured Gemini API and model support it. The fixtures are test evidence, labeled as such, not dashboard metrics. The deployed build runs the Node compatibility crawler rather than the Rust binary, which it reports in the audit warnings rather than hiding.",
     },
   ],
   tech: [
@@ -1146,7 +1146,10 @@ const spectra: CaseStudy = {
   ],
   metaDescription:
     "AI-search perception platform: what an AI actually understands about a site, which facts disappear at which stage, and deterministic scoring backed by evidence.",
-  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/spectra" }],
+  links: [
+    { label: "Run an audit", href: "https://spectra-ai-aeo.vercel.app/" },
+    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/spectra" },
+  ],
 };
 
 const personalOsMcp: CaseStudy = {
