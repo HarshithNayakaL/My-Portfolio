@@ -1,3 +1,4 @@
+import { profileDocs } from "../pages/Profile";
 import { caseStudies } from "./caseStudies";
 import { NAME } from "./projects";
 
@@ -74,6 +75,18 @@ for (const [doc, meta] of Object.entries(legal)) {
     description: meta.description,
     canonical: abs(`/legal/${doc}`),
     ogType: "website",
+  };
+}
+
+// About and contact: the entity anchors an answer engine looks for when the
+// question is "who is this and how do I reach them". Anchors on the homepage
+// cannot be cited on their own or carry their own title and description.
+for (const [slug, doc] of Object.entries(profileDocs)) {
+  routeSeo[`/${slug}`] = {
+    title: `${doc.title} | ${NAME}`,
+    description: doc.description,
+    canonical: abs(`/${slug}`),
+    ogType: slug === "about" ? "profile" : "website",
   };
 }
 

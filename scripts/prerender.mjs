@@ -34,6 +34,7 @@ const {
   LINKEDIN,
   faqs,
   agentSkills,
+  profileDocs,
   facts,
   availability,
   workingTitle,
@@ -373,6 +374,24 @@ function markdownFor(path, seo) {
     ].join("\n");
   }
 
+  // About and contact: the entity pages, rendered as markdown from the same
+  // document the component renders so the two cannot drift.
+  const profileSlug = path.replace("/", "");
+  if (profileDocs[profileSlug]) {
+    const doc = profileDocs[profileSlug];
+    return [
+      `# ${doc.title} — ${NAME}`,
+      "",
+      `> ${doc.description}`,
+      "",
+      `Canonical page: ${seo.canonical}`,
+      "",
+      doc.intro,
+      "",
+      ...doc.sections.flatMap((sec) => [`## ${sec.h}`, "", ...sec.p, ""]),
+    ].join("\n");
+  }
+
   // Homepage: the overview an agent should read first, with every onward link
   // pointing at markdown rather than back into HTML.
   return [
@@ -443,6 +462,7 @@ function markdownFor(path, seo) {
 const SOURCES_FOR = (path) => {
   if (path.startsWith("/work/")) return ["src/data/caseStudies.ts", "src/data/projects.ts"];
   if (path.startsWith("/legal/")) return ["src/pages/Legal.tsx"];
+  if (path === "/about" || path === "/contact") return ["src/pages/Profile.tsx"];
   return ["src/data/projects.ts", "src/components/Faq.tsx", "src/data/caseStudies.ts"];
 };
 

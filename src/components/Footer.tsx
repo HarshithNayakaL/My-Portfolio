@@ -12,6 +12,11 @@ const nav = [
 ];
 
 const legal = [
+  // The entity pages sit here rather than in the bar: the bar's About and
+  // Contact scroll the homepage, which is the right behaviour for a reader and
+  // no use to a crawler, which needs a URL it can follow and cite.
+  { to: "/about", label: "About Harshith" },
+  { to: "/contact", label: "Contact" },
   { to: "/legal/privacy", label: "Privacy Policy" },
   { to: "/legal/terms", label: "Terms of Use" },
   { to: "/legal/cookies", label: "Cookie Policy" },

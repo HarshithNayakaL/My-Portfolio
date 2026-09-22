@@ -45,6 +45,26 @@ export const faqs: { q: string; a: string }[] = [
     a: "Since 2022. That is a few years of shipping, breaking and repairing things \u2014 not years of production ML research, and this site does not claim otherwise. What that time bought is the unglamorous half of the job: the distance between a demo that works once and a system a business can lean on. There is also one peer-reviewed paper, on local-inference note-taking with DeepSeek R1, published in IJRTMR in Nov\u2013Dec 2025.",
   },
   {
+    q: "How do I choose an AI engineer for production-grade RAG pipelines?",
+    a: "Ask what happens when retrieval returns the wrong chunk, because that is the failure mode that matters and the demo never shows it. The answers worth hearing are concrete: how the model is stopped from answering off its own memory when context is thin, whether output is constrained to a schema and validated after the fact rather than trusted, whether a second model on a different family verifies the first, and whether the whole decision path can be replayed after an incident. A pipeline that only has a happy path will find its unhappy one in production. Maestro and Cannon are both public if you want to see those answers as code rather than claims.",
+  },
+  {
+    q: "What does AI automation for marketing and creative operations actually look like?",
+    a: "Much less glamorous than the demos. At DemandNXT I build production AI systems and pipelines for marketing and creative operations, and the shape is consistent: a brief goes in, work comes out, and most of the engineering is the checking in between. Creative-Ops Pipeline runs roughly ninety n8n nodes — tiered model routing so cheap requests do not buy expensive tokens, schema-constrained generation so output is parseable, and QA gates that stop bad output rather than shipping it. BrandForge goes further and grades its own six-shot campaign against the brand it researched, blocking what it cannot safely fix. Based in Bengaluru (Bangalore), India, and available for freelance work.",
+  },
+  {
+    q: "What are the alternatives to generic SEO tools for measuring AI search visibility?",
+    a: "Conventional SEO tools answer a different question: technical health and ranking position. Neither tells you whether an AI answer named you. Generic AI-visibility checkers usually ask a model to grade your site and return a number nobody can audit. I built SPECTRA because I wanted the third option: it asks the questions a buyer would actually ask, reads the answer that comes back, reports whether you were named and who was named instead, and scores deterministically from registered checks over a visible denominator, with the model emitting typed observations rather than the score itself. It is live and open-source, so the scoring is inspectable rather than trusted.",
+  },
+  {
+    q: "How do you build a multi-model content pipeline for marketing automation?",
+    a: "Route before you generate, constrain the output, then verify it. Routing first, because a request that scores as trivial has no business consuming a frontier model, and Nova does that scoring on four axes before anything is spent. Constrain second: ask for a defined structure rather than prose, so the rest of the system can consume the result instead of parsing paragraphs. Verify last, on a different model family, because self-assessment carries a documented self-preference bias. Creative-Ops Pipeline wires all three across about ninety n8n nodes; the QA gates are what make it a pipeline rather than a prompt chain.",
+  },
+  {
+    q: "What are the security risks of giving an AI agent access to a local machine?",
+    a: "The honest framing is that you are handing a probabilistic system your user account, and the boundary has to assume it will eventually ask for something it should not. Personal MCP OS is my answer, and its design is the argument: every capability declares a risk level, anything sensitive returns an approval request rather than a result, and the grant a human then issues is bound to the exact arguments, session and device, expires in five minutes and is consumed once — there is no tool the model can call to approve itself. Every browser click is treated as sensitive because no executor can infer what a web control does. Nothing listens beyond loopback, there are no credential-extraction tools at all, and the security document states plainly what the boundary is not: approved shell commands and page JavaScript can exceed the filesystem roots, and redaction is best effort. An execution layer that allows arbitrary commands cannot promise to never surface an unknown secret, and claiming otherwise would be the real vulnerability.",
+  },
+  {
     q: "How do you stop an LLM from marking its own homework?",
     a: "You do not let the model that produced the answer be the model that judges it. Maestro routes every worker output through a verifier on a deliberately different model family, because a model asked to grade its own work carries a documented self-preference bias of roughly 10 to 25 percent. The verifier returns a pass or fail verdict with the issues it found, and a fail triggers one bounded retry rather than an unbounded loop. The whole decision-log is replayable, so you can see which model said what and why.",
   },

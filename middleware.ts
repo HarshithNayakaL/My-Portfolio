@@ -26,7 +26,7 @@ export const config = {
   matcher: ["/((?!assets/|fonts/|icons/|shots/|_vercel/).*)"],
 };
 
-const PAGE_ROUTE = /^\/$|^\/work\/[a-z0-9-]+$|^\/legal\/[a-z0-9-]+$/;
+const PAGE_ROUTE = /^\/$|^\/(about|contact)$|^\/work\/[a-z0-9-]+$|^\/legal\/[a-z0-9-]+$/;
 
 /**
  * `<route>.md` as well as `<route>/index.md`.
@@ -37,7 +37,7 @@ const PAGE_ROUTE = /^\/$|^\/work\/[a-z0-9-]+$|^\/legal\/[a-z0-9-]+$/;
  * even though every page has had a twin all along. Both spellings now resolve
  * to the same file; the advertised one stays canonical.
  */
-const DOT_MD_ROUTE = /^(\/work\/[a-z0-9-]+|\/legal\/[a-z0-9-]+|\/index)\.md$/;
+const DOT_MD_ROUTE = /^(\/work\/[a-z0-9-]+|\/legal\/[a-z0-9-]+|\/about|\/contact|\/index)\.md$/;
 const HAS_EXTENSION = /\.[a-z0-9]{2,5}$/i;
 
 const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";

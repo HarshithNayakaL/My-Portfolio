@@ -12,6 +12,7 @@ import { useWebMcpTools } from "./lib/useWebMcpTools";
 // so they are code-split — the initial bundle stays lean.
 const CaseStudy = lazy(() => import("./pages/CaseStudy"));
 const Legal = lazy(() => import("./pages/Legal"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -53,6 +54,26 @@ function AnimatedRoutes() {
           <Page>
             <Suspense fallback={<div className="min-h-screen" />}>
               <Legal />
+            </Suspense>
+          </Page>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <Page>
+            <Suspense fallback={<div className="min-h-screen" />}>
+              <Profile doc="about" />
+            </Suspense>
+          </Page>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <Page>
+            <Suspense fallback={<div className="min-h-screen" />}>
+              <Profile doc="contact" />
             </Suspense>
           </Page>
         }

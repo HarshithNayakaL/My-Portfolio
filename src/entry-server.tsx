@@ -15,6 +15,7 @@ export { agentSkills } from "./data/skills";
 export { faqs } from "./components/Faq";
 export { facts, availability, workingTitle } from "./components/About";
 export { legalDocs, LEGAL_UPDATED } from "./pages/Legal";
+export { profileDocs } from "./pages/Profile";
 
 /**
  * Render one route to a complete HTML string for the build-time prerenderer.
