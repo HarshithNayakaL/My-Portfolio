@@ -700,7 +700,7 @@ const aiNotes: CaseStudy = {
 const maestro: CaseStudy = {
   slug: "maestro",
   title: "Maestro",
-  kicker: "Multi-model orchestration",
+  kicker: "Multi-model LLM orchestration",
   outcome:
     "Get frontier-quality answers out of free models by orchestrating them: a conductor routes one task across thinker, worker, and verifier roles, and shows its work at every step.",
   meta: [
@@ -1039,7 +1039,7 @@ const replydesk: CaseStudy = {
 const spectra: CaseStudy = {
   slug: "spectra",
   title: "SPECTRA",
-  kicker: "AI-search perception platform",
+  kicker: "AI search visibility audit",
   outcome:
     "Answers a narrower question than an SEO audit: what does an AI system actually understand about this site, what evidence supports that, and at which stage does a fact disappear?",
   meta: [
@@ -1151,7 +1151,7 @@ const spectra: CaseStudy = {
     alt: "SPECTRA's audit screen on a near-black canvas: an AEO badge over the heading \"Are you in the answer?\", fields for a site and for the questions buyers ask AI, a Gemini 3.1 Flash Lite model selector and a magenta Run audit button, above a panel reading \"27 checks, 4 layers, 1 score\" and a four-step explanation \u2014 crawl like an AI, ask like a buyer, read the answer, fix with code.",
   },
   metaDescription:
-    "AI-search perception platform: what an AI actually understands about a site, which facts disappear at which stage, and deterministic scoring backed by evidence.",
+    "AI search visibility (AEO) audit: asks AI what buyers ask, shows whether a site is in the answer, and scores 27 checks across 4 layers, each tied to evidence.",
   links: [
     { label: "Run an audit", href: "https://spectra-ai-aeo.vercel.app/" },
     { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/spectra" },

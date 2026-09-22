@@ -37,10 +37,10 @@ export const projects: Project[] = [
   {
     slug: "spectra",
     title: "SPECTRA",
-    kicker: "AI-search perception platform",
+    kicker: "AI search visibility audit",
     outcome:
-      "Shows what an AI system actually understands about a website, and at which stage a fact disappears \u2014 the model emits typed observations, a deterministic engine does the scoring.",
-    tags: ["Rust crawler", "Gemini", "Evidence-backed", "Deterministic scoring"],
+      "Asks AI the questions your buyers ask and shows whether your site is in the answer \u2014 then traces what a model actually understood about the site, and at which stage a fact disappeared. The model emits typed observations; a deterministic engine does the scoring.",
+    tags: ["AEO", "Rust crawler", "Gemini", "Deterministic scoring"],
     links: [
       { label: "Live", href: "https://spectra-ai-aeo.vercel.app/" },
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/spectra" },
@@ -92,7 +92,7 @@ export const projects: Project[] = [
   {
     slug: "maestro",
     title: "Maestro",
-    kicker: "Multi-model orchestration",
+    kicker: "Multi-model LLM orchestration",
     outcome:
       "A glass-box engine that routes one task across free LLMs — conductor, thinker, worker, verifier — and returns a single verified answer with a full decision-log of every step.",
     tags: ["LLM orchestration", "Verifier gates", "FastAPI", "Decision-log"],
