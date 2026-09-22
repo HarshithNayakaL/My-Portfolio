@@ -39,12 +39,12 @@ export default function CaseStudy() {
         <div>
           <Link
             to="/#work"
-            className="inline-flex items-center gap-1.5 font-mono text-[13px] text-dim transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 font-mono text-[0.8125rem] text-dim transition-colors hover:text-ink"
           >
             <ArrowLeft size={15} weight="bold" /> All work
           </Link>
 
-          <p className="mt-10 font-mono text-[12px] uppercase tracking-[0.2em] text-accent-ink">
+          <p className="mt-10 font-mono text-[0.75rem] uppercase tracking-[0.2em] text-accent-ink">
             {study.kicker}
           </p>
           <h1 className="mt-5 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
@@ -59,7 +59,7 @@ export default function CaseStudy() {
               corroborated it. Google's guidance is to carry a byline wherever
               a reader would reasonably ask "who wrote this?", which a case
               study plainly is. */}
-          <p className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-dim">
+          <p className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] text-dim">
             <span>Written by</span>
             <Link
               to="/#about"
@@ -77,7 +77,7 @@ export default function CaseStudy() {
           <dl className="mt-10 grid gap-px border-t border-line sm:grid-cols-2 lg:grid-cols-4">
             {study.meta.map((m) => (
               <div key={m.label} className="border-b border-line py-4 pr-4 sm:border-b-0">
-                <dt className="font-mono text-[11px] font-medium uppercase tracking-wider text-dim">
+                <dt className="font-mono text-[0.6875rem] font-medium uppercase tracking-wider text-dim">
                   {m.label}
                 </dt>
                 <dd className="mt-1.5 text-sm leading-snug text-ink">{m.value}</dd>
@@ -145,7 +145,7 @@ export default function CaseStudy() {
                   className="block h-auto w-full"
                 />
               </div>
-              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 font-mono text-[12px] text-faint">
+              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 font-mono text-[0.75rem] text-faint">
                 <span>{study.title}, running.</span>
                 <a
                   href={study.shot.src}
@@ -173,7 +173,7 @@ export default function CaseStudy() {
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
             How it's wired
           </h2>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-dim">
+          <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-dim">
             The pipeline, end to end. Every stage assumes the model can be wrong,
             so the interesting work is in the verify steps, not just generation.
           </p>
@@ -200,7 +200,7 @@ export default function CaseStudy() {
                 <h3 className="text-lg font-medium tracking-tight text-ink">
                   {item.title}
                 </h3>
-                <p className="mt-2.5 text-[15px] leading-relaxed text-dim">
+                <p className="mt-2.5 text-[0.9375rem] leading-relaxed text-dim">
                   {item.body}
                 </p>
               </div>
@@ -220,10 +220,10 @@ export default function CaseStudy() {
           {study.results.map((r, i) => (
             <Reveal key={r.label} delay={i * 0.05}>
               <div className="elev grid gap-2 rounded-[var(--radius-lg)] border border-line bg-surface/50 p-6 md:grid-cols-[180px_1fr] md:gap-8">
-                <p className="font-mono text-[12px] uppercase tracking-wider text-accent-ink">
+                <p className="font-mono text-[0.75rem] uppercase tracking-wider text-accent-ink">
                   {r.label}
                 </p>
-                <p className="text-[15px] leading-relaxed text-dim">{r.body}</p>
+                <p className="text-[0.9375rem] leading-relaxed text-dim">{r.body}</p>
               </div>
             </Reveal>
           ))}
@@ -233,14 +233,14 @@ export default function CaseStudy() {
       {/* Tech */}
       <section className="shell py-12 md:py-16">
         <Reveal>
-          <h2 className="mb-6 font-mono text-[12px] font-medium uppercase tracking-[0.18em] text-dim">
+          <h2 className="mb-6 font-mono text-[0.75rem] font-medium uppercase tracking-[0.18em] text-dim">
             Built with
           </h2>
           <ul className="flex flex-wrap gap-2">
             {study.tech.map((t) => (
               <li
                 key={t}
-                className="rounded-[6px] border border-line px-3.5 py-1.5 font-mono text-[13px] text-dim"
+                className="rounded-[6px] border border-line px-3.5 py-1.5 font-mono text-[0.8125rem] text-dim"
               >
                 {t}
               </li>
@@ -311,7 +311,7 @@ function Legend() {
       {items.map((it) => (
         <span
           key={it.label}
-          className="inline-flex items-center gap-2 font-mono text-[11px] font-medium text-dim"
+          className="inline-flex items-center gap-2 font-mono text-[0.6875rem] font-medium text-dim"
         >
           <span className={`h-1.5 w-1.5 rounded-full ${it.dot}`} aria-hidden />
           {it.label}

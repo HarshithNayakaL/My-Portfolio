@@ -43,7 +43,7 @@ function Item({ tool }: { tool: Tool }) {
           className="h-[18px] w-[18px] opacity-90"
         />
       )}
-      <span className="font-mono text-[15px] tracking-tight">{tool.name}</span>
+      <span className="font-mono text-[0.9375rem] tracking-tight">{tool.name}</span>
     </span>
   );
 }
@@ -125,12 +125,11 @@ export default function TechMarquee() {
   return (
     <section
       ref={ref}
-      aria-label="Tools and models used across the work"
       className={`reveal ${inView ? "is-in" : ""} border-y border-line bg-surface/20 py-12`}
     >
       <div className="shell mb-7 flex items-center gap-3">
         <span className="h-3 w-px bg-accent" aria-hidden />
-        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.24em] text-dim">
+        <p className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-dim">
           The stack behind the work
         </p>
       </div>

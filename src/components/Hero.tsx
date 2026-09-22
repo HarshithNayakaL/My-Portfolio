@@ -33,11 +33,11 @@ export default function Hero() {
             {NAME} <span className="text-dim">— AI Engineer, Full-Stack</span>
           </span>
           <span className="h-4 w-px bg-line-strong" aria-hidden />
-          <span className="text-[15px] font-medium text-dim">
+          <span className="text-[0.9375rem] font-medium text-dim">
             AI Workflow Engineer @ DemandNXT
           </span>
           <span className="h-4 w-px bg-line-strong" aria-hidden />
-          <span className="inline-flex items-center gap-2 text-[15px] font-semibold text-accent-ink">
+          <span className="inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-accent-ink">
             <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
             Available for freelance work
           </span>
@@ -109,7 +109,7 @@ export default function Hero() {
         className="anim-rise relative z-10 mx-auto mt-14 flex flex-col items-center gap-1.5 text-dim transition-colors hover:text-accent-ink"
         style={d(0.9)}
       >
-        <span className="font-mono text-[10px] font-medium uppercase tracking-[0.24em]">
+        <span className="font-mono text-[0.625rem] font-medium uppercase tracking-[0.24em]">
           Scroll
         </span>
         <span className="anim-nudge" aria-hidden>

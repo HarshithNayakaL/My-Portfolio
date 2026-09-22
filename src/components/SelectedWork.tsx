@@ -5,7 +5,7 @@ import Reveal from "./Reveal";
 
 export default function SelectedWork() {
   return (
-    <section className="shell scroll-mt-28 py-20 md:py-28" aria-labelledby="work-heading">
+    <section className="shell scroll-mt-28 py-20 md:py-28">
       <Reveal>
         <SectionHeading
           id="work"

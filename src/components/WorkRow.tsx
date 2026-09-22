@@ -34,11 +34,11 @@ export default function WorkRow({ project }: { project: Project }) {
       <div className="pointer-events-none relative grid gap-6 py-9 pl-5 transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:pl-7 md:grid-cols-[1fr_auto] md:items-end md:gap-12 md:py-11">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-dim">
+            <span className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-dim">
               {kicker}
             </span>
             {inProgress && (
-              <span className="inline-flex items-center gap-2 text-[12px] font-semibold text-accent-ink">
+              <span className="inline-flex items-center gap-2 text-[0.75rem] font-semibold text-accent-ink">
                 <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
                 In progress
               </span>
@@ -72,7 +72,7 @@ export default function WorkRow({ project }: { project: Project }) {
             {tags.map((t) => (
               <li
                 key={t}
-                className="rounded-[6px] border border-line px-2.5 py-0.5 font-mono text-[11px] font-medium text-dim"
+                className="rounded-[6px] border border-line px-2.5 py-0.5 font-mono text-[0.6875rem] font-medium text-dim"
               >
                 {t}
               </li>

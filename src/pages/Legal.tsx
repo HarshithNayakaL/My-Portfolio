@@ -123,18 +123,18 @@ export default function Legal() {
     <article className="shell max-w-3xl pt-32 pb-24 md:pt-40">
       <Link
         to="/"
-        className="inline-flex items-center gap-1.5 font-mono text-[13px] font-medium text-dim transition-colors hover:text-accent-ink"
+        className="inline-flex items-center gap-1.5 font-mono text-[0.8125rem] font-medium text-dim transition-colors hover:text-accent-ink"
       >
         <ArrowLeft size={15} weight="bold" /> Back home
       </Link>
 
-      <p className="mt-10 font-mono text-[12px] font-medium uppercase tracking-[0.2em] text-accent-ink">
+      <p className="mt-10 font-mono text-[0.75rem] font-medium uppercase tracking-[0.2em] text-accent-ink">
         Legal
       </p>
       <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
         {data.title}
       </h1>
-      <p className="mt-3 font-mono text-[12px] text-faint">Last updated · {data.updated}</p>
+      <p className="mt-3 font-mono text-[0.75rem] text-faint">Last updated · {data.updated}</p>
       <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-dim md:text-lg">
         {data.intro}
       </p>
@@ -143,7 +143,7 @@ export default function Legal() {
         {data.sections.map((s) => (
           <section key={s.h}>
             <h2 className="text-xl font-semibold tracking-tight text-ink">{s.h}</h2>
-            <div className="mt-3 space-y-3 text-[15px] leading-relaxed text-dim">
+            <div className="mt-3 space-y-3 text-[0.9375rem] leading-relaxed text-dim">
               {s.p.map((para, i) => (
                 <p key={i}>{para}</p>
               ))}

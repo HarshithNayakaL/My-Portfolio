@@ -66,7 +66,7 @@ function TileCard({ tile, index }: { tile: Tile; index: number }) {
           <h3 className="text-lg font-semibold tracking-tight text-ink transition-colors duration-500 group-hover:text-accent-ink">
             {tile.title}
           </h3>
-          <p className="mt-2 max-w-md text-[15px] leading-relaxed text-dim">
+          <p className="mt-2 max-w-md text-[0.9375rem] leading-relaxed text-dim">
             {tile.body}
           </p>
         </div>

@@ -109,7 +109,7 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
     <main className="shell py-20 md:py-28">
       <Link
         to="/"
-        className="inline-flex items-center gap-2 font-mono text-[13px] text-dim transition-colors hover:text-ink"
+        className="inline-flex items-center gap-2 font-mono text-[0.8125rem] text-dim transition-colors hover:text-ink"
       >
         <ArrowLeft weight="bold" size={15} aria-hidden />
         All work

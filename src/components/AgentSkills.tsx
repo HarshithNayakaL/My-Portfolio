@@ -33,37 +33,38 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
               href={skill.repo}
               target="_blank"
               rel="noreferrer noopener"
-              className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint underline-offset-4 transition-colors hover:text-accent-ink hover:underline"
+              className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint underline-offset-4 transition-colors hover:text-accent-ink hover:underline"
             >
-              GitHub ↗
+              <span className="sr-only">{skill.name} on </span>GitHub
+              <span aria-hidden> ↗</span>
             </a>
           ) : null}
         </div>
 
-        <p className="mt-1.5 text-[15px] font-medium text-dim">{skill.tagline}</p>
+        <p className="mt-1.5 text-[0.9375rem] font-medium text-dim">{skill.tagline}</p>
 
         <dl className="mt-5 flex flex-1 flex-col gap-4">
           <div>
-            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-faint">
+            <dt className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-faint">
               Why it exists
             </dt>
-            <dd className="mt-1.5 text-[15px] leading-relaxed text-dim">
+            <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
               {skill.premise}
             </dd>
           </div>
           <div>
-            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-faint">
+            <dt className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-faint">
               What's in it
             </dt>
-            <dd className="mt-1.5 text-[15px] leading-relaxed text-dim">
+            <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
               {skill.contents}
             </dd>
           </div>
           <div>
-            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-faint">
+            <dt className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-faint">
               The rule it keeps
             </dt>
-            <dd className="mt-1.5 text-[15px] leading-relaxed text-dim">
+            <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
               {skill.discipline}
             </dd>
           </div>
@@ -73,7 +74,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
           {skill.tags.map((t) => (
             <li
               key={t}
-              className="rounded-full border border-line px-2.5 py-1 font-mono text-[11px] text-faint"
+              className="rounded-full border border-line px-2.5 py-1 font-mono text-[0.6875rem] text-faint"
             >
               {t}
             </li>

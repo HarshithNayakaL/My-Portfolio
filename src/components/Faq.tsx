@@ -142,9 +142,11 @@ export default function Faq() {
             >
               <details className="faq-item group" open={i === 0}>
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 text-left">
-                  <h3 className="text-lg font-semibold tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-xl">
+                  {/* A span, not an h3: a <summary> is a button, and headings
+                      inside it can drop out of screen readers' heading lists. */}
+                  <span className="font-display text-lg font-semibold tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-xl">
                     {f.q}
-                  </h3>
+                  </span>
                   <span
                     aria-hidden
                     className="mt-1.5 shrink-0 text-dim transition-transform duration-300 group-open:rotate-45"

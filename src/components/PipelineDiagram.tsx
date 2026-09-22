@@ -28,12 +28,12 @@ function NodeBox({ node }: { node: PipelineNode }) {
           className={`h-1.5 w-1.5 shrink-0 rounded-full ${kindDot[kind]}`}
           aria-hidden
         />
-        <span className="text-[13px] font-medium leading-tight text-ink">
+        <span className="text-[0.8125rem] font-medium leading-tight text-ink">
           {node.label}
         </span>
       </div>
       {node.detail && (
-        <p className="mt-1.5 pl-3.5 font-mono text-[11px] leading-snug text-faint">
+        <p className="mt-1.5 pl-3.5 font-mono text-[0.6875rem] leading-snug text-faint">
           {node.detail}
         </p>
       )}
@@ -48,7 +48,7 @@ export default function PipelineDiagram({ stages }: { stages: PipelineStage[] })
         {stages.map((stage, i) => (
           <div key={stage.title} className="contents md:flex md:flex-1 md:items-stretch">
             <div className="flex-1">
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-faint">
+              <p className="mb-3 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-faint">
                 {stage.title}
               </p>
               <div className="flex flex-col gap-3">
