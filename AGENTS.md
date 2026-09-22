@@ -15,7 +15,7 @@ npm run build     # tsc -b -> vite build -> vite build --ssr -> prerender -> bui
 npm run lint      # tsc -b --noEmit
 npm run verify:negotiation
 npm run verify:onee
-npm run verify:llms   # needs a running server; takes an origin as argv[2]
+npm run verify:llms   # needs a deployment; takes an origin as argv[2]
 ```
 
 `npm run build` is a chain, and every link matters:
@@ -66,7 +66,10 @@ fix the cause — do not weaken the check.
   404 page. `scripts/build-api.mjs` fails the build if either set drifts from
   the data. Add a project → add its slug to `middleware.ts`.
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
-  llms.txt v2 spec. Needs a server — run `npm run preview` and pass its URL.
+  llms.txt v2 spec. Point it at a Vercel deployment (production or a preview
+  URL), not `npm run preview`: that server doesn't run `middleware.ts` or the
+  `vercel.json` rewrites, and its SPA fallback serves the root page for every
+  nested route, so it reports failures the real site doesn't have.
 - **Content negotiation.** `npm run verify:negotiation` asserts what 25
   different client shapes receive. It exists because the rule used to be an
   allowlist of known agent user-agents, which meant every agent *not* on the

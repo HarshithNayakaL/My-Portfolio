@@ -1040,6 +1040,24 @@ for (const [name, want] of [
   }
 }
 
+// Same failure, other table: an extensionless rewrite in vercel.json that
+// middleware.ts does not pass through is answered with the markdown 404 for
+// any client that doesn't ask for text/html, because middleware runs first.
+{
+  const vercel = JSON.parse(await readFile(join(ROOT, "vercel.json"), "utf8"));
+  const src = middleware.match(/REWRITTEN_ROUTE\s*=\s*\/(.+)\/;/)?.[1];
+  if (!src) throw new Error("build-api: could not find REWRITTEN_ROUTE in middleware.ts");
+  const passes = new RegExp(src);
+  const blocked = (vercel.rewrites ?? [])
+    .map((r) => r.source)
+    .filter((s) => !/\.[a-z0-9]{2,5}$/i.test(s) && !passes.test(s));
+  if (blocked.length) {
+    throw new Error(
+      `build-api: vercel.json rewrites ${blocked.join(", ")} but middleware.ts REWRITTEN_ROUTE does not let it through.`,
+    );
+  }
+}
+
 console.log(
   `[api] ${projectList.length} projects, ${studyList.length} case studies, ${faqs.length} faqs, OpenAPI 3.1, RFC 9727 catalog`,
 );

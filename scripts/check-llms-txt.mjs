@@ -35,8 +35,8 @@ const fail = (msg) => {
 };
 const pass = (msg) => console.log(`  ok    ${msg}`);
 
-const get = async (url) => {
-  const r = await fetch(url);
+const get = async (url, headers = {}) => {
+  const r = await fetch(url, { headers });
   return { status: r.status, type: r.headers.get("content-type") ?? "", link: r.headers.get("link"), body: await r.text() };
 };
 
@@ -112,7 +112,10 @@ const routes = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)]
   .map((m) => new URL(m[1]).pathname)
   .map((p) => (p !== "/" ? p.replace(/\/$/, "") : p));
 for (const route of routes) {
-  const page = await get(`${ORIGIN}${route}`);
+  // Ask for HTML the way a browser does. fetch() sends Accept: */*, which the
+  // middleware rightly answers with the markdown twin, so without this every
+  // page failed for having no <link> tags when checked against production.
+  const page = await get(`${ORIGIN}${route}`, { accept: "text/html,application/xhtml+xml,*/*;q=0.8" });
   if (page.status !== 200) { fail(`${route} -> ${page.status}`); continue; }
 
   const alt = page.body.match(/<link[^>]+rel="alternate"[^>]*>/i)?.[0] ?? "";

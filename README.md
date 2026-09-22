@@ -45,11 +45,13 @@ that and produces an empty-shell SPA.
 ```bash
 npm run verify:negotiation   # 25 client shapes get the right representation
 npm run verify:onee          # every mascot animation is reachable
-npm run verify:llms          # needs a server: npm run preview, then pass its URL
+npm run verify:llms <origin> # needs a Vercel deployment, not npm run preview
 ```
 
-`verify:llms` defaults to `http://localhost:4321` and takes an origin as its
-first argument, so point it at whatever `npm run preview` prints.
+`verify:llms` takes an origin as its first argument. Give it a Vercel
+deployment: `vite preview` runs neither the middleware nor the rewrites, and
+falls back to the root page for every nested route, so it fails pages that are
+fine in production.
 
 ## Deploy
 

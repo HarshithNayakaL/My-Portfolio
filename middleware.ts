@@ -40,6 +40,15 @@ const PAGE_ROUTE = /^\/$|^\/(about|contact)$|^\/work\/[a-z0-9-]+$|^\/legal\/[a-z
 const DOT_MD_ROUTE = /^(\/work\/[a-z0-9-]+|\/legal\/[a-z0-9-]+|\/about|\/contact|\/index)\.md$/;
 const HAS_EXTENSION = /\.[a-z0-9]{2,5}$/i;
 
+/**
+ * Extensionless paths that vercel.json rewrites to a static file. Middleware
+ * runs before rewrites, so without this a client sending Accept: *\/* (curl,
+ * fetch, most agents) fell through to the markdown 404 below — the developer
+ * portal and the RFC 9727 api-catalog answered browsers and nobody else.
+ * Keep in step with the "rewrites" block in vercel.json.
+ */
+const REWRITTEN_ROUTE = /^\/(developers|docs|\.well-known\/api-catalog)$/;
+
 const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";
 
 /**
@@ -267,7 +276,7 @@ export default function middleware(request: Request) {
     return routeApi(path, url);
   }
 
-  if (HAS_EXTENSION.test(path)) return next();
+  if (HAS_EXTENSION.test(path) || REWRITTEN_ROUTE.test(path)) return next();
 
   if (
     !servesMarkdown({
