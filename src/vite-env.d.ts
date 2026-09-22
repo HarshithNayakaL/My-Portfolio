@@ -62,6 +62,12 @@ declare global {
   interface Document {
     modelContext?: WebMcpModelContext;
   }
+
+  /** Where Chrome 149 exposes it: the origin trial starts in 149, and the
+   *  move to `document` came in 150. Read only as a fallback. */
+  interface Navigator {
+    modelContext?: WebMcpModelContext;
+  }
 }
 
 export {};

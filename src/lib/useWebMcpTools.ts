@@ -14,15 +14,36 @@ import { caseStudies } from "../data/caseStudies";
  * human is handled by the declarative tool on the contact form, which fills
  * fields but never submits.
  *
- * The API is a proposal (Chrome status: Proposed, targeting M157) and exists in
- * no shipping browser today, so this is a progressive enhancement: if
- * document.modelContext is absent the hook does nothing at all.
+ * WebMCP is a proposed standard in origin trial from Chrome 149, and behind
+ * chrome://flags/#enable-webmcp-testing for local work. Everywhere else the
+ * API is absent, so this is a progressive enhancement: with no modelContext
+ * the hook does nothing at all.
  */
+
+/**
+ * Resolves once the case study for `title` is what's on screen, or after a
+ * timeout. The route is lazy-loaded, so navigate() returns before the page
+ * exists; Chrome's WebMCP guidance is that a tool returns after the UI has
+ * updated, so an agent that reads the page next reads the right one.
+ */
+function whenHeadingShows(title: string, timeoutMs = 4000): Promise<boolean> {
+  return new Promise((resolve) => {
+    const start = performance.now();
+    const check = () => {
+      if (document.querySelector("h1")?.textContent?.trim() === title) return resolve(true);
+      if (performance.now() - start > timeoutMs) return resolve(false);
+      requestAnimationFrame(check);
+    };
+    check();
+  });
+}
 export function useWebMcpTools() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const mc = document.modelContext;
+    // document.modelContext from Chrome 150; navigator.modelContext is where
+    // Chrome 149, the first origin-trial release, has it.
+    const mc = document.modelContext ?? navigator.modelContext;
     if (!mc?.registerTool) return;
 
     const controller = new AbortController();
@@ -79,14 +100,17 @@ export function useWebMcpTools() {
             },
             required: ["slug"],
           },
-          execute: (params) => {
+          execute: async (params) => {
             const slug = (params as { slug?: string }).slug ?? "";
             const project = withCaseStudies.find((p) => p.slug === slug);
             if (!project) {
               return `No case study with slug "${slug}". Available: ${slugs.join(", ")}.`;
             }
             navigate(`/work/${slug}`);
-            return `Opened the ${project.title} case study. Contact: ${EMAIL}`;
+            const shown = await whenHeadingShows(caseStudies[slug].title);
+            return shown
+              ? `Opened the ${project.title} case study; it is on screen now. Contact: ${EMAIL}`
+              : `Navigating to the ${project.title} case study at /work/${slug}; the page is still loading. Contact: ${EMAIL}`;
           },
         },
         opts,
