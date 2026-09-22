@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Before the theme script and the stylesheet, so native UI (scrollbars,
+         form controls) is themed from the first paint. CSS then pins it to
+         whichever theme the script resolved. -->
+    <meta name="color-scheme" content="light dark" />
     <script>
       // Set theme before first paint (no flash). Stored choice wins,
       // otherwise follow the OS preference.

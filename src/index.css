@@ -50,6 +50,12 @@
 
 /* Light (clean iOS neutral — terracotta accent on cool light gray) */
 :root {
+  /* Native UI — scrollbars, form controls, autofill — follows the theme.
+     Pinned to the resolved class rather than left as "light dark": the head
+     script already turns the OS preference (or a stored choice) into .dark
+     before paint, so this tracks the system by default and the toggle when
+     someone uses it. Without it the dark theme had light scrollbars. */
+  color-scheme: light;
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
 
   --canvas: #f3f4f6;
@@ -87,6 +93,7 @@
 
 /* Dark (clean iOS near-black — vibrant terracotta over true dark) */
 .dark {
+  color-scheme: dark;
   --canvas: #0a0b0f;
   --surface: #14151b;
   --elevated: #1c1e26;
@@ -360,6 +367,15 @@
 
   /* The disclosure marker is removed in favour of the icon in the summary.
      list-none covers most engines; Safari needs the pseudo-element too. */
+  /* WebMCP: when an agent has filled the enquiry form and the browser pauses
+     for the person to review (no toolautosubmit, by design), point at the
+     button they need to press. Its own rule: a browser that doesn't know the
+     pseudo-class drops only this block, not the ones around it. */
+  .contact-submit:tool-submit-active {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
   .faq-item > summary::-webkit-details-marker {
     display: none;
   }
