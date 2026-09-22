@@ -13,13 +13,37 @@ import Reveal from "./Reveal";
  *
  * The rest are what a prospective client asks before starting.
  *
+ * The first three now answer who and where, because an audit of this site put
+ * "find an AI workflow engineer in Bengaluru to hire" to a model and it
+ * replied — accurately — that the pages held no contact details and no
+ * availability. The location, the working title and the availability line were
+ * only ever in the About section, which the markdown twins did not carry, so
+ * the questions people actually ask had no answer anywhere an agent could
+ * reach.
+ *
  * Every answer is drawn from work that exists and can be checked — the case
- * studies, the public repos, the stack those projects are built on. There is
- * deliberately nothing about rates, availability or turnaround: those are
- * commitments, not facts, and inventing them would put promises on the site
- * that nobody made.
+ * studies, the public repos, the stack those projects are built on. Rates and
+ * turnaround are still absent: those are commitments, not facts. Availability
+ * is different now only because the site states it visibly in About; this
+ * repeats that claim rather than inventing one.
  */
 export const faqs: { q: string; a: string }[] = [
+  {
+    q: "Who are you, and where are you based?",
+    a: "Harshith Nayaka L \u2014 a full-stack AI Engineer in Bengaluru (Bangalore), Karnataka, India. At DemandNXT the title is AI Workflow Engineer: production AI systems and pipelines for marketing and creative operations. The public work is the clearest answer to what that means in practice \u2014 Maestro, a multi-model LLM orchestration engine, and Cannon, a multi-agent assistant with query-level domain isolation, both live and open-source.",
+  },
+  {
+    q: "Are you available to hire, and how do I get in touch?",
+    a: "Available for freelance work. Email is the direct route \u2014 harshith28124@gmail.com \u2014 and the contact form on this site reaches the same inbox. There are no rates or turnaround times quoted anywhere here, because those depend on the work and this site only states things that can be checked.",
+  },
+  {
+    q: "What does an AI workflow engineer do that a backend engineer doesn't?",
+    a: "The same building, plus the parts that only matter once a model is in the loop. A backend either works or throws; a model returns something plausible every time, including when it is wrong. So the work is routing a request to the right model before spending on it, constraining output to a schema and validating it anyway, having a second model verify the first, isolating agents so context cannot leak between them, and making the hundredth run behave like the first. Maestro, Nova and Cannon are each one of those problems solved in public.",
+  },
+  {
+    q: "How long have you been building, and what is the honest version?",
+    a: "Since 2022. That is a few years of shipping, breaking and repairing things \u2014 not years of production ML research, and this site does not claim otherwise. What that time bought is the unglamorous half of the job: the distance between a demo that works once and a system a business can lean on. There is also one peer-reviewed paper, on local-inference note-taking with DeepSeek R1, published in IJRTMR in Nov\u2013Dec 2025.",
+  },
   {
     q: "How do you stop an LLM from marking its own homework?",
     a: "You do not let the model that produced the answer be the model that judges it. Maestro routes every worker output through a verifier on a deliberately different model family, because a model asked to grade its own work carries a documented self-preference bias of roughly 10 to 25 percent. The verifier returns a pass or fail verdict with the issues it found, and a fail triggers one bounded retry rather than an unbounded loop. The whole decision-log is replayable, so you can see which model said what and why.",

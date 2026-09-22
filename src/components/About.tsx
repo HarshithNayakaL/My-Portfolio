@@ -3,12 +3,27 @@ import Reveal from "./Reveal";
 /** Resolvable DOI — the citable identifier, not just a publisher page link. */
 const PAPER_DOI = "https://www.doi.org/10.59256/ijrtmr.20250506023";
 
-const facts = [
+/**
+ * The identity facts, exported because the markdown twins need exactly these
+ * and a second copy would drift. Everything here is rendered visibly on the
+ * page below — Google's AI-features guidance asks that structured data match
+ * the visible text, and the same reasoning applies to the agent surface.
+ */
+export const facts = [
   { k: "Role", v: "AI Engineer, Full-Stack" },
   { k: "Company", v: "DemandNXT" },
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
 ];
+
+/** The status line above the bio, and the one availability claim on the site. */
+export const availability = "Available for freelance work";
+
+/**
+ * The title held at DemandNXT, kept separate from `Role` because they are
+ * different strings and people search for both.
+ */
+export const workingTitle = "AI Workflow Engineer";
 
 export default function About() {
   return (
@@ -59,7 +74,7 @@ export default function About() {
             <span className="inline-flex items-center gap-2.5">
               <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
               <span className="text-[15px] font-semibold tracking-tight text-accent-ink">
-                Available for freelance work
+                {availability}
               </span>
             </span>
 

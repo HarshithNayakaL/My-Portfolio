@@ -34,6 +34,9 @@ const {
   LINKEDIN,
   faqs,
   agentSkills,
+  facts,
+  availability,
+  workingTitle,
   legalDocs,
   LEGAL_UPDATED,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
@@ -247,6 +250,12 @@ function applySeo(html, path, seo, appHtml) {
     // the component renders, so the structured data cannot drift from the
     // questions actually on the page.
     //
+    // This no longer earns a Google rich result. Google deprecated the FAQ
+    // rich result on 2026-05-07 and removed its documentation, so the markup
+    // buys nothing in Search — kept because it is still valid schema.org that
+    // other parsers read, and because the node costs a few hundred bytes. Do
+    // not add it expecting FAQ snippets back.
+    //
     // Google dropped FAQ rich results in May 2026, which is why the component
     // itself carries no schema. This is not for rich results — agents parse
     // FAQPage to answer "what does this person do" without reading the whole
@@ -373,6 +382,29 @@ function markdownFor(path, seo) {
     "",
     `Canonical page: ${seo.canonical}`,
     "",
+    // Identity first, and stated plainly.
+    //
+    // This block exists because of a measured failure. An audit of the site
+    // asked a model "find an AI workflow engineer in Bengaluru to hire" and it
+    // answered, correctly, that the evidence held no contact details and no
+    // availability: the twin opened straight into a project list, and the
+    // About section — which carries the location, the working title and the
+    // availability line — was never in it at all. Every AI crawler reads this
+    // file rather than the HTML, so that section was invisible to all of them.
+    //
+    // Nothing here is new to the site. Each line is rendered visibly in the
+    // About section, which is what Google's AI-features guidance asks for:
+    // structured data, and by extension the agent surface, should match what
+    // a person sees.
+    "## Who this is",
+    "",
+    ...facts.map((f) => `- **${f.k}:** ${f.v}`),
+    `- **Also known as:** ${workingTitle} (title held at ${
+      facts.find((f) => f.k === "Company")?.v ?? "work"
+    })`,
+    `- **Availability:** ${availability}`,
+    `- **Contact:** ${EMAIL}`,
+    "",
     "## Selected work",
     "",
     ...projects.map((p) => {
@@ -436,6 +468,15 @@ function frontmatter(path, seo) {
     `canonical: ${yaml(seo.canonical)}`,
     `last-updated: ${yaml(lastCommitISO(SOURCES_FOR(path)))}`,
     `author: ${yaml(NAME)}`,
+    // The identity fields an answer engine needs to place this person, on
+    // every page rather than only the homepage: an agent that lands on a case
+    // study should still be able to say who wrote it, where they are and how
+    // to reach them, without a second fetch.
+    `author-role: ${yaml(facts.find((f) => f.k === "Role")?.v ?? "")}`,
+    `author-title: ${yaml(workingTitle)}`,
+    `author-location: ${yaml(facts.find((f) => f.k === "Based in")?.v ?? "")}`,
+    `author-availability: ${yaml(availability)}`,
+    `author-email: ${yaml(EMAIL)}`,
     `content-type: "text/markdown"`,
     `html-version: ${yaml(seo.canonical)}`,
     "---",
