@@ -1,8 +1,9 @@
 import type { CSSProperties } from "react";
-import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react";
+import { ArrowDown } from "@phosphor-icons/react";
 import Magnetic from "./Magnetic";
 import { scrollToSection } from "../lib/scrollToSection";
 import { NAME } from "../data/projects";
+import Icon from "./Icon";
 
 // Headline split so each word rises on its own beat (CSS mask reveal).
 const HEAD_LEAD = "I build AI systems — agents, RAG, full-stack apps — engineered for".split(
@@ -96,7 +97,7 @@ export default function Hero() {
               style={{ touchAction: "manipulation" }}
             >
               Get in touch
-              <ArrowUpRight weight="bold" size={16} className="text-dim" />
+              <Icon name="arrow-up-right" size={16} className="text-dim" />
             </button>
           </Magnetic>
         </div>

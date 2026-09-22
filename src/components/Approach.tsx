@@ -27,7 +27,7 @@ export default function Approach() {
           {words.map((w, i) => (
             <span
               key={i}
-              className={`approach-word mr-[0.28em] inline-block ${inView ? "is-lit" : ""}`}
+              className={`approach-word${inView ? " is-lit" : ""}`}
               // Stagger capped so the tail of a long statement doesn't lag far
               // behind the reader.
               style={{ transitionDelay: `${Math.min(i * 0.028, 1.6)}s` }}

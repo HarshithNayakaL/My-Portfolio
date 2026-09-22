@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react";
 import type { Project } from "../data/projects";
+import Icon from "./Icon";
 
 /**
  * Editorial work row. Each project reads as a full-width index entry — title,
@@ -16,7 +16,7 @@ export default function WorkRow({ project }: { project: Project }) {
       {/* soft glass panel fades in behind the row on hover/focus */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-[-0.85rem] inset-y-1 rounded-[var(--radius-lg)] border border-transparent bg-elevated/0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:border-line group-hover:bg-elevated/45 group-focus-within:border-line group-focus-within:bg-elevated/45"
+        className="work-panel"
       />
       {/* Left accent marker, growing from its middle on hover.
 
@@ -28,10 +28,10 @@ export default function WorkRow({ project }: { project: Project }) {
           the corners, so the curve is never in its way. */}
       <span
         aria-hidden
-        className="absolute left-[-0.85rem] top-1/2 h-[calc(100%-4rem)] w-[3px] -translate-y-1/2 scale-y-0 rounded-full bg-accent transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-y-100 group-focus-within:scale-y-100"
+        className="work-marker"
       />
 
-      <div className="pointer-events-none relative grid gap-6 py-9 pl-5 transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:pl-7 md:grid-cols-[1fr_auto] md:items-end md:gap-12 md:py-11">
+      <div className="work-body">
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-dim">
@@ -51,7 +51,7 @@ export default function WorkRow({ project }: { project: Project }) {
               accessible name beyond an aria-label — and left the visible
               "Case study →" affordance non-actionable. A stretched pseudo
               element keeps the whole row clickable without the ghost overlay. */}
-          <h3 className="mt-3 font-display text-[1.7rem] font-semibold leading-[1.1] tracking-tight text-ink transition-colors duration-300 group-hover:text-accent-ink md:text-4xl">
+          <h3 className="work-title">
             {hasCaseStudy ? (
               <Link
                 to={`/work/${slug}`}
@@ -72,7 +72,7 @@ export default function WorkRow({ project }: { project: Project }) {
             {tags.map((t) => (
               <li
                 key={t}
-                className="rounded-[6px] border border-line px-2.5 py-0.5 font-mono text-[0.6875rem] font-medium text-dim"
+                className="work-tag"
               >
                 {t}
               </li>
@@ -90,10 +90,10 @@ export default function WorkRow({ project }: { project: Project }) {
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`${l.label} — ${title}`}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-dim transition-colors hover:text-ink"
+                className="work-link"
               >
                 {l.label}
-                <ArrowUpRight size={14} weight="bold" />
+                <Icon name="arrow-up-right" />
               </a>
             ))}
             {hasCaseStudy && (
@@ -104,10 +104,9 @@ export default function WorkRow({ project }: { project: Project }) {
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink"
               >
                 {inProgress ? "Preview" : "Case study"}
-                <ArrowRight
-                  weight="bold"
-                  size={15}
-                  className="transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1"
+                <Icon
+                  name="arrow-right"
+                  className="work-cta-arrow"
                 />
               </span>
             )}

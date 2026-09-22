@@ -43,7 +43,7 @@ function Item({ tool }: { tool: Tool }) {
           className="h-[18px] w-[18px] opacity-90"
         />
       )}
-      <span className="font-mono text-[0.9375rem] tracking-tight">{tool.name}</span>
+      <span className="stack-name">{tool.name}</span>
     </span>
   );
 }

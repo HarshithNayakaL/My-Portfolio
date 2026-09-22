@@ -62,8 +62,7 @@ export default function Footer() {
   const col = "flex flex-col gap-3";
   const head =
     "font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-faint";
-  const link =
-    "text-left text-sm font-medium text-dim transition-colors hover:text-accent-ink";
+  const link = "footer-link";
 
   return (
     <footer className="border-t border-line bg-surface/30">

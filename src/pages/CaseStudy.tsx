@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight, ArrowRight, Info } from "@phosphor-icons/react";
+import { ArrowLeft, Info } from "@phosphor-icons/react";
 import { getCaseStudy } from "../data/caseStudies";
 import { EMAIL, NAME } from "../data/projects";
 import PipelineDiagram from "../components/PipelineDiagram";
 import Reveal from "../components/Reveal";
+import Icon from "../components/Icon";
 
 export default function CaseStudy() {
   const { slug } = useParams();
@@ -96,7 +97,7 @@ export default function CaseStudy() {
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-ink transition-colors hover:text-ink"
                 >
                   {l.label}
-                  <ArrowUpRight size={15} weight="bold" />
+                  <Icon name="arrow-up-right" size={15} />
                 </a>
               ))}
             </div>
@@ -262,7 +263,7 @@ export default function CaseStudy() {
             >
               Get in touch
               <span className="cta-icon">
-                <ArrowUpRight weight="bold" size={14} />
+                <Icon name="arrow-up-right" />
               </span>
             </a>
             <Link
@@ -270,7 +271,7 @@ export default function CaseStudy() {
               className="inline-flex items-center gap-1.5 text-sm text-dim transition-colors hover:text-ink"
             >
               See more work
-              <ArrowRight size={15} weight="bold" />
+              <Icon name="arrow-right" />
             </Link>
           </div>
         </Reveal>

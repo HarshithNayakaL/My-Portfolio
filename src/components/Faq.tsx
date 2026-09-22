@@ -1,6 +1,6 @@
-import { Plus } from "@phosphor-icons/react";
 import SectionHeading from "./SectionHeading";
 import Reveal from "./Reveal";
+import Icon from "./Icon";
 
 /**
  * Two kinds of question, in one list.
@@ -141,20 +141,20 @@ export default function Faq() {
               className="border-t border-line first:border-t-0"
             >
               <details className="faq-item group" open={i === 0}>
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 text-left">
+                <summary className="faq-summary">
                   {/* A span, not an h3: a <summary> is a button, and headings
                       inside it can drop out of screen readers' heading lists. */}
-                  <span className="font-display text-lg font-semibold tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-xl">
+                  <span className="faq-q">
                     {f.q}
                   </span>
                   <span
                     aria-hidden
-                    className="mt-1.5 shrink-0 text-dim transition-transform duration-300 group-open:rotate-45"
+                    className="faq-toggle"
                   >
-                    <Plus weight="bold" size={18} />
+                    <Icon name="plus" />
                   </span>
                 </summary>
-                <div className="pb-7 pr-10 text-pretty text-base leading-relaxed text-dim md:text-lg">
+                <div className="faq-a">
                   {f.a}
                 </div>
               </details>

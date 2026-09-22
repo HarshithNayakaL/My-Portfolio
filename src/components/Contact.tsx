@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, PaperPlaneTilt, CheckCircle } from "@phosphor-icons/react";
+import { PaperPlaneTilt, CheckCircle } from "@phosphor-icons/react";
 import { EMAIL, LINKEDIN, GITHUB, WEB3FORMS_KEY } from "../data/projects";
 import Reveal from "./Reveal";
+import Icon from "./Icon";
 
 const socials = [
   { label: "LinkedIn", href: LINKEDIN },
@@ -148,7 +149,7 @@ export default function Contact() {
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-dim transition-colors hover:text-accent-ink"
                     >
                       {s.label}
-                      <ArrowUpRight size={14} weight="bold" />
+                      <Icon name="arrow-up-right" />
                     </a>
                   ))}
                 </div>

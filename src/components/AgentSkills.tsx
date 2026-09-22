@@ -74,7 +74,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
           {skill.tags.map((t) => (
             <li
               key={t}
-              className="rounded-full border border-line px-2.5 py-1 font-mono text-[0.6875rem] text-faint"
+              className="skill-tag"
             >
               {t}
             </li>

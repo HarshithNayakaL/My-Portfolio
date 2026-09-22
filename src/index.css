@@ -191,6 +191,102 @@
   }
 }
 
+/* ----------------------------------------------------------------------
+   Named classes for utility strings the homepage repeats 11-43 times.
+   Same utilities via @apply, so the rendered style is identical; the HTML
+   just stops carrying the full string on every row. Precompiled on
+   purpose rather than CSS @function, which is Chromium-only. */
+@layer components {
+  /* WorkRow: hover panel, accent marker, body, title, tags, links */
+  .work-panel {
+    @apply pointer-events-none absolute inset-x-[-0.85rem] inset-y-1 rounded-[var(--radius-lg)] border border-transparent bg-elevated/0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:border-line group-hover:bg-elevated/45 group-focus-within:border-line group-focus-within:bg-elevated/45;
+  }
+  .work-marker {
+    @apply absolute left-[-0.85rem] top-1/2 h-[calc(100%-4rem)] w-[3px] -translate-y-1/2 scale-y-0 rounded-full bg-accent transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-y-100 group-focus-within:scale-y-100;
+  }
+  .work-body {
+    @apply pointer-events-none relative grid gap-6 py-9 pl-5 transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:pl-7 md:grid-cols-[1fr_auto] md:items-end md:gap-12 md:py-11;
+  }
+  .work-title {
+    @apply mt-3 font-display text-[1.7rem] font-semibold leading-[1.1] tracking-tight text-ink transition-colors duration-300 group-hover:text-accent-ink md:text-4xl;
+  }
+  .work-tag {
+    @apply rounded-[6px] border border-line px-2.5 py-0.5 font-mono text-[0.6875rem] font-medium text-dim;
+  }
+  .work-link {
+    @apply inline-flex items-center gap-1.5 text-sm font-semibold text-dim transition-colors hover:text-ink;
+  }
+  .work-cta-arrow {
+    @apply transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1;
+  }
+
+  /* FAQ disclosure rows */
+  .faq-summary {
+    @apply flex cursor-pointer list-none items-start justify-between gap-6 py-6 text-left;
+  }
+  .faq-q {
+    @apply font-display text-lg font-semibold tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-xl;
+  }
+  .faq-toggle {
+    @apply mt-1.5 shrink-0 text-dim transition-transform duration-300 group-open:rotate-45;
+  }
+  .faq-a {
+    @apply pb-7 pr-10 text-pretty text-base leading-relaxed text-dim md:text-lg;
+  }
+
+  .footer-link {
+    @apply text-left text-sm font-medium text-dim transition-colors hover:text-accent-ink;
+  }
+  .skill-tag {
+    @apply rounded-full border border-line px-2.5 py-1 font-mono text-[0.6875rem] text-faint;
+  }
+  .stack-name {
+    @apply font-mono text-[0.9375rem] tracking-tight;
+  }
+}
+
+/* ----------------------------------------------------------------------
+   Repeated icons, drawn once.
+   The FAQ plus (19 of them), the work-row arrows and the external-link arrow
+   were each a full inline <svg> per use — 12.7KB of the homepage's HTML for
+   three shapes. Agents that fetch the page as HTML truncate it, and at 149KB
+   the FAQ and contact sections fell past the cut. Each icon is now one mask
+   here and an empty <span> in the markup (see Icon.tsx). Same Phosphor bold
+   paths, same sizes; colour still follows currentColor. */
+@layer components {
+  .icon {
+    /* block, like the <svg> it replaces: Tailwind's preflight makes svg
+       display:block, and inline-block would sit in a 24px text line box. */
+    display: block;
+    flex-shrink: 0;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    background-color: currentColor;
+    -webkit-mask: var(--icon-svg) center / contain no-repeat;
+    mask: var(--icon-svg) center / contain no-repeat;
+  }
+  .icon-plus {
+    --icon-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z'/%3E%3C/svg%3E");
+    --icon-size: 18px;
+  }
+  .icon-arrow-right {
+    --icon-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z'/%3E%3C/svg%3E");
+    --icon-size: 15px;
+  }
+  .icon-arrow-up-right {
+    --icon-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z'/%3E%3C/svg%3E");
+    --icon-size: 14px;
+  }
+  /* Forced colours repaint backgrounds, which would blank a masked icon; the
+     plus is also the FAQ's only open/closed cue once the marker is hidden. */
+  @media (forced-colors: active) {
+    .icon {
+      forced-color-adjust: none;
+      background-color: CanvasText;
+    }
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -281,6 +377,8 @@
      sequence once the section scrolls into view. Staggered per-word via an
      inline transition-delay. Pure CSS — no scroll handler, no layout reads. */
   .approach-word {
+    display: inline-block;
+    margin-right: 0.28em;
     opacity: 0.6;
     transition: opacity 0.5s ease-out;
   }
