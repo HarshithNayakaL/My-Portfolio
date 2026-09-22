@@ -61,6 +61,8 @@ Packaged capability rather than deployed product: instructions plus executable d
 ## Machine-readable
 
 - [OpenAPI 3.1 description](https://harshith-nayaka-l-portfolio.vercel.app/openapi.json): Every API route, typed, with an operationId and a description on each operation.
+- [MCP server](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/mcp/server-card.json): The same content over the Model Context Protocol at https://harshith-nayaka-l-portfolio.vercel.app/mcp (Streamable HTTP, read-only, no auth). Tools: get_profile, list_projects, get_case_study, list_faqs, list_agent_skills.
+- [auth.md](https://harshith-nayaka-l-portfolio.vercel.app/auth.md): How agents authenticate here: they don't. No credentials exist; every surface is public and read-only.
 - [API catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog): RFC 9727 linkset pointing at the service description and its documentation.
 - [Agent resource catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json): Agentic Resource Discovery catalog of every agent-readable resource on this host.
 - [Agent card](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/agent-card.json): A2A card describing what this host can answer and in what formats.

@@ -47,7 +47,7 @@ const HAS_EXTENSION = /\.[a-z0-9]{2,5}$/i;
  * portal and the RFC 9727 api-catalog answered browsers and nobody else.
  * Keep in step with the "rewrites" block in vercel.json.
  */
-const REWRITTEN_ROUTE = /^\/(developers|docs|\.well-known\/api-catalog)$/;
+const REWRITTEN_ROUTE = /^\/(developers|docs|\.well-known\/api-catalog|\.well-known\/mcp)$/;
 
 const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";
 
@@ -256,14 +256,232 @@ function routeApi(path: string, url: URL): Response {
   );
 }
 
-export default function middleware(request: Request) {
-  if (request.method !== "GET" && request.method !== "HEAD") return next();
 
+// ------------------------------------------------------------------ MCP server
+//
+// A read-only Model Context Protocol server over the same content as the JSON
+// API, so an MCP client (Claude, ChatGPT, an IDE agent) can add this site as a
+// server and call it natively instead of scraping pages.
+//
+// Streamable HTTP transport, spec 2025-11-25, in its simplest conforming
+// shape: every request gets one application/json response, there are no
+// server-initiated messages, so GET is 405 rather than an SSE stream, and no
+// sessions. Each tool reads the static JSON the build already emits, so the
+// server can never disagree with the API or the pages.
+//
+// The tool table is exported so scripts/build-api.mjs can generate the server
+// card from it: one list, so the card cannot advertise a tool this handler
+// does not serve.
+//
+// No authentication, deliberately: everything it returns is already public on
+// this site. That is also why any https Origin is accepted. The spec's
+// Origin check exists to stop DNS rebinding against servers on a local
+// network, and a public read-only host has nothing for that to reach.
+
+export const MCP_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26"];
+
+const MCP_CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Accept, MCP-Protocol-Version, Mcp-Session-Id, Last-Event-ID",
+};
+
+type McpTool = {
+  name: string;
+  title: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  /** Static JSON file the tool returns, given its validated arguments. */
+  file: (args: Record<string, unknown>) => string;
+};
+
+export const MCP_TOOLS: McpTool[] = [
+  {
+    name: "get_profile",
+    title: "Profile",
+    description:
+      "Who Harshith Nayaka L is: role, employer, location, availability, contact email and public profiles. Start here for questions about the person rather than a project.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    file: () => "/api/v1/profile.json",
+  },
+  {
+    name: "list_projects",
+    title: "Projects",
+    description:
+      "Every project in the portfolio with a one-line outcome, tags, status, links and its slug. Use the slug with get_case_study for the full write-up.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    file: () => "/api/v1/projects.json",
+  },
+  {
+    name: "get_case_study",
+    title: "Case study",
+    description:
+      "The full case study for one project: the problem, what was built, the pipeline, the engineering decisions, results and stack.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        slug: {
+          type: "string",
+          enum: [...CASE_STUDY_SLUGS],
+          description: "The project's slug, as returned by list_projects.",
+        },
+      },
+      required: ["slug"],
+      additionalProperties: false,
+    },
+    file: (args) => `/api/v1/case-studies/${args.slug}.json`,
+  },
+  {
+    name: "list_faqs",
+    title: "FAQ",
+    description:
+      "The questions and answers from the site's FAQ: hiring and availability, what an AI workflow engineer does, and technical questions answered from the projects.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    file: () => "/api/v1/faqs.json",
+  },
+  {
+    name: "list_agent_skills",
+    title: "Agent skills",
+    description:
+      "The published agent skills: what each one does, the method behind it, and its repository.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    file: () => "/api/v1/skills.json",
+  },
+];
+
+type JsonRpcId = string | number | null;
+
+function mcpJson(body: unknown, status = 200, extra: Record<string, string> = {}): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex",
+      ...MCP_CORS,
+      ...extra,
+    },
+  });
+}
+
+const rpcResult = (id: JsonRpcId, result: unknown) => mcpJson({ jsonrpc: "2.0", id, result });
+const rpcError = (id: JsonRpcId, code: number, message: string, data?: unknown, status = 200) =>
+  mcpJson({ jsonrpc: "2.0", id, error: { code, message, ...(data ? { data } : {}) } }, status);
+
+async function handleMcp(request: Request, url: URL): Promise<Response> {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: { ...MCP_CORS, "Access-Control-Max-Age": "86400" } });
+  }
+  if (request.method !== "POST") {
+    return new Response(null, { status: 405, headers: { Allow: "POST, OPTIONS", ...MCP_CORS } });
+  }
+
+  const origin = request.headers.get("origin");
+  if (origin && !origin.startsWith("https://")) {
+    return rpcError(null, -32600, "Origin not allowed: only https origins may call this server.", undefined, 403);
+  }
+  const version = request.headers.get("mcp-protocol-version");
+  if (version && !MCP_VERSIONS.includes(version)) {
+    return rpcError(null, -32600, `Unsupported MCP-Protocol-Version "${version}".`, { supported: MCP_VERSIONS }, 400);
+  }
+
+  let msg: { jsonrpc?: unknown; id?: JsonRpcId; method?: unknown; params?: Record<string, unknown> };
+  try {
+    msg = await request.json();
+  } catch {
+    return rpcError(null, -32700, "Parse error: the body is not valid JSON.", undefined, 400);
+  }
+  if (Array.isArray(msg) || !msg || msg.jsonrpc !== "2.0") {
+    return rpcError(null, -32600, "Invalid request: send one JSON-RPC 2.0 object per POST.", undefined, 400);
+  }
+
+  // Notifications and client responses carry no id and get 202, no body.
+  if (msg.id === undefined) return new Response(null, { status: 202, headers: MCP_CORS });
+
+  const id = msg.id;
+  const params = msg.params ?? {};
+
+  switch (msg.method) {
+    case "initialize": {
+      const requested = String(params.protocolVersion ?? "");
+      return rpcResult(id, {
+        protocolVersion: MCP_VERSIONS.includes(requested) ? requested : MCP_VERSIONS[0],
+        capabilities: { tools: { listChanged: false } },
+        serverInfo: {
+          name: "harshith-nayaka-l-portfolio",
+          title: "Harshith Nayaka L — portfolio",
+          version: "1.0.0",
+          description: "Read-only access to Harshith Nayaka L's portfolio: profile, projects, case studies, FAQ and agent skills.",
+          websiteUrl: ORIGIN,
+        },
+        instructions:
+          "Read-only. Call get_profile for who Harshith Nayaka L is and how to reach him, list_projects to see the work, then get_case_study with a slug for depth. Everything here is also on the public site; nothing can be written or sent.",
+      });
+    }
+    case "ping":
+      return rpcResult(id, {});
+    case "tools/list":
+      return rpcResult(id, {
+        tools: MCP_TOOLS.map(({ file: _file, ...tool }) => ({
+          ...tool,
+          annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+        })),
+      });
+    case "tools/call": {
+      const tool = MCP_TOOLS.find((t) => t.name === params.name);
+      if (!tool) {
+        return rpcError(id, -32602, `Unknown tool "${String(params.name)}".`, {
+          tools: MCP_TOOLS.map((t) => t.name),
+        });
+      }
+      const args = (params.arguments ?? {}) as Record<string, unknown>;
+      if (tool.name === "get_case_study" && !CASE_STUDY_SLUGS.has(String(args.slug))) {
+        return rpcResult(id, {
+          isError: true,
+          content: [{
+            type: "text",
+            text: `No case study with slug "${String(args.slug)}". Valid slugs: ${[...CASE_STUDY_SLUGS].join(", ")}.`,
+          }],
+        });
+      }
+      const res = await fetch(new URL(tool.file(args), url));
+      if (!res.ok) {
+        return rpcResult(id, {
+          isError: true,
+          content: [{ type: "text", text: `The site returned ${res.status} for this data. Try again, or read ${ORIGIN}/llms.txt.` }],
+        });
+      }
+      const data = await res.json();
+      return rpcResult(id, {
+        content: [{ type: "text", text: JSON.stringify(data) }],
+        structuredContent: data,
+      });
+    }
+    default:
+      return rpcError(id, -32601, `Method not found: ${String(msg.method)}.`);
+  }
+}
+
+export default function middleware(request: Request) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/(.)\/$/, "$1");
 
+  // The MCP endpoint takes POST, so it is routed before the GET/HEAD guard.
+  // /.well-known/mcp answers the same protocol for clients that probe the
+  // well-known path; a GET there is a discovery read and passes through to
+  // the static server card.
+  if (path === "/mcp" || (path === "/.well-known/mcp" && request.method !== "GET" && request.method !== "HEAD")) {
+    return handleMcp(request, url);
+  }
+
+  if (request.method !== "GET" && request.method !== "HEAD") return next();
+
   // <route>.md -> <route>/index.md, before the extension guard below sends
   // anything with a dot straight through to the filesystem.
+  // /api has no HTML page to twin; its markdown form is the API guide.
+  if (path === "/api.md") return rewrite(new URL("/api/llms.txt", url));
+
   const dotMd = path.match(DOT_MD_ROUTE);
   if (dotMd && dotMd[1] !== "/index") {
     return rewrite(new URL(`${dotMd[1]}/index.md`, url));

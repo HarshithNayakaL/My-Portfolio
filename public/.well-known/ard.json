@@ -30,6 +30,27 @@
       }
     },
     {
+      "identifier": "urn:air:harshith-nayaka-l-portfolio.vercel.app:mcp:portfolio",
+      "displayName": "Portfolio MCP server",
+      "type": "application/mcp",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/mcp",
+      "description": "Read-only Model Context Protocol server (Streamable HTTP) over the profile, projects, case studies, FAQ and agent skills. Same content as the REST API; no authentication, no write operations. Server card at /.well-known/mcp/server-card.json.",
+      "capabilities": [
+        "get_profile",
+        "list_projects",
+        "get_case_study",
+        "list_faqs",
+        "list_agent_skills"
+      ],
+      "representativeQueries": [
+        "add Harshith Nayaka L's portfolio as an MCP server",
+        "call get_case_study for maestro over MCP"
+      ],
+      "trustManifest": {
+        "identity": "harshith-nayaka-l-portfolio.vercel.app"
+      }
+    },
+    {
       "identifier": "urn:air:harshith-nayaka-l-portfolio.vercel.app:doc:agent-instructions",
       "displayName": "Agent instructions",
       "type": "text/markdown",

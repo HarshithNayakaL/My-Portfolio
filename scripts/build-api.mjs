@@ -563,8 +563,18 @@ await put("/.well-known/api-catalog.json", {
           type: "application/json",
           title: "Version 1 — current, stable",
         },
+        {
+          href: abs("/mcp"),
+          type: "application/json",
+          title: `${NAME} portfolio MCP server — Streamable HTTP, read-only`,
+        },
       ],
       "service-desc": [
+        {
+          href: abs("/.well-known/mcp/server-card.json"),
+          type: "application/json",
+          title: `${NAME} portfolio MCP server — server card`,
+        },
         {
           href: abs("/openapi.json"),
           type: "application/vnd.oai.openapi+json;version=3.1",
@@ -583,6 +593,48 @@ await put("/.well-known/api-catalog.json", {
     },
   ],
 });
+
+// ---------------------------------------------------- MCP server card
+//
+// The MCP server itself lives in middleware.ts (POST /mcp). Its tool table is
+// read from that file here, the way scripts/check-negotiation.mjs reads the
+// negotiation rule, so the card is generated from the code that serves the
+// tools rather than from a second list that could drift.
+{
+  const { transformSync } = await import("esbuild");
+  const src = (await readFile(join(ROOT, "middleware.ts"), "utf8")).replace(
+    /^import[^;]+from "@vercel\/edge";$/m,
+    "const rewrite = () => {}, next = () => {};",
+  );
+  const js = transformSync(src, { loader: "ts", format: "esm" }).code;
+  const { MCP_TOOLS, MCP_VERSIONS } = await import(
+    `data:text/javascript;base64,${Buffer.from(js).toString("base64")}`
+  );
+  const card = {
+    name: "harshith-nayaka-l-portfolio",
+    title: `${NAME} — portfolio`,
+    description:
+      `Read-only MCP server over ${NAME}'s portfolio: profile, projects, case studies, FAQ and agent skills. ` +
+      "The same content as the site and its JSON API; no authentication, nothing can be written or sent.",
+    version: "1.0.0",
+    serverUrl: abs("/mcp"),
+    websiteUrl: ORIGIN,
+    protocolVersion: MCP_VERSIONS[0],
+    supportedProtocolVersions: MCP_VERSIONS,
+    transport: { type: "streamable-http", url: abs("/mcp") },
+    authentication: { required: false },
+    capabilities: { tools: { listChanged: false } },
+    tools: MCP_TOOLS.map(({ name, title, description, inputSchema }) => ({
+      name,
+      title,
+      description,
+      inputSchema,
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    })),
+    documentation: abs("/developers"),
+  };
+  await put("/.well-known/mcp/server-card.json", card);
+}
 
 // --------------------------------------------------------- JSON 404 body
 
@@ -693,6 +745,20 @@ const developerPortal = [
   `| GET | [\`/api/v1/faqs\`](${abs(`${API}/faqs`)}) | Question and answer pairs |`,
   `| GET | [\`/api/v1/skills\`](${abs(`${API}/skills`)}) | Packaged agent skills published from this site |`,
   "",
+  "## MCP server",
+  "",
+  `The same content is also served over the Model Context Protocol at \`${abs("/mcp")}\` — Streamable HTTP, protocol 2025-11-25, read-only, no authentication. Add that URL as a remote MCP server in any MCP client.`,
+  "",
+  "| Tool | Returns |",
+  "| --- | --- |",
+  "| `get_profile` | Name, role, location, availability, contact |",
+  "| `list_projects` | Every project with its outcome, tags and slug |",
+  "| `get_case_study` | The full write-up for one project, by slug |",
+  "| `list_faqs` | The site's question and answer pairs |",
+  "| `list_agent_skills` | The published agent skills |",
+  "",
+  `Server card: [\`/.well-known/mcp/server-card.json\`](${abs("/.well-known/mcp/server-card.json")}).`,
+  "",
   "## Authentication",
   "",
   "None, deliberately. Every record served here is already public on the site, so there is no key to obtain, no token to refresh and no scope to request. Every operation is a read; nothing can be mutated, so there is no separate test environment to point you at and no production data at risk from calling it.",
@@ -742,6 +808,50 @@ const developerPortal = [
   `- [agents.md](${abs("/agents.md")}) — what this site is a good source for, and what it is not.`,
   "",
 ].join("\n");
+
+// ---------------------------------------------------------------- auth.md
+//
+// The agent-auth walkthrough (github.com/workos/auth.md), written for a
+// service that has no auth. An agent following that spec reads it section by
+// section, so each section answers in place: there is nothing to register,
+// claim or exchange. Advertising OAuth metadata or an identity endpoint would
+// send it looking for machinery that does not exist.
+const authMd = [
+  `# Authentication — ${NAME} portfolio`,
+  "",
+  "> No credentials exist for this site. The JSON API, the MCP server and every page are public and read-only: call them directly, with no key, token or account.",
+  "",
+  "## Discover",
+  "",
+  `There is no authorization server, so there is no \`/.well-known/oauth-protected-resource\` or \`/.well-known/oauth-authorization-server\` and no \`agent_auth\` block. Endpoints never answer 401, so there is no \`WWW-Authenticate\` challenge to read. What exists: the REST API at ${abs("/api")}, described by ${abs("/openapi.json")}, and the MCP server at ${abs("/mcp")}.`,
+  "",
+  "## Pick a method",
+  "",
+  "Anonymous access is the only method, and it is sufficient for everything: every operation is a read of public content.",
+  "",
+  "## Register, Claim, Exchange",
+  "",
+  "Not applicable. There is no client registration, no identity to claim and no token to exchange.",
+  "",
+  "## Use the access_token",
+  "",
+  "Send requests without an `Authorization` header:",
+  "",
+  "```",
+  `curl ${abs("/api/v1/projects")}`,
+  "```",
+  "",
+  "## Errors",
+  "",
+  `Errors are JSON with a stable \`code\`, a \`message\` and a \`hint\` naming the call that lists valid values. None of them are auth errors. Details in the [developer portal](${abs("/developers")}).`,
+  "",
+  "## Revocation",
+  "",
+  "Nothing is issued, so there is nothing to revoke.",
+  "",
+].join("\n");
+
+await put_text("/auth.md", authMd);
 
 await put_text("/developers/index.md", developerPortal);
 await put_text("/developers.md", developerPortal);
