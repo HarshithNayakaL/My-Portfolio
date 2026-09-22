@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Nav from "./components/Nav";
 import GlassFilter from "./components/GlassFilter";
@@ -28,12 +28,31 @@ function ScrollManager() {
 // on the route key restarts the animation. Exit animations are dropped
 // deliberately: holding the outgoing page in the tree to animate it out is what
 // forced the whole animation runtime into the initial bundle.
+//
+// Not on the first document load, though. The page is prerendered, so its
+// content is already in the HTML; fading it in from opacity 0 hid the hero
+// heading from paint until the keyframe ran, and Chrome doesn't count
+// opacity-0 paints toward Largest Contentful Paint — it logged the nav logo
+// as LCP while the headline, the thing a visitor came for, was still
+// invisible. The glide only means something as a transition between routes,
+// so it starts from the second route onward. Server render and the hydrating
+// client both see `false` on that first pass, so the markup matches.
+let hasNavigated = false;
+
 function Page({ children }: { children: React.ReactNode }) {
-  return <div className="page-enter">{children}</div>;
+  // Read once at mount. Reading the flag on every render would add the class
+  // to the first page the next time it re-rendered — an in-page #anchor
+  // click changes the location — and replay the fade on a page already
+  // on screen.
+  const [animate] = useState(() => hasNavigated);
+  return <div className={animate ? "page-enter" : undefined}>{children}</div>;
 }
 
 function AnimatedRoutes() {
   const location = useLocation();
+  useEffect(() => {
+    hasNavigated = true;
+  }, []);
   const key = location.pathname.split("/")[1] || "home";
   return (
     <Routes location={location} key={key}>

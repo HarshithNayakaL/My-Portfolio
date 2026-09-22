@@ -35,22 +35,30 @@
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F3F4F6" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0B0F" />
 
-    <!-- Preload every self-hosted font (all 8 are small: 7-15KB each, under
-         200KB combined) so none of them are ever discovered late via the CSS
+    <!-- Preload the self-hosted fonts so none is discovered late via the CSS
          @font-face parse. A font that finishes loading mid-render forces the
          browser to recompute text layout against the real metrics instead of
          the fallback's — a real, traced forced-reflow source (not
          script-triggered, so tools can't point at a JS call site for it), and
-         it also shortens the network dependency chain: these fetches now
-         start in parallel with the CSS instead of chained behind it. -->
+         preloading also starts these fetches in parallel with the CSS instead
+         of chained behind it.
+
+         Priority is split by what the first viewport actually renders,
+         measured at 390px and 1280px: Inter, Poppins 600 (the hero heading,
+         which is the LCP element) and DM Mono 500. Those keep the default
+         high priority; the rest still start early but at low priority, so
+         they don't compete for bandwidth with the three that paint first.
+
+         inter-latin-ext is not preloaded: no page contains a character in its
+         unicode-range, so the preload was the only reason it downloaded. The
+         @font-face rule still covers it if such a character ever appears. -->
     <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/inter-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/poppins-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/dm-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low" />
+    <link rel="preload" href="/fonts/poppins-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low" />
+    <link rel="preload" href="/fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low" />
+    <link rel="preload" href="/fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low" />
 
     <title>
       Harshith Nayaka L — AI Engineer, Full-Stack | Bengaluru

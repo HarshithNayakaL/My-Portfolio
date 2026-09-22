@@ -29,8 +29,14 @@ export default function CaseStudy() {
   return (
     <article className="pt-28 md:pt-32">
       {/* Header */}
+      {/* No Reveal here. Reveal holds its content at opacity 0 until the app
+          hydrates and an IntersectionObserver fires, which put this page's
+          headline behind the whole JS bundle on a slow phone and kept it out
+          of Largest Contentful Paint entirely — Chrome logged the nav logo
+          instead. The header is the first thing on screen; it renders with
+          the HTML. Everything below still reveals on scroll. */}
       <header className="shell">
-        <Reveal>
+        <div>
           <Link
             to="/#work"
             className="inline-flex items-center gap-1.5 font-mono text-[13px] text-dim transition-colors hover:text-ink"
@@ -107,7 +113,7 @@ export default function CaseStudy() {
               </p>
             </div>
           )}
-        </Reveal>
+        </div>
       </header>
 
       {/* Screenshot of the running product, where one exists. Shown whole
@@ -124,7 +130,10 @@ export default function CaseStudy() {
                 resolution. Letting it fill the 1238px content column upscaled
                 it 1.15x, which read as soft, and made a tall capture swallow
                 the viewport. Small on a phone by necessity: these are desktop
-                interfaces, so the caption link is how you actually read one. */}
+                interfaces, so the caption link is how you actually read one.
+                Not lazy-loaded: on a desktop viewport it starts inside the first
+                screen on every case study, and lazy loading an above-the-fold
+                image holds its fetch until layout has run. */}
             <figure className="max-w-[720px]">
               <div className="elev overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface/50">
                 <img
@@ -132,7 +141,6 @@ export default function CaseStudy() {
                   width={study.shot.width}
                   height={study.shot.height}
                   alt={study.shot.alt}
-                  loading="lazy"
                   decoding="async"
                   className="block h-auto w-full"
                 />
