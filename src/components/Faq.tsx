@@ -1,3 +1,4 @@
+import { Plus } from "@phosphor-icons/react";
 import SectionHeading from "./SectionHeading";
 import Reveal from "./Reveal";
 
@@ -120,31 +121,44 @@ export default function Faq() {
           />
         </Reveal>
 
-        {/* Reveal carries the row styling rather than wrapping a second div.
-            A <dl> may group each <dt>/<dd> pair in one <div>, but not two
-            nested ones — with Reveal's own div on the outside this list was
-            dl > div > div > dt, which fails both the definition-list and
-            dlitem accessibility checks and, through them, the agent
-            accessibility tree. One div, styled by Reveal, is valid and keeps
-            the staggered reveal. */}
-        <dl className="mt-14 max-w-3xl">
+        {/* Native <details> rather than a scripted accordion.
+            Nineteen answers laid out in full is a wall; the disclosure makes
+            the list scannable. Doing it with the element the platform already
+            has means it opens before hydration, works with the keyboard for
+            free, and announces its own expanded state — no aria-expanded to
+            keep in sync, no JS to ship.
+
+            The answers stay in the HTML either way, which is the part that
+            matters here: this section is what the FAQPage schema and the
+            markdown twins are generated from, and an answer engine reads the
+            markup, not the open state. Verified after the change by grepping
+            the prerendered HTML for the answer text. */}
+        <div className="mt-14 max-w-3xl">
           {faqs.map((f, i) => (
             <Reveal
               key={f.q}
               delay={(i % 3) * 0.06}
-              className="border-t border-line py-8 first:border-t-0 first:pt-0"
+              className="border-t border-line first:border-t-0"
             >
-              <dt>
-                <h3 className="text-lg font-semibold tracking-tight text-ink md:text-xl">
-                  {f.q}
-                </h3>
-              </dt>
-              <dd className="mt-3 text-pretty text-base leading-relaxed text-dim md:text-lg">
-                {f.a}
-              </dd>
+              <details className="faq-item group" open={i === 0}>
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 text-left">
+                  <h3 className="text-lg font-semibold tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-xl">
+                    {f.q}
+                  </h3>
+                  <span
+                    aria-hidden
+                    className="mt-1.5 shrink-0 text-dim transition-transform duration-300 group-open:rotate-45"
+                  >
+                    <Plus weight="bold" size={18} />
+                  </span>
+                </summary>
+                <div className="pb-7 pr-10 text-pretty text-base leading-relaxed text-dim md:text-lg">
+                  {f.a}
+                </div>
+              </details>
             </Reveal>
           ))}
-        </dl>
+        </div>
       </div>
     </section>
   );

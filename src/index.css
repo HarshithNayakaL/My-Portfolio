@@ -358,6 +358,22 @@
       0 10px 30px -10px rgba(0, 0, 0, 0.3);
   }
 
+  /* The disclosure marker is removed in favour of the icon in the summary.
+     list-none covers most engines; Safari needs the pseudo-element too. */
+  .faq-item > summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-item > summary::marker {
+    content: "";
+  }
+  /* Keyboard focus has to land visibly on the summary, since that is the
+     control — the row, not the heading inside it. */
+  .faq-item > summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: var(--radius);
+  }
+
   /* Row sizing. The bar is a fixed-width stadium and the labels have to fit
      inside it at every width, so type and padding step down instead of links
      dropping out. Measured at semibold: Work 33px, Agent Skills 74, About 38,
