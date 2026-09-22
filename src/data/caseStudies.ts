@@ -1144,6 +1144,12 @@ const spectra: CaseStudy = {
     "PostgreSQL (production model)",
     "Deterministic scoring engine",
   ],
+  shot: {
+    src: "/shots/spectra.0f11b4f7.webp",
+    width: 1079,
+    height: 1738,
+    alt: "SPECTRA's audit screen on a near-black canvas: an AEO badge over the heading \"Are you in the answer?\", fields for a site and for the questions buyers ask AI, a Gemini 3.1 Flash Lite model selector and a magenta Run audit button, above a panel reading \"27 checks, 4 layers, 1 score\" and a four-step explanation \u2014 crawl like an AI, ask like a buyer, read the answer, fix with code.",
+  },
   metaDescription:
     "AI-search perception platform: what an AI actually understands about a site, which facts disappear at which stage, and deterministic scoring backed by evidence.",
   links: [
