@@ -21,6 +21,8 @@ import { facts, availability, workingTitle } from "../components/About";
 
 type Doc = {
   title: string;
+  /** The <title>, where "About | Name" says nothing a searcher asked. */
+  searchTitle?: string;
   description: string;
   intro: string;
   sections: { h: string; p: string[] }[];
@@ -31,6 +33,7 @@ const shipped = projects.filter((p) => p.hasCaseStudy).length;
 export const profileDocs: Record<string, Doc> = {
   about: {
     title: "About",
+    searchTitle: `About ${NAME} — AI Engineer in Bengaluru, India`,
     description:
       "Harshith Nayaka L — AI Engineer, Full-Stack in Bengaluru (Bangalore), India. AI Workflow Engineer at DemandNXT. Available for freelance work.",
     intro: `${NAME} is a full-stack AI Engineer based in Bengaluru (Bangalore), Karnataka, India, and goes by ${workingTitle} at ${
@@ -72,6 +75,9 @@ export const profileDocs: Record<string, Doc> = {
   },
   contact: {
     title: "Contact",
+    // Hiring intent is what brings someone here, and availability for
+    // freelance work is stated on the site (About), so the title can say it.
+    searchTitle: `Hire an AI Engineer in Bengaluru — Contact ${NAME}`,
     description: `Contact ${NAME}, AI Engineer in Bengaluru (Bangalore), India. ${availability}. Email ${EMAIL}.`,
     intro: `${availability}. Email is the direct route, and the form on the homepage reaches the same inbox.`,
     sections: [

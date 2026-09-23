@@ -1,10 +1,22 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Info } from "@phosphor-icons/react";
 import { getCaseStudy } from "../data/caseStudies";
-import { EMAIL, NAME } from "../data/projects";
+import { EMAIL, NAME, projects } from "../data/projects";
 import PipelineDiagram from "../components/PipelineDiagram";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
+
+// Homepage order, case studies only: each study links to its neighbours so
+// none is reachable solely from the homepage grid. They were each linked from
+// exactly one page, which is thin for a crawler deciding what matters.
+const studyOrder = projects.filter((p) => p.hasCaseStudy);
+
+const published = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 export default function CaseStudy() {
   const { slug } = useParams();
@@ -73,6 +85,14 @@ export default function CaseStudy() {
               ·
             </span>
             <span>AI Engineer, Full-Stack — Bengaluru, India</span>
+            <span aria-hidden className="text-faint">
+              ·
+            </span>
+            {/* The date Article.datePublished states, shown: structured data
+                should match what the page visibly says. */}
+            <span>
+              Published <time dateTime={study.published}>{published.format(new Date(study.published))}</time>
+            </span>
           </p>
 
           <dl className="mt-10 grid gap-px border-t border-line sm:grid-cols-2 lg:grid-cols-4">
@@ -275,8 +295,37 @@ export default function CaseStudy() {
             </Link>
           </div>
         </Reveal>
+
+        <StudyNav slug={study.slug} />
       </section>
     </article>
+  );
+}
+
+function StudyNav({ slug }: { slug: string }) {
+  const i = studyOrder.findIndex((p) => p.slug === slug);
+  if (i < 0 || studyOrder.length < 2) return null;
+  const prev = studyOrder[(i - 1 + studyOrder.length) % studyOrder.length];
+  const next = studyOrder[(i + 1) % studyOrder.length];
+  return (
+    <nav aria-label="More case studies" className="mt-16 grid gap-4 border-t border-line pt-8 sm:grid-cols-2">
+      {[
+        { p: prev, label: "Previous case study", align: "" },
+        { p: next, label: "Next case study", align: "sm:text-right" },
+      ].map(({ p, label, align }) => (
+        <Link
+          key={label}
+          to={`/work/${p.slug}`}
+          className={`group rounded-[var(--radius)] border border-line p-4 transition-colors hover:border-line-strong ${align}`}
+        >
+          <span className="block font-mono text-[0.6875rem] uppercase tracking-wider text-faint">{label}</span>
+          <span className="mt-1 block font-display text-lg font-semibold text-ink transition-colors group-hover:text-accent-ink">
+            {p.title}
+          </span>
+          <span className="mt-0.5 block text-sm text-dim">{p.kicker}</span>
+        </Link>
+      ))}
+    </nav>
   );
 }
 

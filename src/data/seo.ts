@@ -44,7 +44,7 @@ export const routeSeo: Record<string, RouteSeo> = {
 // which search engines flag as too short or too long at both ends.
 for (const [slug, cs] of Object.entries(caseStudies)) {
   routeSeo[`/work/${slug}`] = {
-    title: `${cs.title} — ${cs.kicker} | ${NAME}`,
+    title: `${cs.title} — ${cs.searchKicker ?? cs.kicker} | ${NAME}`,
     description: cs.metaDescription,
     canonical: abs(`/work/${slug}`),
     ogType: "article",
@@ -83,7 +83,7 @@ for (const [doc, meta] of Object.entries(legal)) {
 // cannot be cited on their own or carry their own title and description.
 for (const [slug, doc] of Object.entries(profileDocs)) {
   routeSeo[`/${slug}`] = {
-    title: `${doc.title} | ${NAME}`,
+    title: doc.searchTitle ?? `${doc.title} | ${NAME}`,
     description: doc.description,
     canonical: abs(`/${slug}`),
     ogType: slug === "about" ? "profile" : "website",

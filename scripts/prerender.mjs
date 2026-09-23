@@ -83,6 +83,16 @@ let template = await readFile(join(DIST, "index.html"), "utf8");
   }
 }
 
+// ------------------------------------------- drop developer comments
+//
+// index.html is heavily commented, and every comment shipped in every page:
+// 2.2KB each, 1.1KB of it in <head> ahead of any content. One of them quotes
+// "<h1>", which naive SEO and answer-engine scanners counted as a second
+// heading on every page. Stripped from the template only: React's own
+// comment markers (<!-- -->, <!--$-->) arrive later with the rendered app
+// and are needed for hydration, so they are never touched here.
+template = template.replace(/<!--(?!\[if)[\s\S]*?-->\s*/g, "");
+
 // ------------------------------------------- move JSON-LD out of <head> too
 //
 // Structured data is metadata about the page, not part of it, and Google
@@ -178,6 +188,7 @@ function jsonLdFor(path, seo) {
       mainEntityOfPage: seo.canonical,
       url: seo.canonical,
       inLanguage: "en",
+      datePublished: cs.published,
       dateModified: BUILD_TIME,
       isPartOf: { "@id": `${ORIGIN}/#website` },
       about: cs.tech,
@@ -195,7 +206,17 @@ function jsonLdFor(path, seo) {
               caption: cs.shot.alt,
             },
           }
-        : {}),
+        : // No product screenshot (internal or not deployed): the site's
+          // social image, so the Article still carries one as Google's
+          // Article guidance recommends.
+          {
+            image: {
+              "@type": "ImageObject",
+              url: `${ORIGIN}/og-image.png`,
+              width: 1200,
+              height: 630,
+            },
+          }),
     });
     graph.unshift({
       "@type": "Person",
@@ -487,6 +508,9 @@ function frontmatter(path, seo) {
     `description: ${yaml(seo.description)}`,
     `canonical: ${yaml(seo.canonical)}`,
     `last-updated: ${yaml(lastCommitISO(SOURCES_FOR(path)))}`,
+    ...(path.startsWith("/work/") && caseStudies[path.slice(6)]
+      ? [`published: ${yaml(caseStudies[path.slice(6)].published)}`]
+      : []),
     `author: ${yaml(NAME)}`,
     // The identity fields an answer engine needs to place this person, on
     // every page rather than only the homepage: an agent that lands on a case

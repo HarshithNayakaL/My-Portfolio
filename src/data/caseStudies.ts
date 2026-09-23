@@ -32,6 +32,15 @@ export type CaseStudy = {
    *  rather than reusing `outcome`: that is prose for the page and its length
    *  swings from 99 to 213 characters, which search engines flag either way. */
   metaDescription: string;
+  /** When the case study first appeared on this site: the author time of the
+   *  commit that added it (git log -S on its slug; brand-audit-platform was
+   *  first published as seo-command-center). Stored, not computed at build,
+   *  because Vercel builds from a shallow clone that would get it wrong.
+   *  Feeds Article.datePublished and the visible "Published" line. */
+  published: string;
+  /** Replaces `kicker` in the <title> only, where the on-page label means
+   *  nothing to a search ("Flagship"). */
+  searchKicker?: string;
   /** Real screenshot of the running product. Intrinsic size is the full
    *  capture; the page frames a preview of it, but the served file is whole
    *  so image search and AI surfaces get the entire thing. */
@@ -41,6 +50,7 @@ export type CaseStudy = {
 
 const craftconnect: CaseStudy = {
   slug: "craftconnect",
+  published: "2026-06-06T01:30:29Z",
   title: "CraftConnect",
   kicker: "Gen AI Exchange Hackathon 2025",
   outcome:
@@ -149,6 +159,7 @@ const craftconnect: CaseStudy = {
 
 const creativeOps: CaseStudy = {
   slug: "creative-ops-pipeline",
+  published: "2026-06-06T01:30:29Z",
   title: "Creative-Ops Pipeline",
   kicker: "~90-node n8n workflow",
   outcome:
@@ -247,6 +258,8 @@ const creativeOps: CaseStudy = {
 
 const brandforge: CaseStudy = {
   slug: "brandforge",
+  published: "2026-09-10T00:51:52Z",
+  searchKicker: "AI brand campaign pipeline",
   title: "BrandForge",
   kicker: "Flagship",
   outcome:
@@ -371,6 +384,7 @@ const brandforge: CaseStudy = {
 
 const brandAuditPlatform: CaseStudy = {
   slug: "brand-audit-platform",
+  published: "2026-09-10T00:51:52Z",
   title: "Multi-Brand Audit Platform",
   kicker: "Internal tooling, in production",
   outcome:
@@ -485,6 +499,7 @@ const brandAuditPlatform: CaseStudy = {
 
 const novaAi: CaseStudy = {
   slug: "nova-ai",
+  published: "2026-06-06T06:00:39Z",
   title: "Nova",
   kicker: "Cost-tiered model routing",
   outcome:
@@ -602,6 +617,7 @@ const novaAi: CaseStudy = {
 
 const aiNotes: CaseStudy = {
   slug: "ai-notes",
+  published: "2026-06-06T06:00:39Z",
   title: "AI Notes",
   kicker: "Local inference, no server",
   outcome:
@@ -699,6 +715,7 @@ const aiNotes: CaseStudy = {
 
 const maestro: CaseStudy = {
   slug: "maestro",
+  published: "2026-08-03T13:25:26Z",
   title: "Maestro",
   kicker: "Multi-model LLM orchestration",
   outcome:
@@ -816,6 +833,8 @@ const maestro: CaseStudy = {
 
 const cannon: CaseStudy = {
   slug: "cannon",
+  published: "2026-08-07T06:07:07Z",
+  searchKicker: "Multi-agent personal assistant",
   title: "Cannon",
   kicker: "Multi-agent, not multi-task",
   outcome:
@@ -934,6 +953,7 @@ const cannon: CaseStudy = {
 
 const replydesk: CaseStudy = {
   slug: "replydesk",
+  published: "2026-08-03T13:25:26Z",
   title: "ReplyDesk",
   kicker: "WhatsApp lead agent",
   outcome:
@@ -1038,6 +1058,7 @@ const replydesk: CaseStudy = {
 
 const spectra: CaseStudy = {
   slug: "spectra",
+  published: "2026-09-16T02:41:15Z",
   title: "SPECTRA",
   kicker: "AI search visibility audit",
   outcome:
@@ -1160,6 +1181,7 @@ const spectra: CaseStudy = {
 
 const personalOsMcp: CaseStudy = {
   slug: "personal-os-mcp",
+  published: "2026-09-16T02:41:15Z",
   title: "Personal MCP OS",
   kicker: "85-tool local execution layer",
   outcome:
