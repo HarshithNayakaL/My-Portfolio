@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
-import { facts, availability, workingTitle } from "../components/About";
+import { facts, availability, workingTitle, identitySentence } from "../components/About";
+import { caseStudies } from "../data/caseStudies";
 
 /**
  * /about and /contact: the entity anchors.
@@ -21,6 +22,8 @@ import { facts, availability, workingTitle } from "../components/About";
 
 type Doc = {
   title: string;
+  /** The visible <h1>. "About" and "Contact" named nothing a search matches. */
+  h1?: string;
   /** The <title>, where "About | Name" says nothing a searcher asked. */
   searchTitle?: string;
   description: string;
@@ -33,12 +36,11 @@ const shipped = projects.filter((p) => p.hasCaseStudy).length;
 export const profileDocs: Record<string, Doc> = {
   about: {
     title: "About",
-    searchTitle: `About ${NAME} — AI Engineer in Bengaluru, India`,
+    h1: `${NAME} — AI Workflow Engineer in Bengaluru, India`,
+    searchTitle: `${NAME} — AI Workflow Engineer in Bengaluru, India`,
     description:
-      "Harshith Nayaka L — AI Engineer, Full-Stack in Bengaluru (Bangalore), India. AI Workflow Engineer at DemandNXT. Available for freelance work.",
-    intro: `${NAME} is a full-stack AI Engineer based in Bengaluru (Bangalore), Karnataka, India, and goes by ${workingTitle} at ${
-      facts.find((f) => f.k === "Company")?.v
-    }.`,
+      "Harshith Nayaka L is an AI Workflow Engineer and full-stack AI Engineer in Bengaluru (Bangalore), India, at DemandNXT. Available for freelance work.",
+    intro: identitySentence,
     sections: [
       {
         h: "The short version",
@@ -50,6 +52,18 @@ export const profileDocs: Record<string, Doc> = {
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
           "The work is AI agents, retrieval pipelines and full-stack AI applications — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",
         ],
+      },
+      {
+        // One line per project, name first: the shape a list answer quotes
+        // ("built BrandForge, a …"), taken from the same data as the
+        // homepage grid so it cannot drift.
+        h: "Selected work, one line each",
+        p: projects
+          .filter((pr) => pr.hasCaseStudy)
+          .map(
+            (pr) =>
+              `${pr.title} (${caseStudies[pr.slug]?.searchKicker ?? pr.kicker}): ${pr.outcome}`,
+          ),
       },
       {
         h: "What the work actually is",
@@ -75,11 +89,12 @@ export const profileDocs: Record<string, Doc> = {
   },
   contact: {
     title: "Contact",
+    h1: `Hire ${NAME} — AI Engineer in Bengaluru`,
     // Hiring intent is what brings someone here, and availability for
     // freelance work is stated on the site (About), so the title can say it.
     searchTitle: `Hire an AI Engineer in Bengaluru — Contact ${NAME}`,
     description: `Contact ${NAME}, AI Engineer in Bengaluru (Bangalore), India. ${availability}. Email ${EMAIL}.`,
-    intro: `${availability}. Email is the direct route, and the form on the homepage reaches the same inbox.`,
+    intro: `${identitySentence} Email is the direct route, and the form on the homepage reaches the same inbox.`,
     sections: [
       {
         h: "How to reach me",
@@ -120,7 +135,7 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
         <ArrowLeft weight="bold" size={15} aria-hidden />
         All work
       </Link>
-      <h1 className="mt-8 text-4xl font-semibold tracking-tight md:text-5xl">{d.title}</h1>
+      <h1 className="mt-8 text-4xl font-semibold tracking-tight md:text-5xl">{d.h1 ?? d.title}</h1>
       <p className="mt-5 max-w-2xl text-lg leading-relaxed text-dim">{d.intro}</p>
       <div className="mt-12 max-w-2xl space-y-10">
         {d.sections.map((s) => (

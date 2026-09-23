@@ -30,14 +30,22 @@ export default function Hero() {
               several AI engineers named Harshith with portfolios; the ones
               that surface put their name where a reader and a parser both
               hit it first. */}
-          <span className="text-base font-semibold tracking-tight text-ink">
-            {NAME} <span className="text-dim">— AI Engineer, Full-Stack</span>
-          </span>
-          <span className="h-4 w-px bg-line-strong" aria-hidden />
-          <span className="text-[0.9375rem] font-medium text-dim">
-            AI Workflow Engineer @ DemandNXT
-          </span>
-          <span className="h-4 w-px bg-line-strong" aria-hidden />
+          {/* The page's <h1> is who, what and where, because Google matches a
+              search against the title and main heading first, and the
+              searches that matter here are "AI workflow engineer Bengaluru"
+              and "AI engineer to hire in Bangalore". The big slogan below
+              keeps its look as a <p>. font-sans: headings default to the
+              display face, and this line is set in the body face. */}
+          <h1 className="flex flex-wrap items-center gap-x-4 gap-y-2 font-sans">
+            <span className="text-base font-semibold tracking-tight text-ink">
+              {NAME} <span className="text-dim">— AI Engineer, Full-Stack</span>
+            </span>
+            <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />
+            <span className="text-[0.9375rem] font-medium text-dim">
+              AI Workflow Engineer @ DemandNXT · Bengaluru
+            </span>
+          </h1>
+          <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />
           <span className="inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-accent-ink">
             <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
             Available for freelance work
@@ -45,7 +53,7 @@ export default function Hero() {
         </div>
 
         {/* Headline */}
-        <h1 className="max-w-[16ch] text-[clamp(2.6rem,7vw,5.5rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink lg:max-w-[18ch]">
+        <p className="max-w-[16ch] font-display text-[clamp(2.6rem,7vw,5.5rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink lg:max-w-[18ch]">
           {HEAD_LEAD.map((word, i) => (
             <span
               key={`${word}-${i}`}
@@ -64,7 +72,7 @@ export default function Hero() {
               production.
             </span>
           </span>
-        </h1>
+        </p>
 
         {/* Sub */}
         <p

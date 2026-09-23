@@ -30,7 +30,9 @@ const abs = (path: string) => `${ORIGIN}${path === "/" ? "/" : path}`;
  */
 export const routeSeo: Record<string, RouteSeo> = {
   "/": {
-    title: `${SITE_TITLE} | Bengaluru`,
+    // The role people search ("AI workflow engineer", "AI engineer") and the
+    // city, in the title: Google matches the title and main heading first.
+    title: `${NAME} — AI Engineer & AI Workflow Engineer, Bengaluru`,
     description:
       "Full-stack AI Engineer in Bengaluru (Bangalore), India. I build AI agents, RAG pipelines and LLM apps, plus the backends and interfaces around them.",
     canonical: abs("/"),

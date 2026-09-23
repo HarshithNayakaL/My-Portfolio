@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import { NAME } from "../data/projects";
 
 /** Resolvable DOI — the citable identifier, not just a publisher page link. */
 const PAPER_DOI = "https://www.doi.org/10.59256/ijrtmr.20250506023";
@@ -15,6 +16,17 @@ export const facts = [
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
 ];
+
+/**
+ * Who this is, in one liftable statement: name, role, city, what the work is,
+ * employer, availability. AI Mode answers a "list of AI workflow engineers in
+ * Bangalore" question by fanning it out into ordinary searches and quoting the
+ * plain sentence that names a person, a role and a place, so this sentence
+ * leads the About and Contact pages, the markdown twins, llms.txt and the
+ * Person schema, word for word. Every clause is a fact stated elsewhere on
+ * the site; nothing here is new.
+ */
+export const identitySentence = `${NAME} is an AI Workflow Engineer and full-stack AI Engineer based in Bengaluru (Bangalore), India. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, currently as AI Workflow Engineer at DemandNXT, and is available for freelance work.`;
 
 /** The status line above the bio, and the one availability claim on the site. */
 export const availability = "Available for freelance work";
@@ -83,14 +95,14 @@ export default function About() {
             </h2>
 
             <div className="mt-6 space-y-5 text-base leading-relaxed text-dim md:text-lg">
+              {/* The identity sentence, verbatim, as the lead: the line an
+                  answer engine can quote as a statement about a named person,
+                  and the text the Person schema's description matches. The
+                  first-person voice picks up after it. */}
+              <p className="text-ink">{identitySentence}</p>
               <p>
-                I'm Harshith — a full-stack AI Engineer based in Bengaluru
-                (Bangalore), India. I build AI agents, RAG pipelines, and
-                full-stack AI apps: the model, the backend, and the interface
-                around them.
-                At DemandNXT I go by AI Workflow Engineer, building
-                production AI systems and pipelines for marketing and
-                creative operations. My public work includes Maestro, a
+                In practice that means the model, the backend, and the
+                interface around it. My public work includes Maestro, a
                 multi-model LLM orchestration engine, and Cannon, a
                 multi-agent assistant with query-level domain isolation —
                 both live and open-source.

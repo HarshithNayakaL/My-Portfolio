@@ -38,6 +38,7 @@ const {
   facts,
   availability,
   workingTitle,
+  identitySentence,
   legalDocs,
   LEGAL_UPDATED,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
@@ -454,6 +455,8 @@ function markdownFor(path, seo) {
     // structured data, and by extension the agent surface, should match what
     // a person sees.
     "## Who this is",
+    "",
+    identitySentence,
     "",
     ...facts.map((f) => `- **${f.k}:** ${f.v}`),
     `- **Also known as:** ${workingTitle} (title held at ${
