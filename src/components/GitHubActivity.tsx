@@ -17,7 +17,7 @@ const GitHubGraph = lazy(loadGraph);
  * data and the graph's code are both requested only once the section is near
  * the viewport, in parallel.
  */
-export default function GitHubActivity() {
+export default function GitHubActivity({ className }: { className?: string }) {
   const { ref, inView } = useInView<HTMLDivElement>();
   const [data, setData] = useState<Contributions | null>(null);
   const [failed, setFailed] = useState(false);
@@ -34,7 +34,7 @@ export default function GitHubActivity() {
   if (failed) return null;
 
   return (
-    <div ref={ref} className="mt-16 border-t border-line pt-8">
+    <div ref={ref} className={className}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <h3 className="font-mono text-[0.75rem] font-medium uppercase tracking-wider text-dim">
           GitHub activity

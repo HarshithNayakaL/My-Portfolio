@@ -2,6 +2,7 @@ import { projects } from "../data/projects";
 import WorkRow from "./WorkRow";
 import SectionHeading from "./SectionHeading";
 import Reveal from "./Reveal";
+import GitHubActivity from "./GitHubActivity";
 
 export default function SelectedWork() {
   return (
@@ -14,7 +15,10 @@ export default function SelectedWork() {
         />
       </Reveal>
 
-      <div className="mt-10 md:mt-14">
+      {/* The year of commits behind the projects below, ahead of them. */}
+      <GitHubActivity className="mt-10 md:mt-14" />
+
+      <div className="mt-10 md:mt-12">
         {projects.map((p, i) => (
           <Reveal key={p.slug} delay={Math.min(i, 4) * 0.05}>
             <WorkRow project={p} />

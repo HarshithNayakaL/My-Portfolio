@@ -1,5 +1,4 @@
 import Reveal from "./Reveal";
-import GitHubActivity from "./GitHubActivity";
 
 /** Resolvable DOI — the citable identifier, not just a publisher page link. */
 const PAPER_DOI = "https://www.doi.org/10.59256/ijrtmr.20250506023";
@@ -139,8 +138,6 @@ export default function About() {
           </div>
         </Reveal>
       </div>
-
-      <GitHubActivity />
     </section>
   );
 }
