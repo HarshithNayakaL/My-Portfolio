@@ -41,12 +41,16 @@ function NodeBox({ node }: { node: PipelineNode }) {
   );
 }
 
+// Stages sit side by side only from lg (1024px). At md the five columns of
+// the longest pipelines were wider than the box and the last stage was cut
+// off by overflow-hidden between 768 and ~880px, so tablets get the stacked
+// layout phones use.
 export default function PipelineDiagram({ stages }: { stages: PipelineStage[] }) {
   return (
     <div className="elev overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface/50 p-5 md:p-7">
-      <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-2">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-2">
         {stages.map((stage, i) => (
-          <div key={stage.title} className="contents md:flex md:flex-1 md:items-stretch">
+          <div key={stage.title} className="contents lg:flex lg:flex-1 lg:items-stretch">
             <div className="flex-1">
               <p className="mb-3 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-faint">
                 {stage.title}
@@ -60,11 +64,11 @@ export default function PipelineDiagram({ stages }: { stages: PipelineStage[] })
 
             {i < stages.length - 1 && (
               <div
-                className="flex shrink-0 items-center justify-center self-center text-line-strong md:px-1"
+                className="flex shrink-0 items-center justify-center self-center text-line-strong lg:px-1"
                 aria-hidden
               >
-                <CaretDown weight="bold" size={18} className="md:hidden" />
-                <CaretRight weight="bold" size={18} className="hidden md:block" />
+                <CaretDown weight="bold" size={18} className="lg:hidden" />
+                <CaretRight weight="bold" size={18} className="hidden lg:block" />
               </div>
             )}
           </div>

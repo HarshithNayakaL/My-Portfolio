@@ -299,7 +299,9 @@
     to   { opacity: 1; transform: none; }
   }
   @keyframes word-rise {
-    from { transform: translateY(110%); }
+    /* 130%, not 110%: the mask now extends 0.15em below the line (see
+       .word-mask), so the word has to start further down to stay hidden. */
+    from { transform: translateY(130%); }
     to   { transform: translateY(0); }
   }
   @keyframes nudge {
@@ -310,6 +312,18 @@
   .anim-rise {
     animation: rise-in 0.7s cubic-bezier(0.32, 0.72, 0, 1) both;
     animation-delay: var(--delay, 0s);
+  }
+  /* The clip box each hero word rises out of. overflow:hidden on a box only
+     as tall as the heading's 1.03 line height cut the descenders off g, p
+     and y ("engineered", "apps", "production") on every screen size. The
+     padding gives the glyphs room and the equal negative margin takes it
+     back, so the line box, and therefore the layout, is unchanged. */
+  .word-mask {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    padding-block: 0.15em;
+    margin-block: -0.15em;
   }
   .word-rise {
     display: inline-block;

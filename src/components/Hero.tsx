@@ -49,14 +49,14 @@ export default function Hero() {
           {HEAD_LEAD.map((word, i) => (
             <span
               key={`${word}-${i}`}
-              className="inline-block overflow-hidden align-bottom"
+              className="word-mask"
             >
               <span className="word-rise" style={d(wordDelay(i))}>
                 {word}&nbsp;
               </span>
             </span>
           ))}
-          <span className="inline-block overflow-hidden align-bottom">
+          <span className="word-mask">
             <span
               className="word-rise accent-shimmer"
               style={d(wordDelay(HEAD_LEAD.length))}
