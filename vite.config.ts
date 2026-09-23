@@ -46,6 +46,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), fetchPriorityEntry()],
   resolve: {
     alias: [
+      // "@/..." -> src/, the import convention shadcn and its registries
+      // (Kibo UI) generate. Same fileURLToPath form as below, for vite dev.
+      { find: /^@\//, replacement: fileURLToPath(new URL("./src/", import.meta.url)) },
       // @bible-strong/avatar-core compiles its JSON Schema at module scope, so
       // Ajv is unremovable by tree-shaking even though nothing on this site
       // calls the validator. See src/lib/ajvStub.ts for why it is safe to

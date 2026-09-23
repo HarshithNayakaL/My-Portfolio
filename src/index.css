@@ -246,6 +246,35 @@
 }
 
 /* ----------------------------------------------------------------------
+   GitHub contribution graph (Kibo UI). Its default fills name shadcn tokens
+   this design system doesn't define, so the five levels are set here from
+   the site's own: an empty day is a faint ink wash, and activity climbs
+   through the rust accent. Built with color-mix over theme tokens, so light
+   and dark mode follow .dark with no second palette to keep in step. */
+@layer components {
+  .contrib-graph rect[data-level] {
+    stroke: none;
+  }
+  .contrib-graph rect[data-level="0"] { fill: color-mix(in oklab, var(--color-ink) 7%, transparent); }
+  .contrib-graph rect[data-level="1"] { fill: color-mix(in oklab, var(--color-accent) 30%, transparent); }
+  .contrib-graph rect[data-level="2"] { fill: color-mix(in oklab, var(--color-accent) 55%, transparent); }
+  .contrib-graph rect[data-level="3"] { fill: color-mix(in oklab, var(--color-accent) 80%, transparent); }
+  .contrib-graph rect[data-level="4"] { fill: var(--color-accent); }
+  .contrib-graph svg text {
+    fill: var(--color-dim);
+  }
+  .contrib-scroll:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+  /* Forced colours flatten fills; keep the level readable as system colours. */
+  @media (forced-colors: active) {
+    .contrib-graph rect[data-level="0"] { fill: Canvas; stroke: CanvasText; }
+    .contrib-graph rect:not([data-level="0"]) { fill: Highlight; }
+  }
+}
+
+/* ----------------------------------------------------------------------
    Repeated icons, drawn once.
    The FAQ plus (19 of them), the work-row arrows and the external-link arrow
    were each a full inline <svg> per use — 12.7KB of the homepage's HTML for

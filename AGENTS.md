@@ -30,6 +30,8 @@ npm run verify:llms   # needs a deployment; takes an origin as argv[2]
 4. `scripts/build-api.mjs` generates the JSON API, `openapi.json`, the
    schema.org JSONL feeds and the `.well-known` documents.
 
+Registry components (shadcn, Kibo UI) install with `npx shadcn add ...`; `components.json` maps them to `@/` = `src/`. There is no `shadcn init` here on purpose: it would rewrite `src/index.css` and the design tokens.
+
 Never edit anything in `dist/`. It is generated on every build and your change
 will be gone. Edit the source the generator reads from.
 
@@ -50,6 +52,7 @@ reason to hand-edit the output.
 | The mascot's definition | `src/data/onee.avatar.json` |
 | Legal documents | `src/pages/Legal.tsx` |
 | Structured data (JSON-LD) | `index.html` and `scripts/prerender.mjs` |
+| GitHub contribution graph data | fetched at build time in `scripts/build-api.mjs` (github-contributions-api); graph is Kibo UI's, in `src/components/kibo-ui/` |
 
 ## Guards
 
