@@ -41,6 +41,12 @@ export type CaseStudy = {
   /** Replaces `kicker` in the <title> only, where the on-page label means
    *  nothing to a search ("Flagship"). */
   searchKicker?: string;
+  /** Questions people search for that this case study answers, shown on the
+   *  page ("Questions this answers") and feeding its FAQPage schema, markdown
+   *  twin, llms-full.txt and the API. Each answer states its answer in the
+   *  first sentence and names the project and author, so a quoted passage
+   *  stands on its own; every fact in it is taken from this case study. */
+  questions?: { q: string; a: string }[];
   /** Real screenshot of the running product. Intrinsic size is the full
    *  capture; the page frames a preview of it, but the served file is whole
    *  so image search and AI surfaces get the entire thing. */
@@ -152,6 +158,16 @@ const craftconnect: CaseStudy = {
     height: 900,
     alt: "CraftConnect's assistant screen: the heading 'How can I help you today?' above a large microphone button, prompting the user to speak about their business, with a Type control beside it for switching to text and Marketplace, Resources and Community navigation across the top.",
   },
+  questions: [
+    {
+      q: "How can AI help artisans sell their products online?",
+      a: "By removing the keyboard. In CraftConnect, which Harshith Nayaka L led and which reached the semi-finals of the Gen AI Exchange Hackathon 2025, an artisan photographs a product and describes it aloud in their own language, and the system produces a complete structured listing — title, description, categories, tags and a storefront page — ready to publish. The expertise stays in the craft instead of in English product copy and e-commerce forms.",
+    },
+    {
+      q: "How do you combine voice and image input in a multimodal AI app?",
+      a: "Treat them as two witnesses rather than one input. In CraftConnect, built by Harshith Nayaka L’s team, the photo and the spoken description are analysed separately and then reconciled: when they agree, confidence is high, and when they conflict — the voice says silk, the image reads cotton — the system surfaces it instead of guessing. The listing is then generated against a fixed schema, and localisation runs as its own final step so the understanding pipeline never depends on the input language.",
+    },
+  ],
   metaDescription:
     "Multi-modal assistant letting artisans run an online storefront by talking and showing instead of typing. Gen AI Exchange Hackathon 2025 semi-finalist.",
   links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
@@ -250,6 +266,16 @@ const creativeOps: CaseStudy = {
     "Validation layer",
     "QA gates",
     "Structured logging",
+  ],
+  questions: [
+    {
+      q: "How do you build a reliable AI content pipeline in n8n?",
+      a: "Assume the model can be wrong at every step. Harshith Nayaka L’s Creative-Ops Pipeline is a ~90-node n8n workflow that routes a structured brief through tiered models, requests schema-constrained output and validates it anyway, and passes everything through QA gates — deterministic rules for what rules can catch and an LLM critique for whether it is actually on-brand. When a run fails it is logged with enough context to resume the failing step, so one bad model response never costs the whole job.",
+    },
+    {
+      q: "How do you reduce LLM costs in a marketing content pipeline?",
+      a: "Spend the expensive model only where its judgment changes the outcome. In the Creative-Ops Pipeline built by Harshith Nayaka L, the bulk of generation runs on a cheaper model and the expensive one is reserved for the steps that need judgment, keeping the same quality bar for far less. Nova, a related project, goes further by scoring each request before any model is chosen.",
+    },
   ],
   metaDescription:
     "Multi-model content pipeline turning a one-line brief into validated, on-brand output through tiered routing, schema-constrained generation and QA gates.",
@@ -372,6 +398,16 @@ const brandforge: CaseStudy = {
     "n8n",
     "Zod",
   ],
+  questions: [
+    {
+      q: "How do you keep AI-generated product images faithful to the real product?",
+      a: "Pin the product before generating anything, then verify every shot against it. BrandForge, built by Harshith Nayaka L, analyses the supplied photo into a canonical identity and a set of invariants, generates through an image-edits endpoint anchored on that photo rather than text-to-image, and compares each shot to the original attribute by attribute. A failed invariant forces a repair however good the aesthetic score, an invariant the grader did not report on counts as a failure, and a shot that runs out of repairs ships visibly as blocked.",
+    },
+    {
+      q: "How do you stop AI from inventing a brand’s identity?",
+      a: "Make it read the brand instead of recalling it, because a model asked about a company tends to reproduce a stereotype of its category. BrandForge, built by Harshith Nayaka L, runs a bounded crawl of the brand’s own website and tags every conclusion as observed — backed by specific evidence on a specific page — or inferred, and shows that distinction to the person reviewing the output rather than flattening it.",
+    },
+  ],
   metaDescription:
     "Multi-model campaign pipeline: observes a brand from its own site, pins the product's invariants, then grades its own images and blocks what it cannot fix.",
   links: [
@@ -492,6 +528,16 @@ const brandAuditPlatform: CaseStudy = {
     "Vitest",
     "PageSpeed Insights API",
   ],
+  questions: [
+    {
+      q: "Is the Lighthouse SEO score a Google ranking signal?",
+      a: "No. Google’s documentation states that the Lighthouse SEO score is not a ranking signal, and it weights every audit equally. That is why the multi-brand audit platform Harshith Nayaka L built for a marketing team weights each check by its evidence instead: five tiers from blocker to hygiene, each with a weight and a source URL tying it to a public Google statement, and a failed indexing blocker caps the whole score at 25.",
+    },
+    {
+      q: "How do you stop AI from inventing facts in website copy suggestions?",
+      a: "Forbid it explicitly, then check the output for it. In the audit platform Harshith Nayaka L built, the model once proposed plausible but invented business metrics — years trading, projects completed, clients served — to replace placeholder counters, which would have published a lie on the company’s own site. The instruction now separately forbids inventing facts about the business and requires a bracketed placeholder, and the interface detects any remaining placeholder and warns before the copy can go live.",
+    },
+  ],
   metaDescription:
     "Internal audit tooling for a multi-brand portfolio: real-browser crawling, a score where every weight traces to a public source, and paste-ready copy fixes.",
   links: [],
@@ -607,6 +653,16 @@ const novaAi: CaseStudy = {
     height: 962,
     alt: "Nova's opening screen: an AUTO / L1 / L2 / L3 lane switch above the heading \"One prompt in. The right model out.\", three coloured lane cards naming gpt-oss-20b, qwen3.6-27b and gpt-oss-120b with their per-million-token prices, and four example prompts each tagged with the lane they would route to.",
   },
+  questions: [
+    {
+      q: "How do you route prompts to the cheapest LLM that can handle them?",
+      a: "Score the prompt first, and start from the middle lane rather than the cheapest one. Nova, built by Harshith Nayaka L, scores each turn on reasoning, code, breadth and context with deterministic evidence, then a small arbiter model confirms or overrules that with a one-line rationale; a turn has to prove it is trivial to drop to the fast lane or hard to reach the deep one. Every answer shows its lane, complexity reading, rationale and cost.",
+    },
+    {
+      q: "Why do LLM routers send prompts to the wrong model?",
+      a: "Most start cheap and climb, and because most prompts trip only two or three keywords, almost every turn clears the bar for the fast lane — a router that technically works and quietly answers everything badly. Nova, built by Harshith Nayaka L, defaults to the middle lane, scores keyword evidence with diminishing returns, never routes pushback like “that’s wrong” below the middle, and treats a second request in one prompt as disqualifying it from the trivial shortcut.",
+    },
+  ],
   metaDescription:
     "Chat app that scores every turn for difficulty and routes it across three model tiers, showing the lane, the reasoning and the cost on each answer.",
   links: [
@@ -702,6 +758,12 @@ const aiNotes: CaseStudy = {
     height: 900,
     alt: "AI Notes with one entry open: a catalog sidebar headed 'local archive · DeepSeek R1', the note in a ruled editor with Save, Delete and Ask Archive actions above it, an 'AI Offline' badge in the top corner, and 'stored on this device' in the sidebar footer.",
   },
+  questions: [
+    {
+      q: "How do you run DeepSeek R1 locally for AI note-taking?",
+      a: "Through Ollama, called straight from the browser. AI Notes, built by Harshith Nayaka L, runs DeepSeek R1 locally to summarise, improve writing, expand ideas, generate questions and extract keywords, with notes kept in browser storage and no external API call at all, so it works offline once the model is pulled. The approach is published in IJRTMR (Nov–Dec 2025, DOI 10.59256/ijrtmr.20250506023), which reports 87% user satisfaction on summarisation with response times of 1.9 to 3.8 seconds.",
+    },
+  ],
   metaDescription:
     "Notes app running DeepSeek R1 locally through Ollama: summarisation and keyword extraction with inference that never leaves your own machine.",
   links: [
@@ -823,6 +885,16 @@ const maestro: CaseStudy = {
     height: 1583,
     alt: "Maestro's main screen: the task box with a question typed into it, the Conductor, Consensus and Single mode selector, an optional API key field, and below them the orchestration timeline — Conductor, Thinker, Worker and a passing Verifier — each labelled with the model that ran it and its token and latency cost.",
   },
+  questions: [
+    {
+      q: "How do you orchestrate multiple free LLMs to get a better answer?",
+      a: "Split the task into roles and check the result with a different model. In Maestro, an open-source orchestration engine built by Harshith Nayaka L, a Conductor assigns Thinker, Worker and Verifier roles across a pool of free LLMs and a Synthesizer produces the final answer; the Verifier is always a different model family from the Worker, and a failed check triggers exactly one bounded retry. Every step goes into a replayable decision-log: the plan, the routing rationale, each output, the verdict, and token and latency cost.",
+    },
+    {
+      q: "How do you handle Groq free-tier rate limits?",
+      a: "Budget tokens before calling instead of recovering after failing. Groq’s free tier binds on tokens per minute rather than requests, so Maestro, built by Harshith Nayaka L, reserves estimated tokens through a per-model limiter that enforces both requests and tokens per minute, backs off exponentially with jitter on a 429, and falls back across model families. Long-context steps route to Gemini’s larger budget, and models are swapped in one config file rather than in code.",
+    },
+  ],
   metaDescription:
     "Multi-model orchestration engine: a conductor routes one task across thinker, worker and verifier roles, returning a verified answer with a full decision-log.",
   links: [
@@ -940,6 +1012,16 @@ const cannon: CaseStudy = {
     height: 1180,
     alt: "Cannon's dispatch view: a sidebar of domain desks (Dispatch, Fitness, Work, Finance, Learning, Race Engineer) beside an agent grid where each desk lists its own tool count and retrieval scope, plus a card inviting a new agent to be described and built.",
   },
+  questions: [
+    {
+      q: "What is the difference between a multi-agent and a multi-task AI assistant?",
+      a: "A multi-task assistant is one model wearing every hat and carrying every context at once; a multi-agent assistant runs independent specialists. Cannon, built and used daily by Harshith Nayaka L, runs a fitness agent and a work agent, each with its own persona, system prompt, tools and retrieval scope; they share infrastructure but never share context, and the isolation is enforced inside the database query itself. Its sibling project Maestro is the other pattern: collaborating roles splitting one task.",
+    },
+    {
+      q: "How do you add an LLM provider fallback without breaking streaming?",
+      a: "Model the fallback as a provider, not a try/catch. In Cannon, built by Harshith Nayaka L, the fallback implements the AI SDK’s provider interface and wraps Groq behind Gemini, so streaming, tool execution and the UI stream protocol never see the swap. It distinguishes a call that never connects from one that fails mid-stream, and surfaces a mid-stream failure rather than silently retrying, because re-running a half-executed tool chain is worse than a visible error.",
+    },
+  ],
   metaDescription:
     "Multi-agent assistant where every domain is an independent specialist with its own prompt, tools and retrieval scope, isolated at the query itself.",
   links: [
@@ -1046,6 +1128,12 @@ const replydesk: CaseStudy = {
     height: 1310,
     alt: "ReplyDesk's lead operations dashboard: KPI tiles for average response time, leads today, hot leads, after-hours answers and percentage auto-handled; an 8-second agent reply compared against a 29-hour typical manual reply; and a live lead feed showing inbound WhatsApp messages with the agent's reply, a lead score, and whether each was auto-handled or routed to the owner.",
   },
+  questions: [
+    {
+      q: "What does a WhatsApp AI lead agent do?",
+      a: "It captures every inbound WhatsApp message and sends a first reply immediately, so no lead waits for a person. ReplyDesk, built by Harshith Nayaka L, replies in roughly eight seconds and pairs the automation with a live dashboard: a real-time lead feed, the pipeline by stage, a “needs your attention” queue for leads a human should handle, and response-time KPIs. It is an interactive front-end prototype with a simulate-lead demo, not a WhatsApp-connected production deployment.",
+    },
+  ],
   metaDescription:
     "WhatsApp lead agent answering every inbound message in about eight seconds, with a live dashboard for the lead feed, pipeline and response-time KPIs.",
   links: [
@@ -1171,6 +1259,20 @@ const spectra: CaseStudy = {
     height: 1738,
     alt: "SPECTRA's audit screen on a near-black canvas: an AEO badge over the heading \"Are you in the answer?\", fields for a site and for the questions buyers ask AI, a Gemini 3.1 Flash Lite model selector and a magenta Run audit button, above a panel reading \"27 checks, 4 layers, 1 score\" and a four-step explanation \u2014 crawl like an AI, ask like a buyer, read the answer, fix with code.",
   },
+  questions: [
+    {
+      q: "How can I check whether my website appears in AI search answers?",
+      a: "Ask an AI the questions your buyers ask, read what it answers, and trace why your facts do or do not survive — that is what SPECTRA, an AI search visibility (AEO) audit built by Harshith Nayaka L, does. It runs 27 checks across 4 layers and keeps the evidence at every stage, so a finding reads “this fact is in your HTML and does not survive extraction” rather than a bare score. The model classifies the site and emits typed observations; a separate deterministic engine computes every number from registered checks.",
+    },
+    {
+      q: "Why do facts about my website disappear before an AI answers?",
+      a: "Because search visibility is a pipeline, not a page score: a fact can sit in your HTML and still be dropped by the crawler, lost in extraction, flattened in the semantic representation, misread by the model or never retrieved. SPECTRA, built by Harshith Nayaka L, records for each important claim the first stage where it failed and why — across source, crawler, extraction, semantic graph, model understanding and retrieval — so a fix targets the stage that actually lost it.",
+    },
+    {
+      q: "Can you trust an AI visibility score generated by an LLM?",
+      a: "Not if the model produced the number, because a score that is a model’s opinion cannot be audited. In SPECTRA the model never produces a score: it emits observations against a schema, each tied to the evidence it came from, and a scoring engine computes results only from registered checks over a visible denominator. Every metric reports its version, calculation, applied and N/A checks, and its limitations.",
+    },
+  ],
   metaDescription:
     "AI search visibility (AEO) audit: asks AI what buyers ask, shows whether a site is in the answer, and scores 27 checks across 4 layers, each tied to evidence.",
   links: [
@@ -1288,6 +1390,16 @@ const personalOsMcp: CaseStudy = {
     "Zod-validated capability catalog",
     "SQLite audit",
     "Windows DPAPI / Android Keystore",
+  ],
+  questions: [
+    {
+      q: "How do you safely give an AI agent access to your computer?",
+      a: "Give it broad capability, then put a boundary around it that a human controls. In Personal MCP OS, built by Harshith Nayaka L, each of its 85 tools declares a risk level — READ, WRITE, SENSITIVE or EXECUTE — and policy maps it to allow, require approval or deny, with a missing entry requiring approval rather than defaulting open. An approval-gated call returns a request ID; a person approves it through a separate admin CLI, and the grant is bound to the exact arguments, expires in five minutes and is used once. No MCP tool can grant approval.",
+    },
+    {
+      q: "Should an AI browser agent be allowed to click and submit on websites without approval?",
+      a: "Not by default, because a generic executor cannot infer what a website action does. In Personal MCP OS, built by Harshith Nayaka L, every click, key press, submit and download-triggering click is classed SENSITIVE and needs human approval, and there is deliberately no heuristic that reads button text to decide a control looks harmless. Arbitrary page JavaScript is denied by default, since it removes the browser’s confidentiality boundary and can reach page credentials.",
+    },
   ],
   metaDescription:
     "Local-first MCP execution layer: 85 tools across Windows and Android behind risk-based policy, one-use human approvals and a mandatory audit trail.",

@@ -296,9 +296,38 @@ export default function CaseStudy() {
           </div>
         </Reveal>
 
+        {study.questions?.length ? <StudyQuestions items={study.questions} /> : null}
+
         <StudyNav slug={study.slug} />
       </section>
     </article>
+  );
+}
+
+// The searches this case study answers, in the words people search with.
+// Native <details>, same as the homepage FAQ: answers stay in the HTML (and
+// in find-in-page) while the list stays short to scan. The first is open so
+// the section never reads as a wall of collapsed headings.
+function StudyQuestions({ items }: { items: { q: string; a: string }[] }) {
+  return (
+    <div className="mt-16 max-w-3xl border-t border-line pt-8">
+      <h2 className="font-mono text-[0.75rem] font-medium uppercase tracking-wider text-dim">
+        Questions this answers
+      </h2>
+      <div className="mt-4">
+        {items.map((item, i) => (
+          <details key={item.q} className="faq-item group border-t border-line first:border-t-0" open={i === 0}>
+            <summary className="faq-summary">
+              <span className="faq-q">{item.q}</span>
+              <span aria-hidden className="faq-toggle">
+                <Icon name="plus" />
+              </span>
+            </summary>
+            <div className="faq-a">{item.a}</div>
+          </details>
+        ))}
+      </div>
+    </div>
   );
 }
 

@@ -218,6 +218,19 @@ function jsonLdFor(path, seo) {
             },
           }),
     });
+    // The questions shown on the page, so the markup matches visible text.
+    if (cs.questions?.length) {
+      graph.push({
+        "@type": "FAQPage",
+        "@id": `${seo.canonical}#questions`,
+        url: seo.canonical,
+        mainEntity: cs.questions.map((item) => ({
+          "@type": "Question",
+          name: item.q,
+          acceptedAnswer: { "@type": "Answer", text: item.a },
+        })),
+      });
+    }
     graph.unshift({
       "@type": "Person",
       "@id": personId,
@@ -348,6 +361,10 @@ function caseStudyBody(cs, depth) {
   if (cs.results?.length) {
     L.push(`${h} What it changed`, "");
     for (const r of cs.results) L.push(`**${r.label}:** ${r.body}`, "");
+  }
+  if (cs.questions?.length) {
+    L.push(`${h} Questions this answers`, "");
+    for (const item of cs.questions) L.push(`**${item.q}**`, "", item.a, "");
   }
   if (cs.tech?.length) L.push(`${h} Built with`, "", cs.tech.join(", "), "");
   if (cs.links?.length) {

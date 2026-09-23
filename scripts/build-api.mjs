@@ -79,6 +79,7 @@ const caseStudyResource = (cs) => ({
   pipeline: cs.pipeline,
   howItWorks: cs.howItWorks,
   results: cs.results,
+  questions: cs.questions ?? [],
   tech: cs.tech,
   links: cs.links,
   screenshot: cs.shot
@@ -453,6 +454,15 @@ const openapi = {
               type: "object",
               required: ["label", "body"],
               properties: { label: { type: "string" }, body: { type: "string" } },
+            },
+          },
+          questions: {
+            type: "array",
+            description: "Questions this case study answers, as shown on the page and in its FAQPage schema.",
+            items: {
+              type: "object",
+              required: ["q", "a"],
+              properties: { q: { type: "string" }, a: { type: "string" } },
             },
           },
           tech: { type: "array", items: { type: "string" } },
