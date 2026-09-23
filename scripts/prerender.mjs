@@ -719,7 +719,7 @@ for (const cs of Object.values(caseStudies)) {
  *  differently — only the heading depth and the preamble differ. */
 function caseStudyMarkdown(slug, cs) {
   return [
-    `## ${cs.title} — ${cs.kicker}`,
+    `## ${cs.title} — ${cs.searchKicker ?? cs.kicker}`,
     "",
     `URL: ${ORIGIN}/work/${slug}`,
     `Markdown: ${ORIGIN}/work/${slug}/index.md`,
@@ -755,12 +755,23 @@ const full = [
   // number of non-heading sections, then H2-delimited sections — so this note
   // is a paragraph and every case study below is an H2.
   "This is the expanded companion to /llms.txt: the complete text of every case",
-  "study on the site, inlined so it can be read in one fetch without crawling",
-  "each page or executing JavaScript.",
+  "study on the site and every question in its FAQ, inlined so it can be read in",
+  "one fetch without crawling each page or executing JavaScript.",
   "",
   ...Object.entries(caseStudies).map(([slug, cs]) =>
     caseStudyMarkdown(slug, cs),
   ),
+  // The FAQ was the one body of text on the site missing from this file,
+  // and it is the most answer-shaped text there is: questions in the words
+  // people search with, answered with the specifics attached. Same list as
+  // the page and the FAQPage schema.
+  "## Frequently asked questions",
+  "",
+  `Source: ${ORIGIN}/#faq`,
+  "",
+  ...faqs.flatMap((f) => [`### ${f.q}`, "", f.a, ""]),
+  "---",
+  "",
   "## Contact",
   "",
   // Pulled from the shared constants rather than retyped: these were hardcoded

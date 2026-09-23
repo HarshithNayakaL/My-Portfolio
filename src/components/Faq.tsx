@@ -3,30 +3,22 @@ import Reveal from "./Reveal";
 import Icon from "./Icon";
 
 /**
- * Two kinds of question, in one list.
+ * The questions people actually put to a search box or an answer engine,
+ * each answered on the page with specifics attached, because a quoted
+ * passage travels without the page around it. This list is the single source
+ * for the visible FAQ, the FAQPage schema, the markdown twins and
+ * llms-full.txt, so what a person reads is what a parser indexes.
  *
- * The first four are technical: the questions an answer engine is actually
- * fielding, where a project here is the answer. Each is written to stand alone
- * with its specifics attached, because a quoted passage travels without the
- * page around it. They feed the FAQPage schema and the markdown twins, so the
- * same text is what a person reads, what a parser indexes and what an agent
- * retrieves.
+ * Grouped loosely: who and where, and how to hire (the searches that name a
+ * role and a city); then technical questions where a project here is the
+ * answer; then what a prospective client asks before starting.
  *
- * The rest are what a prospective client asks before starting.
- *
- * The first three now answer who and where, because an audit of this site put
- * "find an AI workflow engineer in Bengaluru to hire" to a model and it
- * replied — accurately — that the pages held no contact details and no
- * availability. The location, the working title and the availability line were
- * only ever in the About section, which the markdown twins did not carry, so
- * the questions people actually ask had no answer anywhere an agent could
- * reach.
- *
- * Every answer is drawn from work that exists and can be checked — the case
- * studies, the public repos, the stack those projects are built on. Rates and
- * turnaround are still absent: those are commitments, not facts. Availability
- * is different now only because the site states it visibly in About; this
- * repeats that claim rather than inventing one.
+ * Every question is visible, never schema-only: Google requires structured
+ * data to match the page, and an FAQ that exists only in JSON-LD is the
+ * pattern its spam policies describe. No answer claims to be the best or
+ * the only option \u2014 each names this work and points at evidence that can
+ * be checked. Rates and turnaround are still absent: those are commitments,
+ * not facts. Availability is stated because the site states it in About.
  */
 export const faqs: { q: string; a: string }[] = [
   {
@@ -36,6 +28,14 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: "Are you available to hire, and how do I get in touch?",
     a: "Available for freelance work. Email is the direct route \u2014 harshith28124@gmail.com \u2014 and the contact form on this site reaches the same inbox. There are no rates or turnaround times quoted anywhere here, because those depend on the work and this site only states things that can be checked.",
+  },
+  {
+    q: "Where can I find an AI workflow engineer in Bengaluru?",
+    a: "Harshith Nayaka L is one \u2014 based in Bengaluru (Bangalore), India, working as AI Workflow Engineer at DemandNXT on production AI systems and pipelines for marketing and creative operations, and available for freelance work. Whoever you are comparing, the useful filter is not a list of names but evidence you can check: a running system, its source, and a straight answer to what happens when the model is wrong. Every project on this site links its code or a live app for that reason \u2014 Maestro and Cannon are both live and open-source, and each case study shows the failure handling, not just the output. Email harshith28124@gmail.com with the workflow you have in mind.",
+  },
+  {
+    q: "Can I hire an AI automation engineer in Bangalore for marketing workflows?",
+    a: "Yes \u2014 that is the day job. At DemandNXT, Harshith Nayaka L builds production AI systems and pipelines for marketing and creative operations, and is available for freelance work as well. Two public examples show the shape of it: the Creative-Ops Pipeline turns a structured brief into on-brand output through a ~90-node n8n workflow with tiered model routing, schema-constrained generation and QA gates, and BrandForge reads a brand from its own website, pins what cannot change about a product, and blocks generated images that fail those checks instead of shipping them. There are no rates or turnaround times quoted on this site; the starting point is the steps of the workflow as it runs today, sent to harshith28124@gmail.com.",
   },
   {
     q: "What does an AI workflow engineer do that a backend engineer doesn't?",
@@ -68,6 +68,10 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: "How do you stop an LLM from marking its own homework?",
     a: "You do not let the model that produced the answer be the model that judges it. Maestro routes every worker output through a verifier on a deliberately different model family, because a model asked to grade its own work carries a documented self-preference bias of roughly 10 to 25 percent. The verifier returns a pass or fail verdict with the issues it found, and a fail triggers one bounded retry rather than an unbounded loop. The whole decision-log is replayable, so you can see which model said what and why.",
+  },
+  {
+    q: "How do you stop AI agents from hallucinating in production?",
+    a: "You cannot make a model stop inventing things; you can stop its inventions from reaching the output. Three habits do most of the work in the projects here. Ground it in evidence rather than memory: BrandForge reads a brand from its own website and tags every conclusion as observed \u2014 tied to a specific page \u2014 or inferred, because a model asked about a company otherwise recalls a stereotype of its category. Never let a model grade its own work: Maestro's verifier is always a different model family from the worker, since same-family judging carries a self-preference bias. And let code, not the model, make the final call: output is schema-constrained and then validated anyway, and in BrandForge a failed check forces a repair and, when the repair budget runs out, a visible block \u2014 never a quiet pass.",
   },
   {
     q: "How do you decide which model should answer a request?",
