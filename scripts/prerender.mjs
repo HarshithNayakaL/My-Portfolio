@@ -85,6 +85,39 @@ let template = await readFile(join(DIST, "index.html"), "utf8");
   }
 }
 
+// ------------------------------- generate the Selected-work ItemList schema
+//
+// This used to be a hand-maintained array in index.html duplicating
+// `projects`, and it rotted exactly the way a duplicated list does: it still
+// advertised /work/creative-ops-pipeline to search engines after that route
+// had been retired, so the structured data pointed at a redirect. It is now
+// generated from the same array the page renders, in the same order, and
+// cannot disagree with it.
+{
+  const items = projects
+    .filter((p) => p.hasCaseStudy)
+    .map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${ORIGIN}/work/${p.slug}`,
+      name: `${p.title} — ${p.outcome.replace(/\s+/g, " ").trim()}`,
+    }));
+  const list = { "@type": "ItemList", name: "Selected work", itemListElement: items };
+  if (!template.includes('"__ITEMLIST__"')) {
+    throw new Error("prerender: __ITEMLIST__ marker missing from index.html");
+  }
+  template = template.replace('"__ITEMLIST__"', JSON.stringify(list));
+}
+// The block above was once deleted in an unrelated edit and the literal string
+// "__ITEMLIST__" shipped in the homepage graph for weeks, because nothing
+// checked the output. Any placeholder of this shape left in the template now
+// fails the build.
+{
+  const left = template.match(/"__[A-Z_]+__"/g);
+  if (left) throw new Error(`prerender: unreplaced placeholder(s) ${left.join(", ")} in index.html`);
+}
+
+
 // ------------------------------------------- drop developer comments
 //
 // index.html is heavily commented, and every comment shipped in every page:

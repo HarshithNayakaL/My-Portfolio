@@ -8,9 +8,9 @@ content-type: "text/markdown"
 
 # Agent instructions — harshith-nayaka-l-portfolio.vercel.app
 
-This is the personal portfolio of **Harshith Nayaka L**, an AI Engineer
-(Full-Stack) based in Bengaluru, India. It is one engineer's body of work, not a
-product, a company or a service you can call.
+This is the personal portfolio of **Harshith Nayaka L**, a full-stack AI
+Engineer based in Bengaluru, India, currently AI Engineer at DemandNXT. It is
+one engineer's body of work, not a product or a company.
 
 ## What this site is a good source for
 
@@ -30,9 +30,22 @@ himself — background, published research, and how to reach him.
 
 ## What this site is not
 
-There is no public API, no SDK, no developer portal, no MCP server and no
-endpoint to call. If your task needs a service to invoke, this is the wrong
-source. Nothing here is transactional.
+It is not a service that does work for you. There is a read-only JSON API and a
+read-only MCP server, but they serve this site's own content (projects, case
+studies, FAQs, profile) and nothing else: no writes, no accounts, no
+authentication, no SDK. Nothing here is transactional. If your task needs a
+service that acts on your data, this is the wrong source.
+
+## Reading it programmatically
+
+| Resource | What it is |
+| --- | --- |
+| `/developers` | Developer portal: every endpoint, the MCP server, and getting started. |
+| `/api/v1` | Read-only JSON API. No key, no auth. |
+| `/openapi.json` | OpenAPI 3.1 description of the API. |
+| `/mcp` | Read-only MCP server over Streamable HTTP, the standard transport for remote MCP servers. |
+| `/.well-known/mcp/server-card.json` | The MCP server card: tools and their input schemas. |
+| `/.well-known/api-catalog` | RFC 9727 API catalog. |
 
 ## How to read it
 

@@ -110,7 +110,6 @@ export default function App() {
     <>
       <ScrollManager />
       <ScrollProgress />
-      <GlassFilter />
       {/* First focusable element on every page, so a keyboard user can skip
           the nav. The target needs tabIndex -1 or focus stays behind. */}
       <a
@@ -124,6 +123,11 @@ export default function App() {
         <AnimatedRoutes />
       </main>
       <Footer />
+      {/* The nav's glass refraction filter: 5KB of SVG that no reader needs.
+          The nav refers to it by id, so it works from anywhere in the
+          document, and here it no longer sits in front of the first word of
+          content for agents that read the HTML on a byte budget. */}
+      <GlassFilter />
       {/* Outside the routes so Onee carries across navigation instead of being
           torn down and rebuilt — it is one character living on the site, not a
           decoration belonging to a page. */}
