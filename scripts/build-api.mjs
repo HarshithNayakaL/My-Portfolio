@@ -648,43 +648,29 @@ await put("/.well-known/api-catalog.json", {
 
 // ------------------------------------------------ GitHub contributions
 //
-// Data for the contribution graph in the About section, from
-// github.com/grubersjoe/github-contributions-api. Fetched here, at build time,
-// rather than by the visitor's browser: no third-party request carrying the
-// visitor's IP, no CSP exception for another origin, and the page never
-// waits on someone else's server. The graph is only as fresh as the last
-// deploy, which is the trade.
+// Data for the contribution graph, from github.com/grubersjoe/github-contributions-api.
+// The page reads /data/github-contributions.json, which on Vercel is the live
+// function in api/github-contributions.mjs. This writes the snapshot the page
+// falls back to when that function fails, and the only data `npm run preview`
+// has, since it runs no functions.
 //
-// A failed fetch never fails the build. The file is simply not written and
-// the section renders nothing, rather than a graph of zeroes that would read
-// as a year of no work.
+// A failed fetch never fails the build. The snapshot is simply not written,
+// and if the live endpoint is down too the section renders nothing rather than
+// a graph of zeroes that would read as a year of no work.
 {
+  const { GITHUB_USER, fetchContributions } = await import(join(ROOT, "api/_contributions.mjs"));
   const user = GITHUB.replace(/\/+$/, "").split("/").pop();
+  if (user !== GITHUB_USER) {
+    throw new Error(
+      `build-api: api/_contributions.mjs GITHUB_USER is "${GITHUB_USER}" but src/data/projects.ts GITHUB is "${user}".`,
+    );
+  }
   try {
-    const res = await fetch(
-      `https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(user)}?y=last`,
-      { signal: AbortSignal.timeout(15_000) },
-    );
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const body = await res.json();
-    const contributions = (body.contributions ?? []).filter(
-      (d) => typeof d.date === "string" && Number.isInteger(d.count) && d.level >= 0 && d.level <= 4,
-    );
-    const total = body.total?.lastYear;
-    if (!contributions.length || !Number.isInteger(total)) throw new Error("unexpected response shape");
-    await put("/data/github-contributions.json", {
-      user,
-      profile: GITHUB,
-      total,
-      from: contributions[0].date,
-      to: contributions.at(-1).date,
-      fetchedAt: new Date().toISOString(),
-      source: "https://github.com/grubersjoe/github-contributions-api",
-      contributions,
-    });
-    console.log(`[api] GitHub contributions: ${total} in the last year (${contributions.length} days)`);
+    const data = await fetchContributions(user);
+    await put("/data/github-contributions.snapshot.json", data);
+    console.log(`[api] GitHub contributions snapshot: ${data.total} in the last year (${data.contributions.length} days)`);
   } catch (err) {
-    console.warn(`[api] GitHub contributions skipped: ${err.message}`);
+    console.warn(`[api] GitHub contributions snapshot skipped: ${err.message}`);
   }
 }
 

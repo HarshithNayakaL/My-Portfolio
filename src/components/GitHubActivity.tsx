@@ -13,9 +13,10 @@ const GitHubGraph = lazy(loadGraph);
  * fetch the page as HTML truncate it. The prerendered markup reserves the
  * graph's height so nothing shifts when it appears.
  *
- * Data is a same-origin JSON file written at build time (build-api.mjs). The
- * data and the graph's code are both requested only once the section is near
- * the viewport, in parallel.
+ * Data comes from this origin: the live endpoint (api/github-contributions.mjs),
+ * or, if that fails, the snapshot written at build time. The data and the
+ * graph's code are both requested only once the section is near the viewport,
+ * in parallel.
  */
 export default function GitHubActivity({ className }: { className?: string }) {
   const { ref, inView } = useInView<HTMLDivElement>();
@@ -25,9 +26,11 @@ export default function GitHubActivity({ className }: { className?: string }) {
   useEffect(() => {
     if (!inView || data || failed) return;
     loadGraph().catch(() => {}); // start the chunk download alongside the data
-    fetch("/data/github-contributions.json")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d: Contributions) => setData(d))
+    const get = (url: string) =>
+      fetch(url).then((r) => (r.ok ? (r.json() as Promise<Contributions>) : Promise.reject()));
+    get("/data/github-contributions.json")
+      .catch(() => get("/data/github-contributions.snapshot.json"))
+      .then(setData)
       .catch(() => setFailed(true));
   }, [inView, data, failed]);
 

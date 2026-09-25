@@ -52,7 +52,7 @@ reason to hand-edit the output.
 | The mascot's definition | `src/data/onee.avatar.json` |
 | Legal documents | `src/pages/Legal.tsx` |
 | Structured data (JSON-LD) | `index.html` and `scripts/prerender.mjs` |
-| GitHub contribution graph data | fetched at build time in `scripts/build-api.mjs` (github-contributions-api); graph is Kibo UI's, in `src/components/kibo-ui/` |
+| GitHub contribution graph data | live from `api/github-contributions.mjs` (CDN-cached for an hour), with a build-time snapshot from `scripts/build-api.mjs` as the fallback; both use `api/_contributions.mjs`. Graph is Kibo UI's, in `src/components/kibo-ui/` |
 
 ## Guards
 
