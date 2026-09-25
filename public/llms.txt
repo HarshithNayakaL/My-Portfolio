@@ -1,6 +1,6 @@
 # Harshith Nayaka L — AI Engineer, Full-Stack
 
-> Harshith Nayaka L is an AI Workflow Engineer and full-stack AI Engineer based in Bengaluru (Bangalore), India. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, currently as AI Workflow Engineer at DemandNXT, and is available for freelance work.
+> Harshith Nayaka L is a full-stack AI Engineer based in Bengaluru (Bangalore), India, currently AI Engineer at DemandNXT, where he was previously AI Workflow Engineer. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.
 
 Harshith Nayaka L specialises in the unglamorous part of applied AI — making systems behave the same way on the hundredth run as on the first. Core areas: AI agents and orchestration, retrieval-augmented generation (RAG), LLM integration, multi-modal pipelines (voice, vision, text), output reliability via schema-constrained generation, full-stack AI applications, backend engineering (FastAPI, Node, Postgres), local and cloud inference (Google Cloud AI, Hugging Face, Ollama), and workflow automation with n8n. Building with code since 2022; reached the semi-finals of the Gen AI Exchange Hackathon 2025 (a national event with 270,000+ developers, organised by Google Cloud).
 

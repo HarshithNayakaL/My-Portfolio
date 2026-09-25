@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
-import { facts, availability, workingTitle, identitySentence } from "../components/About";
+import { facts, availability, workingTitle, previousTitle, identitySentence } from "../components/About";
 import { caseStudies } from "../data/caseStudies";
 
 /**
@@ -36,10 +36,10 @@ const shipped = projects.filter((p) => p.hasCaseStudy).length;
 export const profileDocs: Record<string, Doc> = {
   about: {
     title: "About",
-    h1: `${NAME} — AI Workflow Engineer in Bengaluru, India`,
-    searchTitle: `${NAME} — AI Workflow Engineer in Bengaluru, India`,
+    h1: `${NAME} — AI Engineer in Bengaluru, India`,
+    searchTitle: `About ${NAME} — AI Engineer at DemandNXT, Bengaluru`,
     description:
-      "Harshith Nayaka L is an AI Workflow Engineer and full-stack AI Engineer in Bengaluru (Bangalore), India, at DemandNXT. Available for freelance work.",
+      "Harshith Nayaka L is an AI Engineer at DemandNXT, Bengaluru (Bangalore), building AI agents, RAG pipelines and AI workflow automation. Open to freelance.",
     intro: identitySentence,
     sections: [
       {
@@ -47,7 +47,7 @@ export const profileDocs: Record<string, Doc> = {
         p: [
           `Role: ${facts.find((f) => f.k === "Role")?.v}. Company: ${
             facts.find((f) => f.k === "Company")?.v
-          }, where the title is ${workingTitle}. Based in ${
+          }, where the title is ${workingTitle} (previously ${previousTitle}). Based in ${
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
           "The work is AI agents, retrieval pipelines and full-stack AI applications — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",

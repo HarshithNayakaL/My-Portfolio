@@ -38,6 +38,7 @@ const {
   facts,
   availability,
   workingTitle,
+  previousTitle,
   identitySentence,
   legalDocs,
   LEGAL_UPDATED,
@@ -459,7 +460,7 @@ function markdownFor(path, seo) {
     identitySentence,
     "",
     ...facts.map((f) => `- **${f.k}:** ${f.v}`),
-    `- **Also known as:** ${workingTitle} (title held at ${
+    `- **Title:** ${workingTitle}, previously ${previousTitle} (at ${
       facts.find((f) => f.k === "Company")?.v ?? "work"
     })`,
     `- **Availability:** ${availability}`,

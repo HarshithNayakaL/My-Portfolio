@@ -32,7 +32,7 @@ export const routeSeo: Record<string, RouteSeo> = {
   "/": {
     // The role people search ("AI workflow engineer", "AI engineer") and the
     // city, in the title: Google matches the title and main heading first.
-    title: `${NAME} — AI Engineer & AI Workflow Engineer, Bengaluru`,
+    title: `${NAME} — AI Engineer in Bengaluru, India`,
     description:
       "Full-stack AI Engineer in Bengaluru (Bangalore), India. I build AI agents, RAG pipelines and LLM apps, plus the backends and interfaces around them.",
     canonical: abs("/"),

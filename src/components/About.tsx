@@ -26,16 +26,18 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is an AI Workflow Engineer and full-stack AI Engineer based in Bengaluru (Bangalore), India. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, currently as AI Workflow Engineer at DemandNXT, and is available for freelance work.`;
+export const identitySentence = `${NAME} is a full-stack AI Engineer based in Bengaluru (Bangalore), India, currently AI Engineer at DemandNXT, where he was previously AI Workflow Engineer. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /** The status line above the bio, and the one availability claim on the site. */
 export const availability = "Available for freelance work";
 
 /**
  * The title held at DemandNXT, kept separate from `Role` because they are
- * different strings and people search for both.
+ * different strings. The earlier title stays on record because it is true and
+ * people still search for it.
  */
-export const workingTitle = "AI Workflow Engineer";
+export const workingTitle = "AI Engineer";
+export const previousTitle = "AI Workflow Engineer";
 
 export default function About() {
   return (

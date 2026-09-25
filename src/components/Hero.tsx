@@ -42,7 +42,7 @@ export default function Hero() {
             </span>
             <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />
             <span className="text-[0.9375rem] font-medium text-dim">
-              AI Workflow Engineer @ DemandNXT · Bengaluru
+              AI Engineer @ DemandNXT · Bengaluru
             </span>
           </h1>
           <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />

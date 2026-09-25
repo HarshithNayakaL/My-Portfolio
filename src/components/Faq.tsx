@@ -23,7 +23,7 @@ import Icon from "./Icon";
 export const faqs: { q: string; a: string }[] = [
   {
     q: "Who are you, and where are you based?",
-    a: "Harshith Nayaka L \u2014 a full-stack AI Engineer in Bengaluru (Bangalore), Karnataka, India. At DemandNXT the title is AI Workflow Engineer: production AI systems and pipelines for marketing and creative operations. The public work is the clearest answer to what that means in practice \u2014 Maestro, a multi-model LLM orchestration engine, and Cannon, a multi-agent assistant with query-level domain isolation, both live and open-source.",
+    a: "Harshith Nayaka L \u2014 a full-stack AI Engineer in Bengaluru (Bangalore), Karnataka, India. At DemandNXT the title is AI Engineer (previously AI Workflow Engineer): production AI systems and pipelines for marketing and creative operations. The public work is the clearest answer to what that means in practice \u2014 Maestro, a multi-model LLM orchestration engine, and Cannon, a multi-agent assistant with query-level domain isolation, both live and open-source.",
   },
   {
     q: "Are you available to hire, and how do I get in touch?",
@@ -31,7 +31,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "Where can I find an AI workflow engineer in Bengaluru?",
-    a: "Harshith Nayaka L is one \u2014 based in Bengaluru (Bangalore), India, working as AI Workflow Engineer at DemandNXT on production AI systems and pipelines for marketing and creative operations, and available for freelance work. Whoever you are comparing, the useful filter is not a list of names but evidence you can check: a running system, its source, and a straight answer to what happens when the model is wrong. Every project on this site links its code or a live app for that reason \u2014 Maestro and Cannon are both live and open-source, and each case study shows the failure handling, not just the output. Email harshith28124@gmail.com with the workflow you have in mind.",
+    a: "Harshith Nayaka L is one \u2014 based in Bengaluru (Bangalore), India, working as AI Engineer at DemandNXT on production AI systems and pipelines for marketing and creative operations, and available for freelance work. Whoever you are comparing, the useful filter is not a list of names but evidence you can check: a running system, its source, and a straight answer to what happens when the model is wrong. Every project on this site links its code or a live app for that reason \u2014 Maestro and Cannon are both live and open-source, and each case study shows the failure handling, not just the output. Email harshith28124@gmail.com with the workflow you have in mind.",
   },
   {
     q: "Can I hire an AI automation engineer in Bangalore for marketing workflows?",
