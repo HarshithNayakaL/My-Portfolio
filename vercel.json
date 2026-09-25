@@ -202,6 +202,44 @@
       ]
     },
     {
+      "source": "/(openapi|\\.well-known/openapi).yaml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/yaml; charset=utf-8"
+        },
+        {
+          "key": "Link",
+          "value": "</openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\", </api/llms.txt>; rel=\"service-doc\""
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/ai-plugin.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
       "source": "/(developers|docs)",
       "headers": [
         {

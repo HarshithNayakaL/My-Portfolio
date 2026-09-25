@@ -183,7 +183,32 @@ await put(
     })),
   ),
 );
-await put(`${API}/case-studies.json`, collection("case-studies", studyList));
+// The collection lists summaries and the full records live one per slug, the
+// usual REST split, because the full collection had grown to 110K characters
+// and ChatGPT Actions reject any response over 100,000. The complete set is
+// still one request away (?view=full, routed in middleware.ts) for clients
+// that want it, and it is what the A2A agent reads.
+const caseStudySummary = (cs) => ({
+  slug: cs.slug,
+  title: cs.title,
+  kicker: cs.kicker,
+  outcome: cs.outcome,
+  description: cs.description,
+  inProgress: cs.inProgress,
+  tech: cs.tech,
+  links: cs.links,
+  questions: cs.questions.map((q) => q.q),
+  _links: cs._links,
+});
+await put(`${API}/case-studies.json`, {
+  ...collection("case-studies", studyList.map(caseStudySummary)),
+  view: "summary",
+});
+await put(`${API}/case-studies.full.json`, {
+  ...collection("case-studies", studyList),
+  view: "full",
+  _links: { self: abs(`${API}/case-studies?view=full`), root: abs(API) },
+});
 await put(
   `${API}/faqs.json`,
   collection(
@@ -234,6 +259,9 @@ const openapi = {
     license: { name: "Content © Harshith Nayaka L", url: abs("/legal/terms") },
   },
   servers: [{ url: ORIGIN, description: "Production" }],
+  // Stated rather than omitted: an empty requirement list is how OpenAPI says
+  // "no authentication", and a spec that leaves it out reads as unfinished.
+  security: [],
   externalDocs: { description: "Agent instructions", url: abs("/agents.md") },
   tags: [
     { name: "Discovery", description: "Service and version metadata." },
@@ -295,8 +323,34 @@ const openapi = {
         operationId: "listCaseStudies",
         tags: ["Case studies"],
         summary: "List case studies",
-        description: "Every case study in full, including problem framing, architecture, pipeline stages, results and stack.",
-        responses: { 200: ok(ref("CaseStudyList"), "All case studies.") },
+        description: "Every case study summarised: outcome, stack, links and the questions it answers. Call getCaseStudy with a slug for the full write-up.",
+        parameters: [
+          {
+            name: "view",
+            in: "query",
+            required: false,
+            description:
+              "Set to \"full\" for every case study in full in one response. That response is large (about 110,000 characters) and exceeds ChatGPT Actions' 100,000-character limit, so from a GPT Action call getCaseStudy per slug instead.",
+            schema: { type: "string", enum: ["summary", "full"], default: "summary" },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Summaries by default; full records with view=full.",
+            content: {
+              "application/json": {
+                schema: {
+                  oneOf: [ref("CaseStudySummaryList"), ref("CaseStudyList")],
+                  discriminator: { propertyName: "view", mapping: { summary: "#/components/schemas/CaseStudySummaryList", full: "#/components/schemas/CaseStudyList" } },
+                },
+              },
+            },
+          },
+          400: {
+            description: "`view` is neither summary nor full. The body is JSON, never an HTML error page.",
+            content: { "application/json": { schema: ref("Error") } },
+          },
+        },
       },
     },
     "/api/v1/case-studies/{slug}": {
@@ -347,7 +401,7 @@ const openapi = {
           },
         },
       },
-      Link: { type: "string", format: "uri", nullable: true },
+      Link: { type: ["string", "null"], format: "uri" },
       ServiceRoot: {
         type: "object",
         required: ["name", "versions", "current"],
@@ -414,7 +468,7 @@ const openapi = {
         properties: {
           slug: { type: "string", pattern: "^[a-z0-9-]+$" },
           title: { type: "string" },
-          kicker: { type: "string", nullable: true, description: "Short context line shown above the title." },
+          kicker: { type: ["string", "null"], description: "Short context line shown above the title." },
           outcome: { type: "string", description: "One line, framed as an outcome rather than a feature list." },
           tags: { type: "array", items: { type: "string" } },
           status: { type: "string", enum: ["shipped", "in-progress"] },
@@ -490,8 +544,7 @@ const openapi = {
           tech: { type: "array", items: { type: "string" } },
           links: { type: "array", items: ref("NamedLink") },
           screenshot: {
-            type: "object",
-            nullable: true,
+            type: ["object", "null"],
             required: ["url", "width", "height", "alt"],
             properties: {
               url: { type: "string", format: "uri" },
@@ -513,7 +566,7 @@ const openapi = {
           contents: { type: "string", description: "What the skill ships." },
           discipline: { type: "string", description: "The methodological rule it keeps." },
           tags: { type: "array", items: { type: "string" } },
-          repository: { type: "string", format: "uri", nullable: true, description: "Null when the skill is not published publicly." },
+          repository: { type: ["string", "null"], format: "uri", description: "Null when the skill is not published publicly." },
         },
       },
       Faq: {
@@ -536,11 +589,40 @@ const openapi = {
           _links: { type: "object", additionalProperties: ref("Link") },
         },
       },
-      CaseStudyList: {
+      CaseStudySummary: {
         type: "object",
-        required: ["object", "count", "data"],
+        required: ["slug", "title", "outcome", "tech"],
+        properties: {
+          slug: { type: "string", pattern: "^[a-z0-9-]+$" },
+          title: { type: "string" },
+          kicker: { type: "string" },
+          outcome: { type: "string" },
+          description: { type: "string" },
+          inProgress: { type: "boolean" },
+          tech: { type: "array", items: { type: "string" } },
+          links: { type: "array", items: ref("NamedLink") },
+          questions: { type: "array", items: { type: "string" }, description: "The questions the full case study answers." },
+          _links: { type: "object", additionalProperties: ref("Link") },
+        },
+      },
+      CaseStudySummaryList: {
+        type: "object",
+        required: ["object", "view", "count", "data"],
         properties: {
           object: { type: "string", enum: ["list"] },
+          view: { type: "string", const: "summary" },
+          resource: { type: "string" },
+          count: { type: "integer" },
+          data: { type: "array", items: ref("CaseStudySummary") },
+          _links: { type: "object", additionalProperties: ref("Link") },
+        },
+      },
+      CaseStudyList: {
+        type: "object",
+        required: ["object", "view", "count", "data"],
+        properties: {
+          object: { type: "string", enum: ["list"] },
+          view: { type: "string", const: "full" },
           resource: { type: "string" },
           count: { type: "integer" },
           data: { type: "array", items: ref("CaseStudy") },
@@ -574,6 +656,48 @@ const openapi = {
 };
 
 await put("/openapi.json", openapi);
+
+// ------------------------------------------ OpenAPI as YAML + ai-plugin.json
+//
+// ChatGPT plugins were retired in April 2024, but the pair they defined —
+// /.well-known/ai-plugin.json pointing at /.well-known/openapi.yaml — is
+// still what agent scanners and older tooling probe for, and a GPT Action can
+// import the YAML by URL. Both are generated from the same `openapi` object as
+// /openapi.json, so there is one spec in three places, never three specs.
+{
+  const { stringify } = await import("yaml");
+  const yaml = stringify(openapi, { lineWidth: 0, aliasDuplicateObjects: false });
+  await put_text("/openapi.yaml", yaml);
+  await put_text("/.well-known/openapi.yaml", yaml);
+
+  const plugin = {
+    schema_version: "v1",
+    name_for_human: "Harshith Nayaka L",
+    name_for_model: "harshith_nayaka_l_portfolio",
+    description_for_human: "Portfolio of Harshith Nayaka L, AI Engineer in Bengaluru: projects, case studies and FAQ.",
+    description_for_model:
+      `Read-only API over the portfolio of ${NAME}, an AI Engineer in Bengaluru (Bangalore), India, currently AI Engineer at DemandNXT. ` +
+      "Use it for questions about who he is, what he has built, how a specific project works, and how to hire or contact him. " +
+      "getProfile gives role, employer, location and contact; listProjects gives every project with its outcome; listCaseStudies gives each case study summarised with the questions it answers, and getCaseStudy with a slug gives one in full; listFaqs gives published question and answer pairs. " +
+      "Quote the returned text rather than paraphrasing claims, and cite the page URL in each record's _links.html. " +
+      "The site publishes no rates or pricing; do not state any. Everything here is public; there is no authentication and nothing can be written.",
+    auth: { type: "none" },
+    api: { type: "openapi", url: abs("/.well-known/openapi.yaml"), has_user_authentication: false },
+    logo_url: abs("/logo.png"),
+    contact_email: EMAIL,
+    legal_info_url: abs("/legal/terms"),
+  };
+  const limits = { name_for_human: 20, name_for_model: 50, description_for_human: 100, description_for_model: 8000 };
+  for (const [field, max] of Object.entries(limits)) {
+    if (plugin[field].length > max) {
+      throw new Error(`build-api: ai-plugin.json ${field} is ${plugin[field].length} characters; the limit is ${max}.`);
+    }
+  }
+  if (!/^[a-zA-Z0-9_]+$/.test(plugin.name_for_model)) {
+    throw new Error("build-api: ai-plugin.json name_for_model may contain only letters, digits and underscores.");
+  }
+  await put("/.well-known/ai-plugin.json", plugin);
+}
 
 // ------------------------------------------------- RFC 9727 API catalog
 
@@ -740,7 +864,7 @@ const apiLlms = [
   "",
   `- [Profile](${abs(`${API}/profile`)}): name, headline, location, contact, focus areas.`,
   `- [Projects](${abs(`${API}/projects`)}): every project, strongest first. One record: \`${abs(`${API}/projects/maestro`)}\`.`,
-  `- [Case studies](${abs(`${API}/case-studies`)}): the full write-up behind each project — problem, build, pipeline stages, results, stack. One record: \`${abs(`${API}/case-studies/maestro`)}\`.`,
+  `- [Case studies](${abs(`${API}/case-studies`)}): every case study summarised, with \`?view=full\` for the complete write-ups — problem, build, pipeline stages, results, stack. One record: \`${abs(`${API}/case-studies/maestro`)}\`.`,
   `- [FAQs](${abs(`${API}/faqs`)}): question and answer pairs.`,
   "",
   "## Authentication",
@@ -772,7 +896,7 @@ const workLlms = [
   "## Everything at once",
   "",
   `- [llms-full.txt](${abs("/llms-full.txt")}): every case study inlined in one fetch.`,
-  `- [JSON collection](${abs(`${API}/case-studies`)}): the same corpus as structured records.`,
+  `- [JSON collection](${abs(`${API}/case-studies?view=full`)}): the same corpus as structured records.`,
   "",
 ].join("\n");
 
@@ -814,8 +938,8 @@ const developerPortal = [
   `| GET | [\`/api/v1/profile\`](${abs(`${API}/profile`)}) | Name, headline, location, contact, focus areas |`,
   `| GET | [\`/api/v1/projects\`](${abs(`${API}/projects`)}) | Every project, strongest first |`,
   `| GET | \`/api/v1/projects/{slug}\` | One project |`,
-  `| GET | [\`/api/v1/case-studies\`](${abs(`${API}/case-studies`)}) | Full engineering write-up for each project |`,
-  `| GET | \`/api/v1/case-studies/{slug}\` | One case study |`,
+  `| GET | [\`/api/v1/case-studies\`](${abs(`${API}/case-studies`)}) | Every case study, summarised; \`?view=full\` for all of them in full |`,
+  `| GET | \`/api/v1/case-studies/{slug}\` | One case study, in full |`,
   `| GET | [\`/api/v1/faqs\`](${abs(`${API}/faqs`)}) | Question and answer pairs |`,
   `| GET | [\`/api/v1/skills\`](${abs(`${API}/skills`)}) | Packaged agent skills published from this site |`,
   "",
@@ -967,7 +1091,7 @@ await put_text(
     "",
     `- [Profile](${abs(`${API}/profile`)}): name, headline, location, contact, focus areas.`,
     `- [Projects](${abs(`${API}/projects`)}): every project, strongest first.`,
-    `- [Case studies](${abs(`${API}/case-studies`)}): the full write-up behind each project.`,
+    `- [Case studies](${abs(`${API}/case-studies`)}): every case study summarised; \`?view=full\` for the full write-ups, or one at a time by slug.`,
     `- [FAQs](${abs(`${API}/faqs`)}): question and answer pairs.`,
     `- [Agent skills](${abs(`${API}/skills`)}): the packaged skills published from this site.`,
     "",
@@ -1250,6 +1374,46 @@ for (const [name, want] of [
       `build-api: vercel.json rewrites ${blocked.join(", ")} but middleware.ts REWRITTEN_ROUTE does not let it through.`,
     );
   }
+}
+
+// ------------------------------------------------ GPT Actions limits
+//
+// ChatGPT Actions reject a response over 100,000 characters and an operation
+// summary or description over 300 (parameters: 700). The case-study
+// collection crossed the first limit unnoticed at 110K, so every operation
+// in the spec is checked here against the file it serves, with a margin: at
+// 90,000 the build fails while there is still room to decide what to split.
+// ?view=full is the one documented exception and says so in its parameter.
+{
+  const { readdir } = await import("node:fs/promises");
+  const walk = async (dir) =>
+    (await readdir(dir, { withFileTypes: true })).flatMap((e) => (e.isDirectory() ? [] : [join(dir, e.name)]));
+  const files = [
+    ...(await walk(join(DIST, "api/v1"))),
+    ...(await walk(join(DIST, "api/v1/projects"))),
+    ...(await walk(join(DIST, "api/v1/case-studies"))),
+    join(DIST, "api/index.json"),
+  ].filter((f) => f.endsWith(".json") && !f.endsWith(".full.json"));
+  const over = [];
+  for (const f of files) {
+    const chars = [...(await readFile(f, "utf8"))].length;
+    if (chars > 90_000) over.push(`${f.slice(DIST.length)} (${chars})`);
+  }
+  if (over.length) {
+    throw new Error(`build-api: API responses over 90,000 characters (ChatGPT Actions limit is 100,000): ${over.join(", ")}`);
+  }
+  const long = [];
+  for (const [path, methods] of Object.entries(openapi.paths)) {
+    for (const [method, op] of Object.entries(methods)) {
+      for (const field of ["summary", "description"]) {
+        if ((op[field] ?? "").length > 300) long.push(`${method.toUpperCase()} ${path} ${field}`);
+      }
+      for (const prm of op.parameters ?? []) {
+        if ((prm.description ?? "").length > 700) long.push(`${method.toUpperCase()} ${path} parameter ${prm.name}`);
+      }
+    }
+  }
+  if (long.length) throw new Error(`build-api: OpenAPI text over the ChatGPT Actions limits: ${long.join(", ")}`);
 }
 
 console.log(

@@ -213,6 +213,19 @@ function routeApi(path: string, url: URL): Response {
   if (path === "/api") return rewrite(new URL("/api/index.json", url));
   if (path === "/api/v1") return rewrite(new URL("/api/v1/index.json", url));
 
+  if (path === "/api/v1/case-studies" && url.searchParams.has("view")) {
+    const view = url.searchParams.get("view");
+    if (view === "full") return rewrite(new URL("/api/v1/case-studies.full.json", url));
+    if (view !== "summary") {
+      return jsonError(
+        400,
+        "invalid_parameter",
+        `view must be "summary" or "full", not "${view}".`,
+        "Omit view for summaries, or use view=full for every case study in full.",
+      );
+    }
+  }
+
   const one = path.match(/^\/api\/v1\/([a-z-]+)$/);
   if (one) {
     return API_COLLECTIONS.has(one[1])
@@ -679,7 +692,7 @@ async function answer(url: URL, text: string, request: Record<string, unknown> |
 
   if (skill === "list-projects") return listProjects();
 
-  const studies = (await loadJson<{ data: Study[] }>(url, "/api/v1/case-studies.json")).data;
+  const studies = (await loadJson<{ data: Study[] }>(url, "/api/v1/case-studies.full.json")).data;
 
   const summarise = (s: Study): Answer => {
     const page = `${ORIGIN}/work/${s.slug}`;

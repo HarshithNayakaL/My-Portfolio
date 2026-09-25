@@ -56,7 +56,7 @@ reason to hand-edit the output.
 
 ## Guards
 
-Two of these fail the build outright. The other three are scripts you run; they
+Three of these fail the build outright. The other three are scripts you run; they
 exist because each one caught something that had already shipped. If one fires,
 fix the cause — do not weaken the check.
 
@@ -68,6 +68,13 @@ fix the cause — do not weaken the check.
   case-study slugs so it can answer a bad slug with JSON instead of an HTML
   404 page. `scripts/build-api.mjs` fails the build if either set drifts from
   the data. Add a project → add its slug to `middleware.ts`.
+- **ChatGPT Actions limits.** Every JSON response an API operation serves
+  must stay under 90,000 characters (Actions reject over 100,000), and every
+  operation summary/description under 300 characters, parameter description
+  under 700. `/api/v1/case-studies` once reached 110K; that is why the list
+  serves summaries and the full set is behind `?view=full`. The spec itself
+  lints clean with `npx @redocly/cli lint dist/openapi.yaml` (config in
+  `redocly.yaml`).
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
   llms.txt v2 spec. Point it at a Vercel deployment (production or a preview
   URL), not `npm run preview`: that server doesn't run `middleware.ts` or the
@@ -106,7 +113,9 @@ If you change routes, you change all of these — check each one:
 - `/<route>/index.md` — markdown twin, with YAML frontmatter
 - `Accept: text/markdown`, `?mode=agent`, and answer-engine user agents all
   resolve to the twin, via `middleware.ts`
-- `/api/v1/...` — read-only JSON, described by `/openapi.json`
+- `/api/v1/...` — read-only JSON, described by `/openapi.json` (also
+  `/openapi.yaml` and `/.well-known/openapi.yaml`, with
+  `/.well-known/ai-plugin.json` pointing at it; all generated from one object)
 - `/mcp` — read-only MCP server (Streamable HTTP) in `middleware.ts`; its tool
   table is exported and `scripts/build-api.mjs` generates
   `/.well-known/mcp/server-card.json` from it, so add a tool in one place

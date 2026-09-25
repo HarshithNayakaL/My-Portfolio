@@ -1,0 +1,9 @@
+# Lint config for /openapi.json (npx @redocly/cli lint dist/openapi.yaml).
+extends:
+  - recommended
+rules:
+  # Most list operations here have no 4XX outcome: no parameters, no auth,
+  # static files. Declaring one to satisfy the rule would describe a response
+  # the API never sends. Operations that can fail (a bad slug, a bad view)
+  # declare their 4XX.
+  operation-4xx-response: off
