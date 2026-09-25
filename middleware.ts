@@ -463,6 +463,446 @@ async function handleMcp(request: Request, url: URL): Promise<Response> {
   }
 }
 
+// ----------------------------------------------------------------- A2A agent
+//
+// POST /a2a: an Agent2Agent (A2A) agent over the JSON-RPC binding. The agent
+// card used to point A2A clients at /api/v1, which is plain REST and answers
+// no A2A method, so any client that trusted the card failed on its first call.
+//
+// What it does is narrow on purpose: it answers questions about Harshith
+// Nayaka L and his work by retrieving the site's own published answers (the
+// FAQ and each case study's questions) and quoting them verbatim with their
+// source URL. There is no model behind it, so it cannot invent a claim the
+// site does not make; a question the site does not answer gets "no published
+// answer" and the address of everything it does cover.
+//
+// Both protocol versions are served. A2A 1.0 clients send `A2A-Version: 1.0`
+// and PascalCase methods (SendMessage); the spec says a request with no
+// version header is 0.3 (message/send, `kind` discriminators, lowercase
+// enums), and most deployed clients are still 0.3. Method names never overlap
+// between the two, so a request with no header and a 1.0 method name is
+// answered as 1.0 rather than rejected.
+//
+// Stateless: every message completes in the same response and nothing is
+// stored, so there is no task to fetch, cancel or subscribe to afterwards.
+// The card says so (streaming and push notifications off), and those methods
+// return the spec's own errors instead of pretending.
+
+export const A2A_SKILLS = [
+  {
+    id: "answer-question",
+    name: "Answer a question about Harshith Nayaka L",
+    description:
+      "Answers questions about Harshith Nayaka L, AI Engineer in Bengaluru: his role, projects, how he works and how to hire him. Each answer is quoted verbatim from the site's published FAQ or case studies, with its source URL. Nothing is generated.",
+    tags: ["profile", "hiring", "faq", "ai-engineer", "bengaluru"],
+    examples: [
+      "Who is Harshith Nayaka L and where is he based?",
+      "Can I hire an AI engineer in Bangalore for marketing workflows?",
+      "How does Maestro verify its answers?",
+    ],
+  },
+  {
+    id: "list-projects",
+    name: "List projects",
+    description:
+      "Every project in the portfolio with its one-line outcome and link. Send a data part {\"skill\": \"list-projects\"}, or ask for the projects in words.",
+    tags: ["portfolio", "projects"],
+    examples: ["What has Harshith built?", "List his projects."],
+  },
+  {
+    id: "get-case-study",
+    name: "Summarise a case study",
+    description:
+      "The outcome, results and links for one project, with the URL of its full write-up. Send a data part {\"skill\": \"get-case-study\", \"slug\": \"maestro\"}, or name the project.",
+    tags: ["portfolio", "case-study", "architecture"],
+    examples: ["Tell me about Cannon.", "Summarise the BrandForge case study."],
+  },
+] as const;
+
+export const A2A_VERSIONS = ["1.0", "0.3"];
+
+type A2aVersion = "1.0" | "0.3";
+type Part = { text?: string; data?: unknown; mediaType?: string; kind?: string };
+/** `keywords` are matched but never shown: they let a record with no question
+ *  of its own (the profile) be found by the words people ask it with. */
+type Qa = { question: string; answer: string; source: string; keywords?: string };
+type Study = {
+  slug: string;
+  title: string;
+  kicker?: string;
+  outcome: string;
+  results?: { label: string; body: string }[];
+  questions?: { q: string; a: string }[];
+  links?: { label: string; href: string }[];
+};
+type Project = { slug: string; title: string; kicker?: string; outcome: string; hasCaseStudy: boolean };
+
+const A2A_CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Accept, A2A-Version, A2A-Extensions",
+};
+
+const METHODS_10 = new Set([
+  "SendMessage", "SendStreamingMessage", "GetTask", "ListTasks", "CancelTask", "SubscribeToTask",
+  "CreateTaskPushNotificationConfig", "GetTaskPushNotificationConfig",
+  "ListTaskPushNotificationConfigs", "DeleteTaskPushNotificationConfig", "GetExtendedAgentCard",
+]);
+
+function a2aJson(body: unknown, version: A2aVersion | null, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex",
+      ...(version ? { "A2A-Version": version } : {}),
+      ...A2A_CORS,
+    },
+  });
+}
+
+// Error codes from the spec's mapping table (section 5.4), with a
+// google.rpc.ErrorInfo detail as its JSON-RPC binding asks for.
+const A2A_ERRORS = {
+  TASK_NOT_FOUND: -32001,
+  PUSH_NOTIFICATION_NOT_SUPPORTED: -32003,
+  UNSUPPORTED_OPERATION: -32004,
+  CONTENT_TYPE_NOT_SUPPORTED: -32005,
+  EXTENDED_AGENT_CARD_NOT_CONFIGURED: -32007,
+  VERSION_NOT_SUPPORTED: -32009,
+} as const;
+
+function a2aError(
+  id: JsonRpcId,
+  version: A2aVersion | null,
+  reason: keyof typeof A2A_ERRORS | "INVALID_PARAMS" | "METHOD_NOT_FOUND" | "PARSE" | "INVALID_REQUEST",
+  message: string,
+  httpStatus = 200,
+): Response {
+  const code =
+    reason === "INVALID_PARAMS" ? -32602
+    : reason === "METHOD_NOT_FOUND" ? -32601
+    : reason === "PARSE" ? -32700
+    : reason === "INVALID_REQUEST" ? -32600
+    : A2A_ERRORS[reason];
+  const data = [{ "@type": "type.googleapis.com/google.rpc.ErrorInfo", reason, domain: "a2a-protocol.org" }];
+  return a2aJson({ jsonrpc: "2.0", id, error: { code, message, data } }, version, httpStatus);
+}
+
+// ---- retrieval: plain term overlap weighted by rarity, over ~45 short docs.
+
+const STOP = new Set(
+  ("a an the is are was were be been being of to in on for and or with what how does do did can could would " +
+    "should i you he his him me my it its this that there which who whom where when why about from by as at " +
+    "into than then so if any some your yours tell know please get give show much many also just has have had me").split(" "),
+);
+const SYNONYM: Record<string, string> = { bangalore: "bengaluru", hiring: "hire", hired: "hire", freelancer: "freelance" };
+
+function terms(s: string): string[] {
+  return s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !STOP.has(w))
+    .map((w) => SYNONYM[w] ?? w)
+    .map((w) => (w.length > 4 ? w.replace(/(ing|ed|es|s)$/, "") : w));
+}
+
+function rank(query: string, docs: Qa[]): { doc: Qa; score: number }[] {
+  const q = [...new Set(terms(query))];
+  if (!q.length) return [];
+  const indexed = docs.map((doc) => ({
+    doc,
+    qt: new Set(terms(`${doc.question} ${doc.keywords ?? ""}`)),
+    at: new Set(terms(doc.answer)),
+  }));
+  const idf = (t: string) => {
+    const n = indexed.filter((d) => d.qt.has(t) || d.at.has(t)).length;
+    return Math.log(1 + indexed.length / (1 + n));
+  };
+  const weights = new Map(q.map((t) => [t, idf(t)]));
+  const max = q.reduce((sum, t) => sum + 2 * weights.get(t)!, 0);
+  return indexed
+    .map(({ doc, qt, at }) => ({
+      doc,
+      score: q.reduce((s, t) => s + (qt.has(t) ? 2 : at.has(t) ? 1 : 0) * weights.get(t)!, 0) / max,
+    }))
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score);
+}
+
+async function loadJson<T>(url: URL, path: string): Promise<T> {
+  const res = await fetch(new URL(path, url));
+  if (!res.ok) throw new Error(`${path} returned ${res.status}`);
+  return (await res.json()) as T;
+}
+
+type Answer = { skill: string; text: string; data: Record<string, unknown> };
+
+async function answer(url: URL, text: string, request: Record<string, unknown> | null): Promise<Answer> {
+  const skill = typeof request?.skill === "string" ? request.skill : null;
+  const lower = text.toLowerCase();
+
+  const listProjects = async (): Promise<Answer> => {
+    const { data } = await loadJson<{ data: (Project & { tags?: string[] })[] }>(url, "/api/v1/projects.json");
+    // "Which projects use multi-agent systems?" should get those projects, not
+    // all eleven: keep the ones sharing a content word with the question, and
+    // fall back to the full list when the question names no topic.
+    const generic = new Set(terms("project projects portfolio work built build made list which use used system systems harshith nayaka"));
+    const topic = terms(text).filter((t) => !generic.has(t));
+    const matching = topic.length
+      ? data.filter((p) => {
+          const words = new Set(terms(`${p.title} ${p.kicker ?? ""} ${p.outcome} ${(p.tags ?? []).join(" ")}`));
+          return topic.some((t) => words.has(t));
+        })
+      : [];
+    const items = (matching.length ? matching : data).map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      outcome: p.outcome,
+      url: p.hasCaseStudy ? `${ORIGIN}/work/${p.slug}` : ORIGIN,
+    }));
+    return {
+      skill: "list-projects",
+      text: [
+        matching.length
+          ? `Harshith Nayaka L's projects matching "${topic.join(" ")}" (${items.length}):`
+          : `Harshith Nayaka L's projects, strongest first (${items.length}):`,
+        "",
+        ...items.map((p) => `- **${p.title}** — ${p.outcome} ${p.url}`),
+      ].join("\n"),
+      data: { skill: "list-projects", projects: items, source: `${ORIGIN}/#work` },
+    };
+  };
+
+  if (skill === "list-projects") return listProjects();
+
+  const studies = (await loadJson<{ data: Study[] }>(url, "/api/v1/case-studies.json")).data;
+
+  const summarise = (s: Study): Answer => {
+    const page = `${ORIGIN}/work/${s.slug}`;
+    return {
+      skill: "get-case-study",
+      text: [
+        `## ${s.title}${s.kicker ? ` — ${s.kicker}` : ""}`,
+        "",
+        s.outcome,
+        "",
+        ...(s.results ?? []).map((r) => `- **${r.label}:** ${r.body}`),
+        "",
+        ...(s.links ?? []).map((l) => `${l.label}: ${l.href}`),
+        `Full write-up: ${page} (markdown: ${page}/index.md)`,
+      ].join("\n"),
+      data: {
+        skill: "get-case-study",
+        slug: s.slug,
+        title: s.title,
+        outcome: s.outcome,
+        results: s.results ?? [],
+        links: s.links ?? [],
+        source: page,
+        markdown: `${page}/index.md`,
+      },
+    };
+  };
+
+  if (skill === "get-case-study") {
+    const study = studies.find((s) => s.slug === request?.slug);
+    if (study) return summarise(study);
+    return {
+      skill: "get-case-study",
+      text: `No case study with slug "${String(request?.slug)}". Valid slugs: ${studies.map((s) => s.slug).join(", ")}.`,
+      data: { skill: "get-case-study", error: "unknown_slug", slugs: studies.map((s) => s.slug) },
+    };
+  }
+
+  if (
+    (/\b(projects?|portfolio)\b/.test(lower) && /\b(list|all|what|which|show|built|build|made)\b/.test(lower)) ||
+    /\bwhat (has|did|does) \S+( \S+)? (built|build|made|make|shipped)\b/.test(lower)
+  ) {
+    return listProjects();
+  }
+
+  // Rates are the one thing people ask that the site deliberately does not
+  // publish. Answered directly, because term overlap alone matched "rate" to
+  // an answer about API rate limits.
+  if (
+    /\b(hourly|rates?|pricing|price|prices|charges?|fees?|quote|budget|how much|cost)\b/.test(lower) &&
+    !/\b(tokens?|models?|llms?|api|limits?|inference|gpu)\b/.test(lower)
+  ) {
+    return {
+      skill: "answer-question",
+      text: "The site publishes no rates or pricing. To ask, email Harshith Nayaka L at harshith28124@gmail.com.",
+      data: { skill: "answer-question", match: null, pricingPublished: false, contact: "harshith28124@gmail.com" },
+    };
+  }
+
+  const [faqs, profile] = await Promise.all([
+    loadJson<{ data: { question: string; answer: string }[] }>(url, "/api/v1/faqs.json").then((r) => r.data),
+    loadJson<{ summary?: string }>(url, "/api/v1/profile.json"),
+  ]);
+  const docs: Qa[] = [
+    ...(profile.summary
+      ? [{
+          question: "About Harshith Nayaka L",
+          answer: profile.summary,
+          source: `${ORIGIN}/about`,
+          keywords: "who current job role title position employer company works demandnxt based location city",
+        }]
+      : []),
+    ...faqs.map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/#faq` })),
+    ...studies.flatMap((s) =>
+      (s.questions ?? []).map((q) => ({ question: q.q, answer: q.a, source: `${ORIGIN}/work/${s.slug}` })),
+    ),
+  ];
+  const ranked = rank(text, docs);
+  const named = studies.find((s) => new RegExp(`\\b(${s.slug.replace(/-/g, "[- ]")}|${s.title.replace(/[^\w\s]/g, ".?")})\\b`, "i").test(text));
+
+  // A question naming a project is answered from that project's own
+  // questions if one fits; otherwise the project's summary is the answer.
+  let top = ranked[0];
+  if (named) {
+    // "Tell me about Cannon" or "What is SPECTRA?" asks for the project
+    // itself: nothing is left once the name is taken out.
+    const nameTerms = new Set(terms(`${named.slug.replace(/-/g, " ")} ${named.title}`));
+    if (!terms(text).some((t) => !nameTerms.has(t))) return summarise(named);
+    const own = ranked.find((r) => r.doc.source === `${ORIGIN}/work/${named.slug}` && r.score >= 0.45);
+    if (!own) return summarise(named);
+    top = own;
+  }
+
+  if (!top || top.score < 0.3) {
+    return {
+      skill: "answer-question",
+      text: [
+        "The site has no published answer to that question, and this agent only quotes published answers.",
+        "",
+        `Everything the site covers is listed at ${ORIGIN}/llms.txt. For anything else, email Harshith Nayaka L at harshith28124@gmail.com.`,
+      ].join("\n"),
+      data: { skill: "answer-question", match: null, index: `${ORIGIN}/llms.txt`, contact: "harshith28124@gmail.com" },
+    };
+  }
+  const related = ranked.filter((r) => r !== top && r.score >= 0.25).slice(0, 3);
+  return {
+    skill: "answer-question",
+    text: [
+      top.doc.answer,
+      "",
+      top.doc.keywords
+        ? `Source: ${top.doc.source}`
+        : `Source: ${top.doc.source} (published answer to "${top.doc.question}")`,
+      ...(related.length ? ["", "Related published answers:", ...related.map((r) => `- ${r.doc.question} ${r.doc.source}`)] : []),
+    ].join("\n"),
+    data: {
+      skill: "answer-question",
+      match: { question: top.doc.question, answer: top.doc.answer, source: top.doc.source },
+      related: related.map((r) => ({ question: r.doc.question, source: r.doc.source })),
+      quoted: true,
+    },
+  };
+}
+
+function uuid(): string {
+  return crypto.randomUUID();
+}
+
+async function handleA2a(request: Request, url: URL): Promise<Response> {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: { ...A2A_CORS, "Access-Control-Max-Age": "86400" } });
+  }
+  if (request.method !== "POST") {
+    return new Response(
+      JSON.stringify({
+        error: "This is an A2A JSON-RPC endpoint: POST a JSON-RPC 2.0 request. The agent card is at /.well-known/agent-card.json.",
+        agentCard: `${ORIGIN}/.well-known/agent-card.json`,
+      }),
+      { status: 405, headers: { Allow: "POST, OPTIONS", "Content-Type": "application/json; charset=utf-8", ...A2A_CORS } },
+    );
+  }
+
+  let msg: { jsonrpc?: unknown; id?: JsonRpcId; method?: unknown; params?: Record<string, unknown> };
+  try {
+    msg = await request.json();
+  } catch {
+    return a2aError(null, null, "PARSE", "Invalid JSON payload", 400);
+  }
+  if (Array.isArray(msg) || !msg || msg.jsonrpc !== "2.0" || typeof msg.method !== "string") {
+    return a2aError(null, null, "INVALID_REQUEST", "Request payload validation error: send one JSON-RPC 2.0 object per POST.", 400);
+  }
+  const id = msg.id ?? null;
+  const method = msg.method;
+
+  const header = (request.headers.get("a2a-version") ?? url.searchParams.get("A2A-Version") ?? "").trim();
+  const requested = header.split(".").slice(0, 2).join(".");
+  let version: A2aVersion;
+  if (!header) version = METHODS_10.has(method) ? "1.0" : "0.3";
+  else if (requested === "1.0" || requested === "0.3") version = requested;
+  else {
+    return a2aError(id, null, "VERSION_NOT_SUPPORTED", `A2A version "${header}" is not supported. Supported: ${A2A_VERSIONS.join(", ")}.`);
+  }
+  const v10 = version === "1.0";
+  const is = (m10: string, m03: string) => method === (v10 ? m10 : m03);
+
+  if (is("SendMessage", "message/send")) {
+    const params = msg.params ?? {};
+    const message = params.message as { parts?: Part[]; contextId?: string; messageId?: string; role?: string } | undefined;
+    if (!message || !Array.isArray(message.parts) || message.parts.length === 0) {
+      return a2aError(id, version, "INVALID_PARAMS", "Invalid parameters: message.parts must contain at least one part.");
+    }
+    const texts = message.parts.filter((p) => typeof p.text === "string").map((p) => p.text as string);
+    const dataPart = message.parts.find((p) => p.data && typeof p.data === "object" && !Array.isArray(p.data));
+    if (!texts.length && !dataPart) {
+      return a2aError(id, version, "CONTENT_TYPE_NOT_SUPPORTED", "Only text parts, and data parts naming a skill, are supported.");
+    }
+
+    const config = (params.configuration ?? {}) as { acceptedOutputModes?: string[] };
+    const accepted = config.acceptedOutputModes?.length ? config.acceptedOutputModes : null;
+    const acceptsText = !accepted || accepted.some((m) => /^(text\/(plain|markdown|\*)|\*\/\*)$/.test(m));
+    const acceptsJson = !accepted || accepted.some((m) => /^(application\/(json|\*)|\*\/\*)$/.test(m));
+    if (!acceptsText && !acceptsJson) {
+      return a2aError(id, version, "CONTENT_TYPE_NOT_SUPPORTED", "This agent answers in text/markdown, text/plain or application/json.");
+    }
+
+    let result: Answer;
+    try {
+      result = await answer(url, texts.join("\n"), (dataPart?.data as Record<string, unknown>) ?? null);
+    } catch {
+      return a2aJson({ jsonrpc: "2.0", id, error: { code: -32603, message: "Internal error: the site's data could not be read. Try again." } }, version);
+    }
+
+    const parts: Part[] = [];
+    if (acceptsText) parts.push(v10 ? { text: result.text, mediaType: "text/markdown" } : { kind: "text", text: result.text });
+    if (acceptsJson) parts.push(v10 ? { data: result.data, mediaType: "application/json" } : { kind: "data", data: result.data });
+
+    const artifact = { artifactId: uuid(), name: result.skill, parts };
+    const status = { state: v10 ? "TASK_STATE_COMPLETED" : "completed", timestamp: new Date().toISOString() };
+    const contextId = typeof message.contextId === "string" && message.contextId ? message.contextId : uuid();
+    const task = v10
+      ? { id: uuid(), contextId, status, artifacts: [artifact] }
+      : { kind: "task", id: uuid(), contextId, status, artifacts: [artifact] };
+    return a2aJson({ jsonrpc: "2.0", id, result: v10 ? { task } : task }, version);
+  }
+
+  if (is("GetTask", "tasks/get") || is("CancelTask", "tasks/cancel") || is("SubscribeToTask", "tasks/resubscribe")) {
+    return a2aError(id, version, "TASK_NOT_FOUND", "Task not found: this agent is stateless and completes every message in the response that carried it, so no task is kept.");
+  }
+  if (v10 && method === "ListTasks") {
+    return a2aJson({ jsonrpc: "2.0", id, result: { tasks: [], nextPageToken: "", pageSize: 0, totalSize: 0 } }, version);
+  }
+  if (is("SendStreamingMessage", "message/stream")) {
+    return a2aError(id, version, "UNSUPPORTED_OPERATION", "Streaming is not supported (capabilities.streaming is false). Use " + (v10 ? "SendMessage." : "message/send."));
+  }
+  if (/PushNotificationConfig/i.test(method)) {
+    return a2aError(id, version, "PUSH_NOTIFICATION_NOT_SUPPORTED", "Push notifications are not supported (capabilities.pushNotifications is false).");
+  }
+  if (is("GetExtendedAgentCard", "agent/getAuthenticatedExtendedCard")) {
+    return a2aError(id, version, "EXTENDED_AGENT_CARD_NOT_CONFIGURED", "There is no extended agent card: nothing here needs authentication.");
+  }
+  return a2aError(id, version, "METHOD_NOT_FOUND", `Method not found: ${method}.`);
+}
+
 export default function middleware(request: Request) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/(.)\/$/, "$1");
@@ -474,6 +914,7 @@ export default function middleware(request: Request) {
   if (path === "/mcp" || (path === "/.well-known/mcp" && request.method !== "GET" && request.method !== "HEAD")) {
     return handleMcp(request, url);
   }
+  if (path === "/a2a") return handleA2a(request, url);
 
   if (request.method !== "GET" && request.method !== "HEAD") return next();
 

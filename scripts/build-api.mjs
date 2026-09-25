@@ -23,8 +23,10 @@ import { fileURLToPath } from "node:url";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
 
-const { caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN } =
-  await import(join(ROOT, "dist-ssr/entry-server.js"));
+const {
+  caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN,
+  facts, availability, workingTitle, previousTitle, identitySentence,
+} = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
 const API = "/api/v1";
@@ -137,6 +139,15 @@ await put(`${API}/index.json`, {
 await put(`${API}/profile.json`, {
   name: NAME,
   headline: "AI Engineer, Full-Stack",
+  // The same sentence the About section leads with, so an agent quoting the
+  // API quotes what the page says.
+  summary: identitySentence,
+  role: {
+    title: workingTitle,
+    employer: facts.find((f) => f.k === "Company")?.v,
+    previousTitles: [previousTitle],
+  },
+  availability,
   location: { city: "Bengaluru", region: "Karnataka", country: "IN" },
   email: EMAIL,
   profiles: { github: GITHUB, linkedin: LINKEDIN },
@@ -365,6 +376,17 @@ const openapi = {
         properties: {
           name: { type: "string" },
           headline: { type: "string" },
+          summary: { type: "string", description: "One-sentence identity statement, as it leads the About section." },
+          role: {
+            type: "object",
+            required: ["title", "employer"],
+            properties: {
+              title: { type: "string", description: "Current job title." },
+              employer: { type: "string" },
+              previousTitles: { type: "array", items: { type: "string" } },
+            },
+          },
+          availability: { type: "string" },
           location: {
             type: "object",
             required: ["city", "country"],
@@ -578,12 +600,22 @@ await put("/.well-known/api-catalog.json", {
           type: "application/json",
           title: `${NAME} portfolio MCP server — Streamable HTTP, read-only`,
         },
+        {
+          href: abs("/a2a"),
+          type: "application/json",
+          title: `${NAME} portfolio A2A agent — JSON-RPC, A2A 1.0 and 0.3, read-only`,
+        },
       ],
       "service-desc": [
         {
           href: abs("/.well-known/mcp/server-card.json"),
           type: "application/json",
           title: `${NAME} portfolio MCP server — server card`,
+        },
+        {
+          href: abs("/.well-known/agent-card.json"),
+          type: "application/json",
+          title: `${NAME} portfolio A2A agent — agent card`,
         },
         {
           href: abs("/openapi.json"),
@@ -606,6 +638,10 @@ await put("/.well-known/api-catalog.json", {
 
 // ---------------------------------------------------- MCP server card
 //
+// A2A_SKILLS and A2A_VERSIONS come out of the same transpile and are used by
+// the agent card further down.
+let MCP_TOOLS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS;
+//
 // The MCP server itself lives in middleware.ts (POST /mcp). Its tool table is
 // read from that file here, the way scripts/check-negotiation.mjs reads the
 // negotiation rule, so the card is generated from the code that serves the
@@ -617,9 +653,9 @@ await put("/.well-known/api-catalog.json", {
     "const rewrite = () => {}, next = () => {};",
   );
   const js = transformSync(src, { loader: "ts", format: "esm" }).code;
-  const { MCP_TOOLS, MCP_VERSIONS } = await import(
+  ({ MCP_TOOLS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS } = await import(
     `data:text/javascript;base64,${Buffer.from(js).toString("base64")}`
-  );
+  ));
   const card = {
     name: "harshith-nayaka-l-portfolio",
     title: `${NAME} — portfolio`,
@@ -796,6 +832,22 @@ const developerPortal = [
   "| `list_agent_skills` | The published agent skills |",
   "",
   `Server card: [\`/.well-known/mcp/server-card.json\`](${abs("/.well-known/mcp/server-card.json")}).`,
+  "",
+  "## A2A agent",
+  "",
+  `An Agent2Agent (A2A) agent answers at \`${abs("/a2a")}\` over the JSON-RPC binding, protocol versions 1.0 and 0.3. Send it a message; it replies with a completed task whose artifact quotes the site's published answer and its source URL. There is no model behind it, so it never answers beyond what the site says. Stateless: no task is stored, and streaming and push notifications are off.`,
+  "",
+  "| Skill | Send | Returns |",
+  "| --- | --- | --- |",
+  ...A2A_SKILLS.map((s) => `| \`${s.id}\` | e.g. "${s.examples[0]}" | ${s.name} |`),
+  "",
+  "```bash",
+  `curl -s ${abs("/a2a")} \\`,
+  "  -H 'Content-Type: application/json' -H 'A2A-Version: 1.0' \\",
+  `  -d '{"jsonrpc":"2.0","id":1,"method":"SendMessage","params":{"message":{"messageId":"1","role":"ROLE_USER","parts":[{"text":"Where is Harshith based?"}]}}}'`,
+  "```",
+  "",
+  `Agent card: [\`/.well-known/agent-card.json\`](${abs("/.well-known/agent-card.json")}). With the official SDK (\`pip install a2a-sdk\`), pass the site origin to \`A2ACardResolver\` and the client picks the interface itself.`,
   "",
   "## Authentication",
   "",
@@ -1009,54 +1061,48 @@ await put_text(
 
 // ------------------------------------------------- A2A card + skills index
 //
-// Both describe the same thing honestly: this host serves documents and
-// read-only data. It is not an agent that can be delegated a task, and saying
-// otherwise would send an agent looking for an endpoint that does not exist.
+// The agent card describes the A2A agent in middleware.ts (POST /a2a), and its
+// skills are read from that file's A2A_SKILLS, so the card cannot advertise a
+// skill the handler does not serve. It used to name /api/v1 as an A2A
+// endpoint, which answers no A2A method.
+//
+// The card is written for A2A 1.0 (supportedInterfaces, one entry per
+// protocol version) and also carries the 0.3 top-level fields (url,
+// preferredTransport, protocolVersion). A 0.3 client reads only those, a 1.0
+// client reads only supportedInterfaces, and both SDKs were run against the
+// deployed card to confirm neither rejects the other's fields.
 
 await put("/.well-known/agent-card.json", {
-  protocolVersion: "0.3.0",
-  name: `${NAME} — portfolio`,
+  name: `${NAME} — portfolio agent`,
   description:
-    "Read-only source of engineering case studies, project records and profile data for Harshith Nayaka L. Serves documents and JSON; it does not execute tasks.",
-  url: abs("/api/v1"),
-  preferredTransport: "HTTP+JSON",
+    `Answers questions about ${NAME}, an AI Engineer in Bengaluru, India: his role, projects, how he works and how to hire him. ` +
+    "Every answer is quoted verbatim from the site's published FAQ, case studies or profile, with its source URL; there is no model behind it and nothing is generated. " +
+    "Read-only and stateless: no authentication, no task storage, no streaming.",
+  supportedInterfaces: A2A_VERSIONS.map((protocolVersion) => ({
+    url: abs("/a2a"),
+    protocolBinding: "JSONRPC",
+    protocolVersion,
+  })),
   provider: { organization: NAME, url: ORIGIN },
-  version: "1.0.0",
-  documentationUrl: abs("/agents.md"),
-  capabilities: { streaming: false, pushNotifications: false, stateTransitionHistory: false },
-  defaultInputModes: ["text/plain"],
-  defaultOutputModes: ["application/json", "text/markdown"],
+  version: "2.0.0",
+  documentationUrl: abs("/developers"),
+  iconUrl: abs("/favicon.svg"),
+  capabilities: { streaming: false, pushNotifications: false, extendedAgentCard: false },
   securitySchemes: {},
-  security: [],
-  skills: [
-    {
-      id: "list-projects",
-      name: "List projects",
-      description: "Return every project on this site with its outcome, tags, status and links.",
-      tags: ["portfolio", "projects"],
-      examples: ["What has Harshith built?", "Which projects involve multi-agent systems?"],
-      inputModes: ["text/plain"],
-      outputModes: ["application/json"],
-    },
-    {
-      id: "get-case-study",
-      name: "Get a case study",
-      description: "Return the full engineering write-up for one project: problem, architecture, pipeline stages, results and stack.",
-      tags: ["portfolio", "case-study", "architecture"],
-      examples: ["How does Maestro's verifier work?", "Explain Cannon's agent isolation."],
-      inputModes: ["text/plain"],
-      outputModes: ["application/json", "text/markdown"],
-    },
-    {
-      id: "get-profile",
-      name: "Get the profile",
-      description: "Return name, headline, location, contact details and focus areas.",
-      tags: ["profile", "contact"],
-      examples: ["Who is Harshith Nayaka L?", "How do I contact him?"],
-      inputModes: ["text/plain"],
-      outputModes: ["application/json"],
-    },
-  ],
+  securityRequirements: [],
+  defaultInputModes: ["text/plain", "application/json"],
+  defaultOutputModes: ["text/markdown", "application/json"],
+  skills: A2A_SKILLS.map((skill) => ({
+    ...skill,
+    tags: [...skill.tags],
+    examples: [...skill.examples],
+    inputModes: ["text/plain", "application/json"],
+    outputModes: ["text/markdown", "application/json"],
+  })),
+  // A2A 0.3 fields, for clients that predate supportedInterfaces.
+  protocolVersion: "0.3.0",
+  url: abs("/a2a"),
+  preferredTransport: "JSONRPC",
 });
 
 const SKILL_ARTIFACT = {

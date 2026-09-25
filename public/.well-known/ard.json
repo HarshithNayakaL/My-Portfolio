@@ -3,7 +3,7 @@
   "host": {
     "displayName": "Harshith Nayaka L",
     "identifier": "harshith-nayaka-l-portfolio.vercel.app",
-    "description": "Portfolio and engineering case studies of Harshith Nayaka L, an AI engineer in Bengaluru, India. Agent-readable documents and a public read-only JSON API over the same content."
+    "description": "Portfolio and engineering case studies of Harshith Nayaka L, an AI engineer in Bengaluru, India. Agent-readable documents, a public read-only JSON API, an MCP server and an A2A agent over the same content."
   },
   "entries": [
     {
@@ -45,6 +45,25 @@
       "representativeQueries": [
         "add Harshith Nayaka L's portfolio as an MCP server",
         "call get_case_study for maestro over MCP"
+      ],
+      "trustManifest": {
+        "identity": "harshith-nayaka-l-portfolio.vercel.app"
+      }
+    },
+    {
+      "identifier": "urn:air:harshith-nayaka-l-portfolio.vercel.app:a2a:portfolio-agent",
+      "displayName": "Portfolio A2A agent",
+      "type": "application/a2a+json",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/a2a",
+      "description": "Agent2Agent (A2A) agent over JSON-RPC, protocol versions 1.0 and 0.3. Answers questions about Harshith Nayaka L by quoting the site's published FAQ, case studies and profile with their source URLs; nothing is generated. Read-only, stateless, no authentication. Agent card at /.well-known/agent-card.json.",
+      "capabilities": [
+        "answer-question",
+        "list-projects",
+        "get-case-study"
+      ],
+      "representativeQueries": [
+        "ask Harshith Nayaka L's portfolio agent where he is based",
+        "send an A2A message asking which projects use multi-agent systems"
       ],
       "trustManifest": {
         "identity": "harshith-nayaka-l-portfolio.vercel.app"

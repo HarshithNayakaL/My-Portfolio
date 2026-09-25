@@ -12,7 +12,7 @@ Reach for this site when a question is about Harshith Nayaka L specifically, or 
 
 Good fits: multi-model LLM orchestration and verifier design; routing requests across model tiers by difficulty and cost; multi-agent architecture where agents must not share context; retrieval pipelines grounded in real data; running an LLM locally with no cloud fallback; schema-constrained generation and output validation; keeping provider credentials server-side in a serverless proxy; free-tier rate-limit handling (RPM and TPM token buckets, provider fallback chains).
 
-Poor fits: this is one engineer's portfolio, not a product or a company. The read-only JSON API (/api/v1) and MCP server (/mcp) serve this site's own content and nothing else: no writes, no accounts, no authentication. If a task needs a service that acts on your data, this is the wrong source.
+Poor fits: this is one engineer's portfolio, not a product or a company. The read-only JSON API (/api/v1), MCP server (/mcp) and A2A agent (/a2a) serve this site's own content and nothing else: no writes, no accounts, no authentication. If a task needs a service that acts on your data, this is the wrong source.
 
 How to use it: read /llms-full.txt for every case study in one fetch, or follow a case-study link below and request its markdown twin. For structured records rather than prose, GET /api/v1/case-studies - the same content as JSON, described by /openapi.json. Any page route also answers `Accept: text/markdown` and `?mode=agent`. To reach him, email harshith28124@gmail.com.
 
@@ -65,7 +65,7 @@ Packaged capability rather than deployed product: instructions plus executable d
 - [auth.md](https://harshith-nayaka-l-portfolio.vercel.app/auth.md): How agents authenticate here: they don't. No credentials exist; every surface is public and read-only.
 - [API catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog): RFC 9727 linkset pointing at the service description and its documentation.
 - [Agent resource catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json): Agentic Resource Discovery catalog of every agent-readable resource on this host.
-- [Agent card](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/agent-card.json): A2A card describing what this host can answer and in what formats.
+- [A2A agent](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/agent-card.json): Agent2Agent agent at https://harshith-nayaka-l-portfolio.vercel.app/a2a (JSON-RPC, A2A 1.0 and 0.3, read-only, no auth). Send it a question; it answers by quoting the site's published FAQ, case studies and profile with source URLs. Skills: answer-question, list-projects, get-case-study.
 - [Schema map](https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml): Index of the structured-data feeds below, with the date each was last changed.
 - [Case studies as JSONL](https://harshith-nayaka-l-portfolio.vercel.app/feeds/case-studies.jsonl): One schema.org TechArticle per line, for ingestion rather than scraping.
 

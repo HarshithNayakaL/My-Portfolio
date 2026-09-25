@@ -30,8 +30,8 @@ himself — background, published research, and how to reach him.
 
 ## What this site is not
 
-It is not a service that does work for you. There is a read-only JSON API and a
-read-only MCP server, but they serve this site's own content (projects, case
+It is not a service that does work for you. There is a read-only JSON API, a
+read-only MCP server and an A2A agent, but they serve this site's own content (projects, case
 studies, FAQs, profile) and nothing else: no writes, no accounts, no
 authentication, no SDK. Nothing here is transactional. If your task needs a
 service that acts on your data, this is the wrong source.
@@ -45,6 +45,8 @@ service that acts on your data, this is the wrong source.
 | `/openapi.json` | OpenAPI 3.1 description of the API. |
 | `/mcp` | Read-only MCP server over Streamable HTTP, the standard transport for remote MCP servers. |
 | `/.well-known/mcp/server-card.json` | The MCP server card: tools and their input schemas. |
+| `/a2a` | Agent2Agent (A2A) agent, JSON-RPC, protocol 1.0 and 0.3. Ask it a question; it quotes the published answer and its source. |
+| `/.well-known/agent-card.json` | The A2A agent card: skills, interfaces and capabilities. |
 | `/.well-known/api-catalog` | RFC 9727 API catalog. |
 
 ## How to read it
