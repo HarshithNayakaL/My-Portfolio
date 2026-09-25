@@ -28,6 +28,47 @@ export const facts = [
  */
 export const identitySentence = `${NAME} is a full-stack AI Engineer based in Bengaluru (Bangalore), India, currently AI Engineer at DemandNXT, where he was previously AI Workflow Engineer. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
+/**
+ * The stack, stated once in words. AI Mode fans a question like "AI engineer
+ * in Bangalore who knows FastAPI" out into searches such as "Python FastAPI AI
+ * engineer Bengaluru", and a passage only answers one if it names the tools;
+ * before this they appeared only as chips scattered across case studies.
+ * `match` must occur in some case study's `tech` list — build-api.mjs fails
+ * the build otherwise — so this cannot name a tool the work does not show.
+ */
+export const stack: { label: string; match: string }[] = [
+  { label: "Python", match: "python" },
+  { label: "FastAPI", match: "fastapi" },
+  { label: "TypeScript", match: "typescript" },
+  { label: "React", match: "react" },
+  { label: "Next.js", match: "next.js" },
+  { label: "Node.js", match: "node.js" },
+  { label: "n8n", match: "n8n" },
+  { label: "Google Gemini", match: "gemini" },
+  { label: "Groq-hosted open models", match: "groq" },
+  { label: "OpenAI", match: "openai" },
+  { label: "PostgreSQL with pgvector", match: "pgvector" },
+  { label: "SQLite", match: "sqlite" },
+  { label: "Redis", match: "redis" },
+  { label: "the Model Context Protocol", match: "model context protocol" },
+  { label: "Playwright", match: "playwright" },
+  { label: "Vitest", match: "vitest" },
+];
+
+const pick = (...labels: string[]) => labels.map((l) => stack.find((x) => x.label === l)!.label);
+/** The list alone, for places that supply their own lead-in (the twin's facts). */
+export const stackList =
+  `${pick("Python", "FastAPI").join(" and ")}; ` +
+  `${pick("TypeScript", "React", "Next.js").join(", ")} and ${pick("Node.js")[0]}; ` +
+  `${pick("n8n")[0]} for workflow automation; ` +
+  `${pick("Google Gemini", "Groq-hosted open models").join(", ")} and ${pick("OpenAI")[0]} models; ` +
+  `${pick("PostgreSQL with pgvector", "SQLite").join(", ")} and ${pick("Redis")[0]}; ` +
+  `${pick("the Model Context Protocol")[0]}; and ${pick("Playwright", "Vitest").join(" and ")} for testing`;
+
+/** Third person and self-contained, like the identity sentence, so the
+ *  passage still names who and what when an answer engine lifts it alone. */
+export const stackSentence = `Across these projects, ${NAME}'s full-stack AI engineering stack is ${stackList}.`;
+
 /** The status line above the bio, and the one availability claim on the site. */
 export const availability = "Available for freelance work";
 
@@ -109,6 +150,7 @@ export default function About() {
                 multi-agent assistant with query-level domain isolation —
                 both live and open-source.
               </p>
+              <p>{stackSentence}</p>
               <p>
                 I've been building with code since 2022. That isn't years of
                 production ML, and I won't pretend it is. It's a few years of

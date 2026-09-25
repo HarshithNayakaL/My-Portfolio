@@ -25,7 +25,7 @@ const DIST = join(ROOT, "dist");
 
 const {
   caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN,
-  facts, availability, workingTitle, previousTitle, identitySentence,
+  facts, availability, workingTitle, previousTitle, identitySentence, stack, stackSentence,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
@@ -136,6 +136,15 @@ await put(`${API}/index.json`, {
   _links: { self: abs(API), root: abs("/api"), describedby: abs("/openapi.json") },
 });
 
+// The stack sentence may only name tools some case study lists.
+{
+  const listed = Object.values(caseStudies).flatMap((cs) => cs.tech.map((t) => t.toLowerCase()));
+  const unbacked = stack.filter((t) => !listed.some((l) => l.includes(t.match)));
+  if (unbacked.length) {
+    throw new Error(`build-api: stack names ${unbacked.map((t) => t.label).join(", ")}, which no case study's tech list contains.`);
+  }
+}
+
 await put(`${API}/profile.json`, {
   name: NAME,
   headline: "AI Engineer, Full-Stack",
@@ -148,6 +157,7 @@ await put(`${API}/profile.json`, {
     previousTitles: [previousTitle],
   },
   availability,
+  stack: stack.map((t) => t.label),
   location: { city: "Bengaluru", region: "Karnataka", country: "IN" },
   email: EMAIL,
   profiles: { github: GITHUB, linkedin: LINKEDIN },
@@ -441,6 +451,7 @@ const openapi = {
             },
           },
           availability: { type: "string" },
+          stack: { type: "array", items: { type: "string" }, description: "Technologies used across the case studies." },
           location: {
             type: "object",
             required: ["city", "country"],

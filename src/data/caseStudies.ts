@@ -38,8 +38,8 @@ export type CaseStudy = {
    *  because Vercel builds from a shallow clone that would get it wrong.
    *  Feeds Article.datePublished and the visible "Published" line. */
   published: string;
-  /** Replaces `kicker` in the <title> only, where the on-page label means
-   *  nothing to a search ("Flagship"). */
+  /** Replaces `kicker` where it means nothing to a search ("Flagship"): in
+   *  the <title>, and in the page's eyebrow line, which is part of its <h1>. */
   searchKicker?: string;
   /** Questions people search for that this case study answers, shown on the
    *  page ("Questions this answers") and feeding its FAQPage schema, markdown
@@ -59,6 +59,7 @@ const craftconnect: CaseStudy = {
   published: "2026-06-06T01:30:29Z",
   title: "CraftConnect",
   kicker: "Gen AI Exchange Hackathon 2025",
+  searchKicker: "Multi-modal artisan assistant",
   outcome:
     "Let an artisan stand up an online storefront by talking and showing a product, instead of typing forms in a language that isn't theirs.",
   meta: [
@@ -169,7 +170,7 @@ const craftconnect: CaseStudy = {
     },
   ],
   metaDescription:
-    "Multi-modal assistant letting artisans run an online storefront by talking and showing instead of typing. Gen AI Exchange Hackathon 2025 semi-finalist.",
+    "Voice-and-photo assistant on Google Gemini letting artisans run an online storefront by talking, not typing. Gen AI Exchange Hackathon 2025 semi-finalist.",
   links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/craftconnect" }],
 };
 
@@ -423,6 +424,7 @@ const brandAuditPlatform: CaseStudy = {
   published: "2026-09-10T00:51:52Z",
   title: "Multi-Brand Audit Platform",
   kicker: "Internal tooling, in production",
+  searchKicker: "SEO audit tooling",
   outcome:
     "An internal audit platform a marketing team runs on: it crawls every brand site in the portfolio in a real browser, scores them against a model where every weight is tied to something Google actually published, and hands back paste-ready copy fixes.",
   meta: [
@@ -676,6 +678,7 @@ const aiNotes: CaseStudy = {
   published: "2026-06-06T06:00:39Z",
   title: "AI Notes",
   kicker: "Local inference, no server",
+  searchKicker: "Local-LLM notes app",
   outcome:
     "A note-taking app whose AI features run entirely on your own machine, so your notes never leave it.",
   meta: [
@@ -1286,6 +1289,7 @@ const personalOsMcp: CaseStudy = {
   published: "2026-09-16T02:41:15Z",
   title: "Personal MCP OS",
   kicker: "85-tool local execution layer",
+  searchKicker: "85-tool local MCP server",
   outcome:
     "Gives an MCP client real hands on a machine — filesystem, shell, Git, browser, Android — behind a policy and approval layer that assumes the model will eventually ask for something it shouldn't.",
   meta: [

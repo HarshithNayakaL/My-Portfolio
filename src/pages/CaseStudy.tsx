@@ -57,11 +57,20 @@ export default function CaseStudy() {
             <ArrowLeft size={15} weight="bold" /> All work
           </Link>
 
-          <p className="mt-10 font-mono text-[0.75rem] uppercase tracking-[0.2em] text-accent-ink">
-            {study.kicker}
-          </p>
-          <h1 className="mt-5 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-            {study.title}
+          {/* The eyebrow is part of the <h1>, after the name in source order
+              and lifted above it by flex-col-reverse. Google matches a search
+              against the title and main heading, and a heading of just
+              "Maestro" carries none of the words anyone searches; the heading
+              now reads "Maestro: Multi-model LLM orchestration" to a crawler
+              and a screen reader, with the layout unchanged. */}
+          <h1 className="mt-10 flex max-w-4xl flex-col-reverse gap-5">
+            <span className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+              {study.title}
+            </span>
+            <span className="font-mono text-[0.75rem] font-normal uppercase leading-normal tracking-[0.2em] text-accent-ink">
+              <span className="sr-only">: </span>
+              {study.searchKicker ?? study.kicker}
+            </span>
           </h1>
           <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-dim md:text-xl">
             {study.outcome}

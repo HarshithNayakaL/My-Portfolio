@@ -39,6 +39,7 @@ const {
   availability,
   workingTitle,
   previousTitle,
+  stackList,
   identitySentence,
   legalDocs,
   LEGAL_UPDATED,
@@ -496,6 +497,7 @@ function markdownFor(path, seo) {
     `- **Title:** ${workingTitle}, previously ${previousTitle} (at ${
       facts.find((f) => f.k === "Company")?.v ?? "work"
     })`,
+    `- **Stack:** ${stackList}`,
     `- **Availability:** ${availability}`,
     `- **Contact:** ${EMAIL}`,
     "",

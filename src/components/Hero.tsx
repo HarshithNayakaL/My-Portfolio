@@ -36,13 +36,17 @@ export default function Hero() {
               and "AI engineer to hire in Bangalore". The big slogan below
               keeps its look as a <p>. font-sans: headings default to the
               display face, and this line is set in the body face. */}
+          {/* The {" "} between the parts is load-bearing: flex gaps are
+              visual only, and without real spaces the heading's text — what
+              a crawler or answer engine actually reads — ran together as
+              "Full-StackAI Engineer". */}
           <h1 className="flex flex-wrap items-center gap-x-4 gap-y-2 font-sans">
             <span className="text-base font-semibold tracking-tight text-ink">
-              {NAME} <span className="text-dim">— AI Engineer, Full-Stack</span>
-            </span>
+              {NAME} <span className="text-dim">— Full-Stack AI Engineer</span>
+            </span>{" "}
             <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />
             <span className="text-[0.9375rem] font-medium text-dim">
-              AI Engineer @ DemandNXT · Bengaluru
+              @ DemandNXT · Bengaluru, India
             </span>
           </h1>
           <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />

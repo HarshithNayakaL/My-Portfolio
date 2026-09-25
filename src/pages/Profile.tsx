@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
-import { facts, availability, workingTitle, previousTitle, identitySentence } from "../components/About";
+import { facts, availability, workingTitle, previousTitle, identitySentence, stackSentence } from "../components/About";
 import { caseStudies } from "../data/caseStudies";
 
 /**
@@ -51,6 +51,7 @@ export const profileDocs: Record<string, Doc> = {
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
           "The work is AI agents, retrieval pipelines and full-stack AI applications — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",
+          stackSentence,
         ],
       },
       {
@@ -127,7 +128,7 @@ export const profileDocs: Record<string, Doc> = {
 export default function Profile({ doc }: { doc: "about" | "contact" }) {
   const d = profileDocs[doc];
   return (
-    <main className="shell py-20 md:py-28">
+    <article className="shell py-20 md:py-28">
       <Link
         to="/"
         className="inline-flex items-center gap-2 font-mono text-[0.8125rem] text-dim transition-colors hover:text-ink"
@@ -149,6 +150,6 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
           </section>
         ))}
       </div>
-    </main>
+    </article>
   );
 }
