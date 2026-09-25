@@ -147,7 +147,7 @@ await put(`${API}/index.json`, {
 
 await put(`${API}/profile.json`, {
   name: NAME,
-  headline: "AI Engineer, Full-Stack",
+  headline: workingTitle,
   // The same sentence the About section leads with, so an agent quoting the
   // API quotes what the page says.
   summary: identitySentence,

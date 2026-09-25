@@ -425,7 +425,7 @@ function markdownFor(path, seo) {
       "",
       `> ${cs.outcome}`,
       "",
-      `Case study by ${NAME}, AI Engineer (Full-Stack), Bengaluru, India.`,
+      `Case study by ${NAME}, ${workingTitle}, Bengaluru, India.`,
       `Canonical page: ${seo.canonical}`,
       "",
       ...caseStudyBody(cs, 2),
@@ -469,7 +469,7 @@ function markdownFor(path, seo) {
   // Homepage: the overview an agent should read first, with every onward link
   // pointing at markdown rather than back into HTML.
   return [
-    `# ${NAME} — AI Engineer, Full-Stack`,
+    `# ${NAME} — ${workingTitle}`,
     "",
     `> ${routeSeo["/"].description}`,
     "",
@@ -494,7 +494,7 @@ function markdownFor(path, seo) {
     identitySentence,
     "",
     ...facts.map((f) => `- **${f.k}:** ${f.v}`),
-    `- **Title:** ${workingTitle}, previously ${previousTitle} (at ${
+    `- **Previously:** ${previousTitle} (at ${
       facts.find((f) => f.k === "Company")?.v ?? "work"
     })`,
     `- **Stack:** ${stackList}`,
@@ -804,7 +804,7 @@ const header = llmsTxt
 const full = [
   header.replace(
     /^# .*$/m,
-    `# ${NAME} — AI Engineer, Full-Stack (full content)`,
+    `# ${NAME} — ${workingTitle} (full content)`,
   ),
   "",
   // The llms.txt spec allows one H1 only, followed by a blockquote, then any

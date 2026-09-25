@@ -23,7 +23,7 @@ import Icon from "./Icon";
 export const faqs: { q: string; a: string }[] = [
   {
     q: "Who are you, and where are you based?",
-    a: "Harshith Nayaka L \u2014 a full-stack AI Engineer in Bengaluru (Bangalore), Karnataka, India. At DemandNXT the title is AI Engineer (previously AI Workflow Engineer): production AI systems and pipelines for marketing and creative operations. The public work is the clearest answer to what that means in practice \u2014 Maestro, a multi-model LLM orchestration engine, and Cannon, a multi-agent assistant with query-level domain isolation, both live and open-source.",
+    a: "Harshith Nayaka L \u2014 AI Engineer - Full Stack at DemandNXT in Bengaluru (Bangalore), Karnataka, India, previously AI Workflow Engineer there: production AI systems and pipelines for marketing and creative operations. The public work is the clearest answer to what that means in practice \u2014 Maestro, a multi-model LLM orchestration engine, and Cannon, a multi-agent assistant with query-level domain isolation, both live and open-source.",
   },
   {
     q: "Are you available to hire, and how do I get in touch?",

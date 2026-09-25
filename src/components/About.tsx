@@ -10,8 +10,17 @@ const PAPER_DOI = "https://www.doi.org/10.59256/ijrtmr.20250506023";
  * page below — Google's AI-features guidance asks that structured data match
  * the visible text, and the same reasoning applies to the agent surface.
  */
+/**
+ * The job title at DemandNXT, exactly as the company writes it ("AI Engineer -
+ * Full Stack"; not "Full-Stack AI Engineer", which reads as a different
+ * title). Every surface that states the role uses this constant. The earlier
+ * title stays on record because it is true and people still search for it.
+ */
+export const workingTitle = "AI Engineer - Full Stack";
+export const previousTitle = "AI Workflow Engineer";
+
 export const facts = [
-  { k: "Role", v: "AI Engineer, Full-Stack" },
+  { k: "Role", v: workingTitle },
   { k: "Company", v: "DemandNXT" },
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
@@ -26,7 +35,7 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is a full-stack AI Engineer based in Bengaluru (Bangalore), India, currently AI Engineer at DemandNXT, where he was previously AI Workflow Engineer. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
+export const identitySentence = `${NAME} is an ${workingTitle} at DemandNXT in Bengaluru (Bangalore), India, where he was previously ${previousTitle}. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /**
  * The stack, stated once in words. AI Mode fans a question like "AI engineer
@@ -67,18 +76,12 @@ export const stackList =
 
 /** Third person and self-contained, like the identity sentence, so the
  *  passage still names who and what when an answer engine lifts it alone. */
-export const stackSentence = `Across these projects, ${NAME}'s full-stack AI engineering stack is ${stackList}.`;
+export const stackSentence = `Across these projects, ${NAME}'s stack is ${stackList}.`;
 
 /** The status line above the bio, and the one availability claim on the site. */
 export const availability = "Available for freelance work";
 
-/**
- * The title held at DemandNXT, kept separate from `Role` because they are
- * different strings. The earlier title stays on record because it is true and
- * people still search for it.
- */
-export const workingTitle = "AI Engineer";
-export const previousTitle = "AI Workflow Engineer";
+
 
 export default function About() {
   return (

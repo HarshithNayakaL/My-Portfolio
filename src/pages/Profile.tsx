@@ -45,9 +45,7 @@ export const profileDocs: Record<string, Doc> = {
       {
         h: "The short version",
         p: [
-          `Role: ${facts.find((f) => f.k === "Role")?.v}. Company: ${
-            facts.find((f) => f.k === "Company")?.v
-          }, where the title is ${workingTitle} (previously ${previousTitle}). Based in ${
+          `Role: ${workingTitle} at ${facts.find((f) => f.k === "Company")?.v} (previously ${previousTitle}). Based in ${
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
           "The work is AI agents, retrieval pipelines and full-stack AI applications — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",

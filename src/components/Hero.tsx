@@ -3,6 +3,7 @@ import { ArrowDown } from "@phosphor-icons/react";
 import Magnetic from "./Magnetic";
 import { scrollToSection } from "../lib/scrollToSection";
 import { NAME } from "../data/projects";
+import { workingTitle } from "./About";
 import Icon from "./Icon";
 
 // Headline split so each word rises on its own beat (CSS mask reveal).
@@ -42,7 +43,7 @@ export default function Hero() {
               "Full-StackAI Engineer". */}
           <h1 className="flex flex-wrap items-center gap-x-4 gap-y-2 font-sans">
             <span className="text-base font-semibold tracking-tight text-ink">
-              {NAME} <span className="text-dim">— Full-Stack AI Engineer</span>
+              {NAME} <span className="text-dim">— {workingTitle}</span>
             </span>{" "}
             <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />
             <span className="text-[0.9375rem] font-medium text-dim">

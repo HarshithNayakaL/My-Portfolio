@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { scrollToSection } from "../lib/scrollToSection";
 import { EMAIL, LINKEDIN, GITHUB, NAME } from "../data/projects";
+import { workingTitle } from "./About";
 
 const nav = [
   { id: "work", label: "Work" },
@@ -78,8 +79,8 @@ export default function Footer() {
               {NAME}
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-dim">
-              AI Engineer, Full-Stack — agents, RAG, and production-grade AI
-              systems. Currently AI Engineer at DemandNXT.
+              {workingTitle} at DemandNXT — agents, RAG, and production-grade
+              AI systems.
             </p>
           </div>
 
