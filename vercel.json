@@ -87,7 +87,7 @@
         },
         {
           "key": "Link",
-          "value": "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\", </openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\""
+          "value": "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\", </sitemap.xml>; rel=\"index\", </openapi.json>; rel=\"service-desc\", </.well-known/api-catalog>; rel=\"api-catalog\", </.well-known/ard.json>; rel=\"ard\"; type=\"application/json\""
         }
       ]
     },
@@ -123,6 +123,10 @@
         {
           "key": "Content-Type",
           "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
         }
       ]
     },

@@ -1229,6 +1229,121 @@ await put("/.well-known/agent-card.json", {
   preferredTransport: "JSONRPC",
 });
 
+// ------------------------------------------------ ARD manifest
+//
+// Agentic Resource Discovery (agenticresourcediscovery.org, spec 0.91). It
+// used to be two hand-copied static files in public/.well-known, which listed
+// the MCP server by its endpoint under a made-up media type and mixed plain
+// documents in with agentic resources. It is now generated from the same
+// tables that serve each resource, and lists only what ARD indexes: the API,
+// the MCP server, the A2A agent and the published agent skills, each under
+// the media type the spec's conformance tool recognises and pointing at the
+// resource's own descriptor. Documents (llms.txt, agents.md, the sitemap)
+// stay discoverable through llms.txt; the conformance tool reads any text/*
+// entry as a malformed skill.
+//
+// /.well-known/ard.json is the path the spec requires consumers to fetch.
+// ai-catalog.json is its predecessor, which consumers MAY still consult, so
+// the same document is written to both. Every page also carries
+// <link rel="ard">, the other mechanism consumers MUST honour.
+{
+  const host = new URL(ORIGIN).host;
+  const urn = (namespace, name) => `urn:air:${host}:${namespace}:${name}`;
+  const trustManifest = { identity: ORIGIN, identityType: "https" };
+  const base = { "@context": "https://agenticresourcediscovery.org/context/v1", updatedAt: new Date(stamp).toISOString() };
+  const operations = Object.values(openapi.paths).flatMap((m) => Object.values(m).map((op) => op.operationId));
+  const entries = [
+    {
+      ...base,
+      identifier: urn("api", "rest-v1"),
+      displayName: `${NAME} — portfolio REST API`,
+      type: "application/vnd.oai.openapi+json;version=3.1",
+      url: abs("/openapi.json"),
+      description:
+        `Read-only JSON API over ${NAME}'s profile, projects, case studies, FAQ and agent skills. No authentication, no write operations; also importable as a ChatGPT Action.`,
+      capabilities: operations,
+      representativeQueries: [
+        `what has ${NAME} built`,
+        "get the Maestro case study as structured JSON",
+        "which projects use retrieval-augmented generation",
+      ],
+      version: openapi.info.version,
+      trustManifest,
+    },
+    {
+      ...base,
+      identifier: urn("mcp", "portfolio"),
+      displayName: `${NAME} — portfolio MCP server`,
+      type: "application/mcp-server-card+json",
+      url: abs("/.well-known/mcp/server-card.json"),
+      description:
+        `Read-only MCP server (Streamable HTTP, ${abs("/mcp")}) over ${NAME}'s profile, projects, case studies, FAQ and agent skills. No authentication.`,
+      capabilities: MCP_TOOLS.map((t) => t.name),
+      representativeQueries: [
+        `add ${NAME}'s portfolio as an MCP server`,
+        "look up an AI engineer's case studies over MCP",
+        "get the Cannon case study through an MCP tool",
+      ],
+      trustManifest,
+    },
+    {
+      ...base,
+      identifier: urn("a2a", "portfolio-agent"),
+      displayName: `${NAME} — portfolio A2A agent`,
+      type: "application/a2a-agent-card+json",
+      url: abs("/.well-known/agent-card.json"),
+      description:
+        `A2A agent (JSON-RPC, 1.0 and 0.3, ${abs("/a2a")}) that answers questions about ${NAME}, AI Engineer in Bengaluru, by quoting the site's published answers with their source. Read-only, no authentication.`,
+      capabilities: A2A_SKILLS.map((s) => s.id),
+      representativeQueries: [
+        "find an AI engineer in Bengaluru to hire",
+        `ask ${NAME}'s agent what he has built`,
+        ...A2A_SKILLS.slice(0, 2).map((s) => s.examples[0]),
+      ].slice(0, 5),
+      trustManifest,
+    },
+    ...agentSkills
+      .filter((s) => s.skillFile)
+      .map((s) => ({
+        ...base,
+        identifier: urn("skill", s.name),
+        displayName: s.name,
+        type: 'text/markdown; profile="urn:air:agent-skills"',
+        url: s.skillFile,
+        description: `${s.tagline}. ${s.premise}`,
+        tags: s.tags,
+        representativeQueries: s.queries,
+        metadata: { repository: s.repo },
+        trustManifest,
+      })),
+  ];
+
+  // The spec's own checks (Appendix D), enforced here so a bad entry fails
+  // the build rather than an indexer.
+  for (const e of entries) {
+    const where = `build-api: ARD entry ${e.identifier}`;
+    if (!/^urn:air:[a-zA-Z0-9.-]+(:[a-zA-Z0-9._-]+)+$/.test(e.identifier)) throw new Error(`${where}: identifier is not urn:air:<publisher>:<namespace>:<name>.`);
+    if (!e.displayName || !e.type) throw new Error(`${where}: displayName and type are required.`);
+    if (Boolean(e.url) === Boolean(e.data)) throw new Error(`${where}: exactly one of url or data.`);
+    const n = e.representativeQueries?.length ?? 0;
+    if (n < 2 || n > 5) throw new Error(`${where}: representativeQueries has ${n}; the spec asks for 2-5.`);
+    if (new URL(e.trustManifest.identity).host !== e.identifier.split(":")[2]) throw new Error(`${where}: trustManifest.identity does not match the URN publisher.`);
+  }
+
+  const manifest = {
+    specVersion: "0.91",
+    host: {
+      displayName: NAME,
+      identifier: host,
+      description:
+        `Portfolio and engineering case studies of ${NAME}, an AI Engineer in Bengaluru, India: a read-only REST API, an MCP server, an A2A agent and published agent skills. Documents for agents are indexed at ${abs("/llms.txt")}.`,
+    },
+    entries,
+  };
+  await put("/.well-known/ard.json", manifest);
+  await put("/.well-known/ai-catalog.json", manifest);
+}
+
 const SKILL_ARTIFACT = {
   "list-projects": "/api/v1/projects.json",
   "get-case-study": "/api/v1/case-studies.json",

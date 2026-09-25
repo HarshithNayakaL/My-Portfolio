@@ -14,6 +14,12 @@ Allow: /
 # nothing next to a red "robots.txt is not valid" on every SEO report.
 # Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+# Agentic Resource Discovery (agenticresourcediscovery.org) also allows an
+# "Agentmap:" line here. Commented for the same reason: consumers are required
+# to read /.well-known/ard.json and <link rel="ard">, both of which this site
+# serves, so the directive would add a Lighthouse failure and no reach.
+# Agentmap: https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json
+
 # AI assistants & answer engines (explicitly welcomed)
 User-agent: GPTBot
 Allow: /

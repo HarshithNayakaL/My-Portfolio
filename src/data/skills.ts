@@ -23,6 +23,13 @@ export type AgentSkill = {
   discipline: string;
   tags: string[];
   repo?: string;
+  /** Raw URL of the skill's SKILL.md, the file an agent installs. Listed in
+   *  /.well-known/ard.json; set only alongside `repo`. */
+  skillFile?: string;
+  /** 2-5 requests the skill serves, phrased the way a user asks. Taken from
+   *  the triggers in the skill's own SKILL.md description; they are what an
+   *  ARD registry builds its search index from. */
+  queries?: string[];
 };
 
 export const agentSkills: AgentSkill[] = [
@@ -37,6 +44,8 @@ export const agentSkills: AgentSkill[] = [
       "Every weight, threshold and filter is read out of the published Rust and Scala source, down to the credibility model's actual formula. Where the source says nothing, the skill says nothing.",
     tags: ["Open-source ranking", "Retrieval & filters", "Account credibility", "Node, no deps"],
     repo: "https://github.com/HarshithNayakaL/x-algorithm-source",
+    skillFile: "https://raw.githubusercontent.com/HarshithNayakaL/x-algorithm-source/main/x-algorithm-boost/SKILL.md",
+    queries: ["write an X post that gets more reach", "why did my tweet flop", "audit my X account for growth", "plan a posting cadence for a product launch on X"],
   },
   {
     name: "linkedin-boost",
@@ -49,6 +58,8 @@ export const agentSkills: AgentSkill[] = [
       "A three-tier honesty boundary is enforced throughout: documented, inference from mechanism, or folklore. LinkedIn has never published an objective weight, a link penalty, a hashtag rule or a posting-frequency rule — so when asked for one, the skill says it is not public rather than inventing it.",
     tags: ["Multi-surface ranking", "Honesty boundary", "Profile & post audit", "Node, no deps"],
     repo: "https://github.com/HarshithNayakaL/linkedin-algorithm-source",
+    skillFile: "https://raw.githubusercontent.com/HarshithNayakaL/linkedin-algorithm-source/main/SKILL.md",
+    queries: ["rewrite my LinkedIn headline so recruiters find me", "why did my LinkedIn post get no reach", "how does the LinkedIn feed algorithm work", "A/B score two drafts of a LinkedIn post"],
   },
   {
     name: "humanizer",
@@ -61,6 +72,8 @@ export const agentSkills: AgentSkill[] = [
       "Never invent specifics. The commonest way to raise a genericness score is to add a concrete detail, and the commonest way to ruin a piece is to make one up — so a fabricated statistic is treated as a strictly worse outcome than a bland sentence.",
     tags: ["Register vs genericness", "Markdown-safe", "Scored 0-100", "Python"],
     repo: "https://github.com/HarshithNayakaL/humanizer-claude-skill",
+    skillFile: "https://raw.githubusercontent.com/HarshithNayakaL/humanizer-claude-skill/main/humanizer/SKILL.md",
+    queries: ["make this sound less like AI", "does this draft read as ChatGPT wrote it", "humanize this blog post without changing its meaning", "score how human this email reads"],
   },
   {
     name: "ui-ux-taste",
@@ -73,5 +86,7 @@ export const agentSkills: AgentSkill[] = [
       "The moodboard stage is never skipped, because recommending a stack from a text description is the exact failure mode the skill exists to prevent. It returns one stack rather than a menu — a menu of five viable frameworks makes you do the work the skill was supposed to save.",
     tags: ["Design direction", "Stack selection", "ASCII wireframes", "Portfolio-aware"],
     repo: "https://github.com/HarshithNayakaL/ui-ux-taste-skill",
+    skillFile: "https://raw.githubusercontent.com/HarshithNayakaL/ui-ux-taste-skill/main/ui-ux-taste/SKILL.md",
+    queries: ["what should my app's UI look like", "help me pick a design direction for a new website", "which frontend stack should I use for this app", "show me some UI directions to choose from"],
   },
 ];
