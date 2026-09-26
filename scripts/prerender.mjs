@@ -535,12 +535,28 @@ function markdownFor(path, seo) {
   ].join("\n");
 }
 
-/** Source files behind a route, newest commit of which dates the page. */
+/**
+ * Source files behind a route, newest commit of which dates the page. Every
+ * file whose text reaches the rendered page belongs here: the lists once
+ * named only the data files, so a new homepage heading (Hero.tsx) or title
+ * (seo.ts) left the sitemap claiming the page had not changed.
+ */
+const SHARED_SOURCES = ["src/data/seo.ts", "src/components/About.tsx", "src/components/Footer.tsx"];
 const SOURCES_FOR = (path) => {
-  if (path.startsWith("/work/")) return ["src/data/caseStudies.ts", "src/data/projects.ts"];
-  if (path.startsWith("/legal/")) return ["src/pages/Legal.tsx"];
-  if (path === "/about" || path === "/contact") return ["src/pages/Profile.tsx"];
-  return ["src/data/projects.ts", "src/components/Faq.tsx", "src/data/caseStudies.ts"];
+  if (path.startsWith("/work/")) {
+    return [...SHARED_SOURCES, "src/data/caseStudies.ts", "src/data/projects.ts", "src/pages/CaseStudy.tsx"];
+  }
+  if (path.startsWith("/legal/")) return ["src/data/seo.ts", "src/components/Footer.tsx", "src/pages/Legal.tsx"];
+  if (path === "/about" || path === "/contact") return [...SHARED_SOURCES, "src/pages/Profile.tsx"];
+  return [
+    ...SHARED_SOURCES,
+    "src/data/projects.ts",
+    "src/data/caseStudies.ts",
+    "src/data/skills.ts",
+    "src/components/Faq.tsx",
+    "src/components/Hero.tsx",
+    "index.html",
+  ];
 };
 
 /**
@@ -674,19 +690,22 @@ for (const path of allRoutes) {
 // teach Google that this site's lastmod means nothing, and it stops being a
 // crawl-scheduling signal at exactly the moment pages are sitting in
 // "Discovered - currently not indexed".
+//
+// One `git log` over all of a page's files returns the newest commit touching
+// any of them. This used to return the first file that had any commit at all,
+// so the homepage was dated by projects.ts alone however recently its FAQ or
+// heading changed.
 function lastCommitISO(files) {
-  for (const file of files) {
-    try {
-      const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", file], {
-        cwd: ROOT,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "ignore"],
-      }).trim();
-      if (out) return out;
-    } catch {
-      // No git in the build image, or a shallow clone with no history for this
-      // path. Fall through to the build stamp rather than failing the build.
-    }
+  try {
+    const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", ...files], {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    if (out) return out;
+  } catch {
+    // No git in the build image, or a shallow clone with no history for these
+    // paths. Fall through to the build stamp rather than failing the build.
   }
   return BUILD_TIME;
 }
