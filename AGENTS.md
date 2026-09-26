@@ -82,7 +82,9 @@ fix the cause — do not weaken the check.
   at an `@id` nothing defines, or has FAQ text not visible on the page, a
   wrong project count, a missing markdown twin, and stale facts: the old job
   title used as current, "Author of" for the co-authored paper, the retired
-  BlogSpace, and any project attributed to the employer. Each rule is a bug
+  BlogSpace, and any project attributed to the employer; and an inline
+  script whose sha256 is missing from the CSP in `vercel.json`, or any
+  resource loaded from another origin. Each rule is a bug
   that shipped once. If it fires, fix the content, not the rule.
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
   llms.txt v2 spec. Point it at a Vercel deployment (production or a preview

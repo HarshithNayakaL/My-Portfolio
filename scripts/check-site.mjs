@@ -9,6 +9,7 @@
 // It reads only dist/, so it checks what ships, not what the source intended.
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -142,6 +143,29 @@ for (const f of files.filter((f) => TEXT.test(f))) {
     const around = s.slice(Math.max(0, m.index - 60), m.index + 20);
     const inAliasList = /alternateName|previousTitles|"AI Workflow Engineer",?\s*$/.test(s.slice(Math.max(0, m.index - 400), m.index + 22));
     if (!PREVIOUS.test(around) && !inAliasList) fail("stale fact", `${rel(f)}: "AI Workflow Engineer" used as the current title`);
+  }
+}
+
+// ---- CSP: every inline script is allowed by hash, nothing loads cross-origin
+// Editing the inline theme script in index.html without updating its sha256
+// in vercel.json does not fail anywhere else: the browser silently refuses to
+// run it and the theme toggle breaks in production only.
+{
+  const csp = JSON.parse(read(join(ROOT, "vercel.json")))
+    .headers.flatMap((h) => h.headers)
+    .find((h) => h.key === "Content-Security-Policy").value;
+  const scriptSrc = csp.split(";").map((d) => d.trim().split(/\s+/)).find((d) => d[0] === "script-src") ?? [];
+  const allowed = new Set(scriptSrc.filter((v) => v.startsWith("'sha256-")).map((v) => v.slice(1, -1)));
+  for (const f of files.filter((f) => f.endsWith(".html"))) {
+    const s = read(f);
+    for (const m of s.matchAll(/<script(?![^>]*type="application\/ld\+json")(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
+      if (!m[1].trim()) continue;
+      const hash = `sha256-${createHash("sha256").update(m[1]).digest("base64")}`;
+      if (!allowed.has(hash)) fail("CSP", `${rel(f)} has an inline script whose hash ${hash} is not in vercel.json script-src`);
+    }
+    for (const m of s.matchAll(/<(?:script|link|img|source)[^>]+(?:src|href)="(https?:\/\/[^"]+)"/g)) {
+      if (!m[1].startsWith(ORIGIN)) fail("CSP", `${rel(f)} loads ${m[1]} from another origin`);
+    }
   }
 }
 
