@@ -916,9 +916,37 @@ async function handleA2a(request: Request, url: URL): Promise<Response> {
   return a2aError(id, version, "METHOD_NOT_FOUND", `Method not found: ${method}.`);
 }
 
+/**
+ * Case studies that were retired, not renamed. These used to 301 to /#work,
+ * which Google treats as a soft 404 and keeps the old URL indexed: a Google AI
+ * Mode audit in September 2026 was still describing BlogSpace from it. 410
+ * says the page is gone on purpose, which is the fastest way out of the index.
+ * A renamed page (seo-command-center -> brand-audit-platform) keeps its 301.
+ */
+const RETIRED = /^\/work\/(blogspace)(\/index\.md|\.md)?$/;
+
+function gone(): Response {
+  const body =
+    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Removed | Harshith Nayaka L</title>" +
+    "<meta name=\"robots\" content=\"noindex\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head>" +
+    "<body style=\"font-family:system-ui,sans-serif;max-width:40rem;margin:4rem auto;padding:0 1rem;line-height:1.6\">" +
+    "<main><h1>This project was removed</h1><p>It is no longer part of the portfolio.</p>" +
+    `<p><a href="${ORIGIN}/#work">See the current work</a></p></main></body></html>`;
+  return new Response(body, {
+    status: 410,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=0, must-revalidate",
+      "X-Robots-Tag": "noindex",
+    },
+  });
+}
+
 export default function middleware(request: Request) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/(.)\/$/, "$1");
+
+  if (RETIRED.test(path)) return gone();
 
   // The MCP endpoint takes POST, so it is routed before the GET/HEAD guard.
   // /.well-known/mcp answers the same protocol for clients that probe the

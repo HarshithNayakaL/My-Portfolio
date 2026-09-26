@@ -32,16 +32,6 @@
       "source": "/work/seo-command-center/index.md",
       "destination": "/work/brand-audit-platform/index.md",
       "permanent": true
-    },
-    {
-      "source": "/work/blogspace",
-      "destination": "/#work",
-      "permanent": true
-    },
-    {
-      "source": "/work/blogspace/index.md",
-      "destination": "/index.md",
-      "permanent": true
     }
   ],
   "headers": [
