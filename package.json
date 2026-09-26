@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/build-api.mjs",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs && node scripts/build-api.mjs && node scripts/check-site.mjs",
     "build:client": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "tsc -b --noEmit",
     "indexnow": "node scripts/indexnow.mjs",
     "verify:llms": "node scripts/check-llms-txt.mjs",
     "verify:onee": "node scripts/check-onee-moods.mjs",
-    "verify:negotiation": "node scripts/check-negotiation.mjs"
+    "verify:negotiation": "node scripts/check-negotiation.mjs",
+    "verify:site": "node scripts/check-site.mjs"
   },
   "dependencies": {
     "@bible-strong/avatar-core": "^0.1.0",

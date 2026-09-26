@@ -233,11 +233,13 @@ export default function Contact() {
                     </div>
                   </div>
 
+                  {/* Honeypot. No autoComplete: the attribute is invalid on a
+                      checkbox (html-validate flags it) and browsers never
+                      autofill one, so it did nothing. */}
                   <input
                     type="checkbox"
                     name="botcheck"
                     tabIndex={-1}
-                    autoComplete="off"
                     aria-hidden
                     className="hidden"
                   />

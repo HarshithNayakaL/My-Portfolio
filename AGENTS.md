@@ -11,7 +11,7 @@ point at both.
 
 ```bash
 npm install
-npm run build     # tsc -b -> vite build -> vite build --ssr -> prerender -> build-api
+npm run build     # tsc -b -> vite build -> vite build --ssr -> prerender -> build-api -> check-site
 npm run lint      # tsc -b --noEmit
 npm run verify:negotiation
 npm run verify:onee
@@ -56,7 +56,7 @@ reason to hand-edit the output.
 
 ## Guards
 
-Three of these fail the build outright. The other three are scripts you run; they
+Four of these fail the build outright. The other three are scripts you run; they
 exist because each one caught something that had already shipped. If one fires,
 fix the cause — do not weaken the check.
 
@@ -75,6 +75,15 @@ fix the cause — do not weaken the check.
   serves summaries and the full set is behind `?view=full`. The spec itself
   lints clean with `npx @redocly/cli lint dist/openapi.yaml` (config in
   `redocly.yaml`).
+- **Whole-site consistency.** `scripts/check-site.mjs` runs last in the build
+  and reads only `dist/`. It fails on a broken internal link, a canonical or
+  sitemap mismatch, a duplicate title or description, a page without exactly
+  one `<h1>`, JSON-LD that does not parse, keeps a `__PLACEHOLDER__`, points
+  at an `@id` nothing defines, or has FAQ text not visible on the page, a
+  wrong project count, a missing markdown twin, and stale facts: the old job
+  title used as current, "Author of" for the co-authored paper, the retired
+  BlogSpace, and any project attributed to the employer. Each rule is a bug
+  that shipped once. If it fires, fix the content, not the rule.
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
   llms.txt v2 spec. Point it at a Vercel deployment (production or a preview
   URL), not `npm run preview`: that server doesn't run `middleware.ts` or the
