@@ -155,8 +155,7 @@ export default function About() {
               </p>
               <p>{stackSentence}</p>
               <p>
-                I've been building with code since 2022. That isn't years of
-                production ML, and I won't pretend it is. It's a few years of
+                I've been building with code since 2022: a few years of
                 actually shipping things, breaking them, and learning what
                 reliable looks like up close.
               </p>
@@ -175,7 +174,7 @@ export default function About() {
                 Published research
               </h3>
               <p className="mt-3 text-base leading-relaxed text-dim">
-                Author of{" "}
+                Co-author of{" "}
                 <a
                   href={PAPER_DOI}
                   target="_blank"

@@ -39,7 +39,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "Can you automate our marketing workflows with AI?",
-    a: "Yes, that's my day job at DemandNXT. The shape is usually the same: a brief goes in, content comes out, and most of the work is the checking in between. My Creative-Ops Pipeline is one example, about 90 n8n nodes that send each request to the right model, force the output into a fixed structure and stop bad output at QA gates instead of shipping it. BrandForge goes further: it reads a brand from its own website, generates a six-shot campaign, and repairs or blocks any image that doesn't match the real product.",
+    a: "Yes, that's my day job at DemandNXT. The shape is usually the same: a brief goes in, content comes out, and most of the work is the checking in between. Two projects on this site show the pattern. The Creative-Ops Pipeline is about 90 n8n nodes that send each request to the right model, force the output into a fixed structure and stop bad output at QA gates instead of shipping it. BrandForge goes further: it reads a brand from its own website, generates a six-shot campaign, and repairs or blocks any image that doesn't match the real product.",
   },
   {
     q: "Can you build a WhatsApp bot for my business?",
@@ -51,7 +51,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "How long have you been doing this?",
-    a: "I've been building since 2022. That's a few years of shipping, breaking and fixing real things, not a decade of ML research, and I won't pretend otherwise. I've also co-authored one peer-reviewed paper, on running DeepSeek R1 locally for note-taking (IJRTMR, 2025).",
+    a: "I've been building since 2022: a few years of shipping, breaking and fixing real systems. I've also co-authored a peer-reviewed paper on running DeepSeek R1 locally for note-taking (IJRTMR, 2025), and most of my projects are public, so you can judge the work directly.",
   },
   {
     q: "What's your tech stack, and can you work with the tools we already use?",

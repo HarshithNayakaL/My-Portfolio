@@ -24,6 +24,9 @@ type Doc = {
   title: string;
   /** The visible <h1>. "About" and "Contact" named nothing a search matches. */
   h1?: string;
+  /** When set, the <h1> renders as name + headline on two visual lines; its
+   *  text stays `h1` exactly, joined by a visually hidden " — ". */
+  h1Split?: [string, string];
   /** The <title>, where "About | Name" says nothing a searcher asked. */
   searchTitle?: string;
   description: string;
@@ -36,12 +39,28 @@ const shipped = projects.filter((p) => p.hasCaseStudy).length;
 export const profileDocs: Record<string, Doc> = {
   about: {
     title: "About",
-    h1: `${NAME} — AI Engineer in Bengaluru, India`,
-    searchTitle: `About ${NAME} — AI Engineer at DemandNXT, Bengaluru`,
+    // Shaped like the entries AI Mode builds people lists from. An audit of
+    // 70 AI Mode queries found every named person came from a page headed
+    // "Name – Role | tool | tool – City" (Upwork, LinkedIn, and personal sites
+    // such as "About Gagan BP - n8n Specialist & Technical Partner | India"),
+    // while this page's title named only the employer. The specialties people
+    // search for now lead the title and heading.
+    h1: `${NAME} — AI Engineer | AI Agents, RAG & n8n Automation | Bengaluru`,
+    h1Split: [NAME, "AI Engineer | AI Agents, RAG & n8n Automation | Bengaluru"],
+    searchTitle: `${NAME} — AI Engineer | AI Agents, RAG & n8n Automation | Bengaluru`,
     description:
-      "Harshith Nayaka L is an AI Engineer at DemandNXT, Bengaluru (Bangalore), building AI agents, RAG pipelines and AI workflow automation. Open to freelance.",
+      "AI Engineer - Full Stack at DemandNXT, Bengaluru (Bangalore). I build AI agents, RAG pipelines and n8n workflow automation. Available for freelance work.",
     intro: identitySentence,
     sections: [
+      {
+        h: "At a glance",
+        p: [
+          `${workingTitle} at ${facts.find((f) => f.k === "Company")?.v} · Bengaluru (Bangalore), India · ${availability}.`,
+          "Specialties: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and LLM apps built full stack.",
+          "Shipped: Personal MCP OS, an 85-tool local MCP server where risky actions wait for one-time human approval; a roughly 90-node n8n content pipeline with QA gates; Maestro, a live open-source multi-model LLM orchestration engine; and Cannon, a multi-agent assistant with 91 unit tests.",
+          stackSentence,
+        ],
+      },
       {
         h: "The short version",
         p: [
@@ -49,7 +68,6 @@ export const profileDocs: Record<string, Doc> = {
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
           "The work is AI agents, retrieval pipelines and full-stack AI applications — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",
-          stackSentence,
         ],
       },
       {
@@ -72,26 +90,32 @@ export const profileDocs: Record<string, Doc> = {
         ],
       },
       {
-        h: "The honest version",
+        // This used to add "not years of production ML research". AI Mode
+        // quoted that clause back as the reason to leave me off a list; the
+        // start date is the fact, and it stays.
+        h: "Everything here is checkable",
         p: [
-          "Building with code since 2022. That is a few years of shipping things, breaking them and learning what reliable looks like up close — not years of production ML research, and this site does not claim otherwise.",
+          "Building with code since 2022: a few years of shipping things, breaking them and learning what reliable looks like up close.",
           "Everything stated here is checkable. The projects are public repositories, the research is a published paper with a DOI, and where a number appears it traces to something that can be read rather than taken on trust.",
         ],
       },
       {
         h: "Published research",
         p: [
-          "Author of “AI-Powered Note-Taking System: A Local Machine Learning Approach DeepSeek R1 Integration”, published in the International Journal of Research Trends and Multidisciplinary Research (IJRTMR), Nov–Dec 2025. It documents the local-inference approach behind the AI Notes project: summarisation running on DeepSeek R1 through Ollama, with no cloud fallback.",
+          "Co-author of “AI-Powered Note-Taking System: A Local Machine Learning Approach DeepSeek R1 Integration”, published in the International Journal of Research Trends and Multidisciplinary Research (IJRTMR), Nov–Dec 2025. It documents the local-inference approach behind the AI Notes project: summarisation running on DeepSeek R1 through Ollama, with no cloud fallback.",
         ],
       },
     ],
   },
   contact: {
     title: "Contact",
-    h1: `Hire ${NAME} — AI Engineer in Bengaluru`,
+    h1: `Hire ${NAME} — Freelance AI Engineer in Bengaluru`,
     // Hiring intent is what brings someone here, and availability for
     // freelance work is stated on the site (About), so the title can say it.
-    searchTitle: `Hire an AI Engineer in Bengaluru — Contact ${NAME}`,
+    // The AI Mode audit's people lists for "freelance n8n expert Bengaluru"
+    // and "best freelance AI developers in Bangalore" were built from pages
+    // naming the specialty alongside "freelance" and the city.
+    searchTitle: `Freelance AI Engineer in Bengaluru — AI Agents, RAG, n8n | ${NAME}`,
     description: `Contact ${NAME}, AI Engineer in Bengaluru (Bangalore), India. ${availability}. Email ${EMAIL}.`,
     intro: `${identitySentence} Email is the direct route, and the form on the homepage reaches the same inbox.`,
     sections: [
@@ -134,7 +158,15 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
         <ArrowLeft weight="bold" size={15} aria-hidden />
         All work
       </Link>
-      <h1 className="mt-8 text-4xl font-semibold tracking-tight md:text-5xl">{d.h1 ?? d.title}</h1>
+      {d.h1Split ? (
+        <h1 className="mt-8 font-semibold tracking-tight">
+          <span className="block text-4xl md:text-5xl">{d.h1Split[0]}</span>
+          <span className="sr-only"> — </span>
+          <span className="mt-3 block text-xl font-medium text-dim md:text-2xl">{d.h1Split[1]}</span>
+        </h1>
+      ) : (
+        <h1 className="mt-8 text-4xl font-semibold tracking-tight md:text-5xl">{d.h1 ?? d.title}</h1>
+      )}
       <p className="mt-5 max-w-2xl text-lg leading-relaxed text-dim">{d.intro}</p>
       <div className="mt-12 max-w-2xl space-y-10">
         {d.sections.map((s) => (
