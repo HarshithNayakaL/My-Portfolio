@@ -39,7 +39,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "Can you automate our marketing workflows with AI?",
-    a: "Yes, that's my day job at DemandNXT. The shape is usually the same: a brief goes in, content comes out, and most of the work is the checking in between. Two projects on this site show the pattern. The Creative-Ops Pipeline is about 90 n8n nodes that send each request to the right model, force the output into a fixed structure and stop bad output at QA gates instead of shipping it. BrandForge goes further: it reads a brand from its own website, generates a six-shot campaign, and repairs or blocks any image that doesn't match the real product.",
+    a: "Yes. At DemandNXT I build AI systems for marketing and creative teams, and the shape is usually the same: a brief goes in, content comes out, and most of the work is the checking in between. The public projects here show that pattern. The Creative-Ops Pipeline is about 90 n8n nodes that send each request to the right model, force the output into a fixed structure and stop bad output at QA gates instead of shipping it. BrandForge goes further: it reads a brand from its own website, generates a six-shot campaign, and repairs or blocks any image that doesn't match the real product.",
   },
   {
     q: "Can you build a WhatsApp bot for my business?",

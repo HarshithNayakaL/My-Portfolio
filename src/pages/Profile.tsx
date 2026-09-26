@@ -3,6 +3,7 @@ import { ArrowLeft } from "@phosphor-icons/react";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
 import { facts, availability, workingTitle, previousTitle, identitySentence, stackSentence } from "../components/About";
 import { caseStudies } from "../data/caseStudies";
+import { profileQA } from "../data/profileQA";
 
 /**
  * /about and /contact: the entity anchors.
@@ -32,6 +33,8 @@ type Doc = {
   description: string;
   intro: string;
   sections: { h: string; p: string[] }[];
+  /** Question-and-answer pairs rendered after the sections, with FAQPage schema. */
+  qa?: { h: string; items: { q: string; a: string }[] };
 };
 
 const shipped = projects.filter((p) => p.hasCaseStudy).length;
@@ -106,6 +109,7 @@ export const profileDocs: Record<string, Doc> = {
         ],
       },
     ],
+    qa: { h: `Questions people ask about ${NAME}`, items: profileQA },
   },
   contact: {
     title: "Contact",
@@ -179,6 +183,19 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
             </div>
           </section>
         ))}
+        {d.qa && (
+          <section>
+            <h2 className="text-2xl font-semibold tracking-tight">{d.qa.h}</h2>
+            <div className="mt-6 space-y-7">
+              {d.qa.items.map((item) => (
+                <div key={item.q}>
+                  <h3 className="text-lg font-semibold tracking-tight text-ink">{item.q}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-dim">{item.a}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </article>
   );

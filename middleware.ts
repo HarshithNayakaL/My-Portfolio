@@ -754,7 +754,7 @@ async function answer(url: URL, text: string, request: Record<string, unknown> |
 
   const [faqs, profile] = await Promise.all([
     loadJson<{ data: { question: string; answer: string }[] }>(url, "/api/v1/faqs.json").then((r) => r.data),
-    loadJson<{ summary?: string }>(url, "/api/v1/profile.json"),
+    loadJson<{ summary?: string; questions?: { question: string; answer: string }[] }>(url, "/api/v1/profile.json"),
   ]);
   const docs: Qa[] = [
     ...(profile.summary
@@ -765,6 +765,7 @@ async function answer(url: URL, text: string, request: Record<string, unknown> |
           keywords: "who current job role title position employer company works demandnxt based location city",
         }]
       : []),
+    ...(profile.questions ?? []).map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/about` })),
     ...faqs.map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/#faq` })),
     ...studies.flatMap((s) =>
       (s.questions ?? []).map((q) => ({ question: q.q, answer: q.a, source: `${ORIGIN}/work/${s.slug}` })),

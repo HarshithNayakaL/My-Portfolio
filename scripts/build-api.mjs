@@ -25,7 +25,7 @@ const DIST = join(ROOT, "dist");
 
 const {
   caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN,
-  facts, availability, workingTitle, previousTitle, identitySentence, stack, stackSentence,
+  facts, availability, workingTitle, previousTitle, identitySentence, stack, stackSentence, profileQA,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
@@ -158,6 +158,7 @@ await put(`${API}/profile.json`, {
   },
   availability,
   stack: stack.map((t) => t.label),
+  questions: profileQA.map(({ q, a }) => ({ question: q, answer: a })),
   location: { city: "Bengaluru", region: "Karnataka", country: "IN" },
   email: EMAIL,
   profiles: { github: GITHUB, linkedin: LINKEDIN },
@@ -452,6 +453,15 @@ const openapi = {
           },
           availability: { type: "string" },
           stack: { type: "array", items: { type: "string" }, description: "Technologies used across the case studies." },
+          questions: {
+            type: "array",
+            description: "Questions people ask about him, answered as on /about.",
+            items: {
+              type: "object",
+              required: ["question", "answer"],
+              properties: { question: { type: "string" }, answer: { type: "string" } },
+            },
+          },
           location: {
             type: "object",
             required: ["city", "country"],

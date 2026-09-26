@@ -16,6 +16,7 @@ export { faqs } from "./components/Faq";
 export { facts, availability, workingTitle, previousTitle, identitySentence, stack, stackList, stackSentence } from "./components/About";
 export { legalDocs, LEGAL_UPDATED } from "./pages/Legal";
 export { profileDocs } from "./pages/Profile";
+export { profileQA } from "./data/profileQA";
 
 /**
  * Render one route to a complete HTML string for the build-time prerenderer.

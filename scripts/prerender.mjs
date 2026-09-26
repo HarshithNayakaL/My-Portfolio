@@ -190,6 +190,12 @@ function jsonLdFor(path, seo) {
   const slug = path.startsWith("/work/") ? path.slice("/work/".length) : null;
   const cs = slug ? caseStudies[slug] : null;
 
+  // Two levels: every page here sits directly under the homepage. This used
+  // to insert a middle level named "Work" for case studies and "Legal" for
+  // everything else, both pointing at the homepage, so /about and /contact
+  // told Google they were legal pages and the middle crumb named a page that
+  // does not exist.
+  const profileDoc = profileDocs[path.replace("/", "")];
   const breadcrumb = {
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -197,19 +203,38 @@ function jsonLdFor(path, seo) {
       {
         "@type": "ListItem",
         position: 2,
-        name: cs ? "Work" : "Legal",
-        item: `${ORIGIN}/`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: cs ? cs.title : seo.title.split(" | ")[0],
+        name: cs ? cs.title : profileDoc ? profileDoc.title : seo.title.split(" | ")[0],
         item: seo.canonical,
       },
     ],
   };
 
   const graph = [breadcrumb];
+
+  // /about is the profile page: say so, point at the homepage's Person node
+  // rather than defining a second one, and carry its visible questions.
+  if (path === "/about") {
+    graph.unshift({
+      "@type": "ProfilePage",
+      "@id": `${seo.canonical}#profilepage`,
+      url: seo.canonical,
+      name: seo.title,
+      isPartOf: { "@id": `${ORIGIN}/#website` },
+      mainEntity: { "@id": personId },
+    });
+  }
+  if (profileDoc?.qa) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${seo.canonical}#questions`,
+      url: seo.canonical,
+      mainEntity: profileDoc.qa.items.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
+    });
+  }
 
   if (cs) {
     const project = projects.find((p) => p.slug === slug);
@@ -463,6 +488,9 @@ function markdownFor(path, seo) {
       doc.intro,
       "",
       ...doc.sections.flatMap((sec) => [`## ${sec.h}`, "", ...sec.p, ""]),
+      ...(doc.qa
+        ? [`## ${doc.qa.h}`, "", ...doc.qa.items.flatMap((item) => [`### ${item.q}`, "", item.a, ""])]
+        : []),
     ].join("\n");
   }
 
