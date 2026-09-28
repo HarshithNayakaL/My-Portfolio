@@ -17,6 +17,7 @@ export { facts, availability, workingTitle, previousTitle, identitySentence, sta
 export { legalDocs, LEGAL_UPDATED } from "./pages/Legal";
 export { profileDocs } from "./pages/Profile";
 export { profileQA } from "./data/profileQA";
+export { contentDate } from "./lib/contentDate";
 
 /**
  * Render one route to a complete HTML string for the build-time prerenderer.

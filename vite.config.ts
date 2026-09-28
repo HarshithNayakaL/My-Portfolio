@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { contentDates } from "./scripts/content-dates.mjs";
 
 /**
  * The stylesheet is left as Vite's normal, render-blocking
@@ -44,6 +45,8 @@ function fetchPriorityEntry(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), fetchPriorityEntry()],
+  // One set of last-updated dates for both bundles; see scripts/content-dates.mjs.
+  define: { __CONTENT_DATES__: JSON.stringify(contentDates()) },
   resolve: {
     alias: [
       // "@/..." -> src/, the import convention shadcn and its registries

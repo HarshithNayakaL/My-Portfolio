@@ -52,6 +52,11 @@ export type CaseStudy = {
    *  so image search and AI surfaces get the entire thing. */
   shot?: { src: string; width: number; height: number; alt: string };
   links: { label: string; href: string }[];
+  /** The published research or documentation a claim on the page rests on,
+   *  listed under "Sources" and as the Article's schema.org citation. Only
+   *  sources that say what the page says they say: an answer engine quoting
+   *  the claim can then quote where it comes from. */
+  sources?: { label: string; href: string }[];
 };
 
 const craftconnect: CaseStudy = {
@@ -434,7 +439,7 @@ const brandAuditPlatform: CaseStudy = {
     { label: "Status", value: "In production \u2014 proprietary, no code shown" },
   ],
   problem: [
-    "Every SEO tool shows you a number. Almost none of them can tell you where the number came from. Google does not publish numeric ranking weights, and its own Lighthouse SEO score weights every audit equally while its documentation states plainly that the score is not a ranking signal. So a single score is a judgement, and most tools present it as a measurement.",
+    "Every SEO tool shows you a number. Almost none of them can tell you where the number came from. Google does not publish numeric ranking weights, and its own Lighthouse SEO score weights every audit equally and says itself that many factors it does not score may affect search ranking. So a single score is a judgement, and most tools present it as a measurement.",
     "That matters the moment someone acts on it. A team reading a confident 80 will spend real budget on the wrong page — and the tool that produced it has no way to defend the number in a room.",
   ],
   build: [
@@ -533,7 +538,7 @@ const brandAuditPlatform: CaseStudy = {
   questions: [
     {
       q: "Is the Lighthouse SEO score a Google ranking signal?",
-      a: "No. Google’s documentation states that the Lighthouse SEO score is not a ranking signal, and it weights every audit equally. That is why the multi-brand audit platform Harshith Nayaka L built for a marketing team weights each check by its evidence instead: five tiers from blocker to hygiene, each with a weight and a source URL tying it to a public Google statement, and a failed indexing blocker caps the whole score at 25.",
+      a: "No. It is a checklist, not a model of ranking: Lighthouse weights every SEO audit equally, calls the category basic search engine optimisation advice, and says many factors it does not score may affect search ranking. That is why the multi-brand audit platform Harshith Nayaka L built for a marketing team weights each check by its evidence instead: five tiers from blocker to hygiene, each with a weight and a source URL tying it to a public Google statement, and a failed indexing blocker caps the whole score at 25.",
     },
     {
       q: "How do you stop AI from inventing facts in website copy suggestions?",
@@ -543,6 +548,11 @@ const brandAuditPlatform: CaseStudy = {
   metaDescription:
     "Internal audit tooling for a multi-brand portfolio: real-browser crawling, a score where every weight traces to a public source, and paste-ready copy fixes.",
   links: [],
+  sources: [
+    { label: "Lighthouse: how the SEO score is calculated (every audit equally weighted)", href: "https://github.com/GoogleChrome/lighthouse/blob/main/docs/scoring.md" },
+    { label: "Google Search Central: Google does not use the keywords meta tag in web ranking (2009), on the description meta tag", href: "https://developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag" },
+    { label: "Google SEO Starter Guide: headings out of order do not matter to Google Search", href: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide" },
+  ],
 };
 
 const novaAi: CaseStudy = {
@@ -796,7 +806,7 @@ const maestro: CaseStudy = {
     "The interesting claim, backed by Sakana's TRINITY and Mixture-of-Agents research, is that intelligent orchestration beats raw model size. Maestro is a glass-box, open-source rebuild of that idea: not cheaper tokens (the models are already free), but better answers from them, with the reasoning made visible instead of hidden.",
   ],
   build: [
-    "A Conductor model reads a task and assigns Thinker, Worker, and Verifier roles across a pool of free LLMs, then a Synthesizer produces the final answer. Crucially, the Verifier is always a different model family than the Worker, which mitigates the well-documented 10–25% self-preference bias in LLM-as-judge.",
+    "A Conductor model reads a task and assigns Thinker, Worker, and Verifier roles across a pool of free LLMs, then a Synthesizer produces the final answer. Crucially, the Verifier is always a different model family than the Worker, because LLM judges tend to favour their own kind: in the MT-Bench study GPT-4 gave its own answers a 10% higher win rate and Claude-v1 a 25% higher one (a result its authors call suggestive, not conclusive), and later work found LLM evaluators recognise and favour their own generations.",
     "Every step appends to a structured, replayable decision-log, the plan, the routing rationale, each model's output, the verifier's verdict, token and latency cost. That log is the actual product: it's what a black-box orchestration layer can't give you.",
     "It's engineered to run in the real world on free tiers: a per-model token-bucket limiter enforcing both RPM and TPM, exponential backoff with jitter on 429s, and diversified fallback chains so one failed call never crashes a run. Models are swapped by editing one config file, never the orchestration code.",
     "It deploys publicly without leaking your quota: API-key auth, per-client rate limiting (globally consistent via Upstash Redis on serverless), security headers, input hardening, and strict CORS, with a startup self-audit that warns on unsafe production config.",
@@ -838,7 +848,7 @@ const maestro: CaseStudy = {
   howItWorks: [
     {
       title: "The judge is never the same family as the worker",
-      body: "LLM-as-judge has a measured 10–25% self-preference bias, so a model grading its own family's output is compromised. Maestro's verifier is always a different model family than the worker, and a failed check triggers exactly one bounded retry rather than an open-ended loop.",
+      body: "LLM evaluators have been shown to recognise and favour their own generations, so a model grading its own family's output is compromised. Maestro's verifier is always a different model family than the worker, and a failed check triggers exactly one bounded retry rather than an open-ended loop.",
     },
     {
       title: "The decision-log is the product",
@@ -903,6 +913,12 @@ const maestro: CaseStudy = {
   links: [
     { label: "Live app", href: "https://maestro-psi-neon.vercel.app/" },
     { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
+  ],
+  sources: [
+    { label: "Sakana AI (Xu et al.), TRINITY: An Evolved LLM Coordinator (arXiv 2512.04695)", href: "https://arxiv.org/abs/2512.04695" },
+    { label: "Wang et al., Mixture-of-Agents Enhances Large Language Model Capabilities (arXiv 2406.04692)", href: "https://arxiv.org/abs/2406.04692" },
+    { label: "Zheng et al., Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (arXiv 2306.05685)", href: "https://arxiv.org/abs/2306.05685" },
+    { label: "Panickssery et al., LLM Evaluators Recognize and Favor Their Own Generations (arXiv 2404.13076)", href: "https://arxiv.org/abs/2404.13076" },
   ],
 };
 

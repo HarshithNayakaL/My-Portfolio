@@ -280,6 +280,8 @@ export default function CaseStudy() {
         </Reveal>
       </section>
 
+      {study.sources?.length ? <StudySources items={study.sources} /> : null}
+
       {/* CTA */}
       <section className="shell border-t border-line py-20 md:py-28">
         <Reveal>
@@ -338,6 +340,27 @@ function StudyQuestions({ items }: { items: { q: string; a: string }[] }) {
         ))}
       </div>
     </div>
+  );
+}
+
+// The research and documentation the page's claims rest on. Plain links, no
+// Reveal: a citation list is reference material, not something to animate in.
+function StudySources({ items }: { items: { label: string; href: string }[] }) {
+  return (
+    <section className="shell pb-12 md:pb-16">
+      <h2 className="mb-4 font-mono text-[0.75rem] font-medium uppercase tracking-[0.18em] text-dim">
+        Sources
+      </h2>
+      <ol className="flex max-w-3xl list-decimal flex-col gap-2 pl-5 text-[0.875rem] leading-relaxed text-dim marker:text-faint">
+        {items.map((s) => (
+          <li key={s.href}>
+            <a href={s.href} target="_blank" rel="noreferrer noopener" className="underline decoration-line underline-offset-4 transition-colors hover:text-ink">
+              {s.label}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 

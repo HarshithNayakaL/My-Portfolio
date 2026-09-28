@@ -84,6 +84,7 @@ const caseStudyResource = (cs) => ({
   questions: cs.questions ?? [],
   tech: cs.tech,
   links: cs.links,
+  sources: cs.sources ?? [],
   screenshot: cs.shot
     ? { url: abs(cs.shot.src), width: cs.shot.width, height: cs.shot.height, alt: cs.shot.alt }
     : null,
@@ -564,6 +565,7 @@ const openapi = {
           },
           tech: { type: "array", items: { type: "string" } },
           links: { type: "array", items: ref("NamedLink") },
+          sources: { type: "array", items: ref("NamedLink"), description: "Published research or documentation the case study's claims rest on." },
           screenshot: {
             type: ["object", "null"],
             required: ["url", "width", "height", "alt"],

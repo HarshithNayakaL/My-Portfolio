@@ -169,6 +169,30 @@ for (const f of files.filter((f) => TEXT.test(f))) {
   }
 }
 
+// ---- one last-updated date per page, everywhere it is stated
+// The Article and ProfilePage schema once stamped the build time while the
+// sitemap and twins read git, so every deploy claimed every page had changed.
+{
+  const lastmod = new Map(
+    [...read(join(DIST, "sitemap.xml")).matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)].map((m) => [
+      m[1].slice(ORIGIN.length).replace(/\/$/, "") || "/",
+      m[2],
+    ]),
+  );
+  for (const [route, s] of pages) {
+    const dates = {
+      footer: s.match(/Last updated(?:<!-- -->)?\s*<time datetime="([^"]+)"/i)?.[1],
+      sitemap: lastmod.get(route),
+      twin: existsSync(join(DIST, route === "/" ? "" : route, "index.md"))
+        ? read(join(DIST, route === "/" ? "" : route, "index.md")).match(/last-updated: "([^"]+)"/)?.[1]
+        : undefined,
+      ...Object.fromEntries([...s.matchAll(/"dateModified":"([^"]+)"/g)].map((m, i) => [`schema${i}`, m[1]])),
+    };
+    const values = new Set(Object.values(dates));
+    if (Object.values(dates).some((v) => !v) || values.size !== 1) fail("last-updated date", `${route} ${JSON.stringify(dates)}`);
+  }
+}
+
 // ---- counts and twins
 const studies = JSON.parse(read(join(DIST, "api/v1/case-studies.json"))).count;
 for (const f of files.filter((f) => /\.(html|md|txt)$/.test(f))) {

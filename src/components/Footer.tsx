@@ -3,6 +3,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { scrollToSection } from "../lib/scrollToSection";
 import { EMAIL, LINKEDIN, GITHUB, NAME } from "../data/projects";
 import { workingTitle } from "./About";
+import { contentDate } from "../lib/contentDate";
+
+// UTC so the server render and the browser print the same day.
+const updatedFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 const nav = [
   { id: "work", label: "Work" },
@@ -130,8 +134,12 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+          {/* The page's last real content change: the same value as its
+              dateModified, sitemap lastmod and markdown twin, shown because an
+              undated page reads as stale to a person and to an answer engine. */}
           <p className="text-[0.8125rem] font-medium text-faint">
-            © {year} {NAME}. All rights reserved.
+            © {year} {NAME}. All rights reserved. · Last updated{" "}
+            <time dateTime={contentDate(pathname)}>{updatedFormat.format(new Date(contentDate(pathname)))}</time>
           </p>
           <p className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-faint">
             Reliability is the feature.

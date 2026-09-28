@@ -35,6 +35,7 @@ const {
   faqs,
   agentSkills,
   profileDocs,
+  contentDate,
   facts,
   availability,
   workingTitle,
@@ -250,10 +251,13 @@ function jsonLdFor(path, seo) {
       url: seo.canonical,
       inLanguage: "en",
       datePublished: cs.published,
-      dateModified: BUILD_TIME,
+      dateModified: contentDate(path),
       isPartOf: { "@id": `${ORIGIN}/#website` },
       about: cs.tech,
       keywords: (project?.tags ?? cs.tech).join(", "),
+      ...(cs.sources?.length
+        ? { citation: cs.sources.map((s) => ({ "@type": "CreativeWork", name: s.label, url: s.href })) }
+        : {}),
       // Google's generative-AI guidance is explicit that images give a page
       // surfaces beyond a plain link, so the screenshot is declared rather
       // than left for a crawler to infer from the markup.
@@ -315,7 +319,7 @@ function jsonLdFor(path, seo) {
 const BUILD_TIME = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 
 function applySeo(html, path, seo, appHtml) {
-  let out = html.replace("BUILD_TIMESTAMP", BUILD_TIME);
+  let out = html.replace("BUILD_TIMESTAMP", contentDate(path));
 
   out = out.replace(
     /<title>[\s\S]*?<\/title>/i,
@@ -428,6 +432,9 @@ function caseStudyBody(cs, depth) {
     for (const item of cs.questions) L.push(`**${item.q}**`, "", item.a, "");
   }
   if (cs.tech?.length) L.push(`${h} Built with`, "", cs.tech.join(", "), "");
+  if (cs.sources?.length) {
+    L.push(`${h} Sources`, "", cs.sources.map((s, i) => `${i + 1}. [${s.label}](${s.href})`).join("\n"), "");
+  }
   if (cs.links?.length) {
     L.push(
       `${h} Links`,
@@ -564,30 +571,6 @@ function markdownFor(path, seo) {
 }
 
 /**
- * Source files behind a route, newest commit of which dates the page. Every
- * file whose text reaches the rendered page belongs here: the lists once
- * named only the data files, so a new homepage heading (Hero.tsx) or title
- * (seo.ts) left the sitemap claiming the page had not changed.
- */
-const SHARED_SOURCES = ["src/data/seo.ts", "src/components/About.tsx", "src/components/Footer.tsx"];
-const SOURCES_FOR = (path) => {
-  if (path.startsWith("/work/")) {
-    return [...SHARED_SOURCES, "src/data/caseStudies.ts", "src/data/projects.ts", "src/pages/CaseStudy.tsx"];
-  }
-  if (path.startsWith("/legal/")) return ["src/data/seo.ts", "src/components/Footer.tsx", "src/pages/Legal.tsx"];
-  if (path === "/about" || path === "/contact") return [...SHARED_SOURCES, "src/pages/Profile.tsx"];
-  return [
-    ...SHARED_SOURCES,
-    "src/data/projects.ts",
-    "src/data/caseStudies.ts",
-    "src/data/skills.ts",
-    "src/components/Faq.tsx",
-    "src/components/Hero.tsx",
-    "index.html",
-  ];
-};
-
-/**
  * YAML frontmatter for a markdown twin.
  *
  * An agent that fetches the markdown gets the document but none of the context
@@ -607,7 +590,7 @@ function frontmatter(path, seo) {
     `title: ${yaml(seo.title)}`,
     `description: ${yaml(seo.description)}`,
     `canonical: ${yaml(seo.canonical)}`,
-    `last-updated: ${yaml(lastCommitISO(SOURCES_FOR(path)))}`,
+    `last-updated: ${yaml(contentDate(path))}`,
     ...(path.startsWith("/work/") && caseStudies[path.slice(6)]
       ? [`published: ${yaml(caseStudies[path.slice(6)].published)}`]
       : []),
@@ -719,25 +702,6 @@ for (const path of allRoutes) {
 // crawl-scheduling signal at exactly the moment pages are sitting in
 // "Discovered - currently not indexed".
 //
-// One `git log` over all of a page's files returns the newest commit touching
-// any of them. This used to return the first file that had any commit at all,
-// so the homepage was dated by projects.ts alone however recently its FAQ or
-// heading changed.
-function lastCommitISO(files) {
-  try {
-    const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", ...files], {
-      cwd: ROOT,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-    if (out) return out;
-  } catch {
-    // No git in the build image, or a shallow clone with no history for these
-    // paths. Fall through to the build stamp rather than failing the build.
-  }
-  return BUILD_TIME;
-}
-
 const priorityFor = (path) =>
   path === "/" ? "1.0" : path.startsWith("/work/") ? "0.9" : "0.3";
 
@@ -748,7 +712,7 @@ const sitemap = [
     [
       "  <url>",
       `    <loc>${ORIGIN}${path === "/" ? "/" : path}</loc>`,
-      `    <lastmod>${lastCommitISO(SOURCES_FOR(path))}</lastmod>`,
+      `    <lastmod>${contentDate(path)}</lastmod>`,
       `    <changefreq>monthly</changefreq>`,
       `    <priority>${priorityFor(path)}</priority>`,
       "  </url>",

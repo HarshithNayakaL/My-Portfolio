@@ -84,7 +84,9 @@ fix the cause — do not weaken the check.
   title used as current, "Author of" for the co-authored paper, the retired
   BlogSpace, and any project attributed to the employer; and an inline
   script whose sha256 is missing from the CSP in `vercel.json`, or any
-  resource loaded from another origin. Each rule is a bug
+  resource loaded from another origin; and a page whose footer "Last updated",
+  sitemap `lastmod`, markdown-twin date and JSON-LD `dateModified` disagree
+  (all four come from `scripts/content-dates.mjs`). Each rule is a bug
   that shipped once. If it fires, fix the content, not the rule.
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
   llms.txt v2 spec. Point it at a Vercel deployment (production or a preview
