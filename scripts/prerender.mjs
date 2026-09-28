@@ -213,11 +213,13 @@ function jsonLdFor(path, seo) {
 
   const graph = [breadcrumb];
 
-  // /about is the profile page: say so, point at the homepage's Person node
-  // rather than defining a second one, and carry its visible questions.
+  // /about is an AboutPage, not a second ProfilePage: the homepage is the
+  // profile page, and two ProfilePages for one person split the same query
+  // (see src/data/seo.ts). It points at the homepage's Person node rather
+  // than defining a second one, and carries its visible questions.
   if (path === "/about") {
     graph.unshift({
-      "@type": "ProfilePage",
+      "@type": "AboutPage",
       "@id": `${seo.canonical}#profilepage`,
       url: seo.canonical,
       name: seo.title,

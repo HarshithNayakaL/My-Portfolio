@@ -30,11 +30,17 @@ const abs = (path: string) => `${ORIGIN}${path === "/" ? "/" : path}`;
  */
 export const routeSeo: Record<string, RouteSeo> = {
   "/": {
-    // The role people search ("AI workflow engineer", "AI engineer") and the
-    // city, in the title: Google matches the title and main heading first.
-    title: `${NAME} — AI Engineer in Bengaluru, India`,
+    // The one page that targets "AI engineer in Bengaluru", in the shape AI
+    // Mode builds people lists from: an audit of 70 AI Mode queries found every
+    // named person came from a page headed "Name — Role | tool | tool | City"
+    // (Upwork, LinkedIn, personal sites). /about carried that shape too, and
+    // /contact another "AI Engineer in Bengaluru" title, so three pages split
+    // one query and Google alternated between them. /about now answers who he
+    // is, /contact how to hire him; only this page claims the role and city.
+    // It keeps the exact phrase the previous title ranked for.
+    title: `${NAME} — AI Engineer in Bengaluru | AI Agents, RAG & n8n Automation`,
     description:
-      "AI Engineer - Full Stack in Bengaluru (Bangalore), India. I build AI agents, RAG pipelines and LLM apps, plus the backends and interfaces around them.",
+      `${NAME}, AI Engineer - Full Stack in Bengaluru (Bangalore): AI agents, RAG pipelines, n8n automation and LLM apps. Available for freelance work.`,
     canonical: abs("/"),
     ogType: "profile",
   },

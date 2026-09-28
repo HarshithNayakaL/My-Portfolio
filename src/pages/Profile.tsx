@@ -42,17 +42,15 @@ const shipped = projects.filter((p) => p.hasCaseStudy).length;
 export const profileDocs: Record<string, Doc> = {
   about: {
     title: "About",
-    // Shaped like the entries AI Mode builds people lists from. An audit of
-    // 70 AI Mode queries found every named person came from a page headed
-    // "Name – Role | tool | tool – City" (Upwork, LinkedIn, and personal sites
-    // such as "About Gagan BP - n8n Specialist & Technical Partner | India"),
-    // while this page's title named only the employer. The specialties people
-    // search for now lead the title and heading.
-    h1: `${NAME} — AI Engineer | AI Agents, RAG & n8n Automation | Bengaluru`,
-    h1Split: [NAME, "AI Engineer | AI Agents, RAG & n8n Automation | Bengaluru"],
-    searchTitle: `${NAME} — AI Engineer | AI Agents, RAG & n8n Automation | Bengaluru`,
-    description:
-      "AI Engineer - Full Stack at DemandNXT, Bengaluru (Bangalore). I build AI agents, RAG pipelines and n8n workflow automation. Available for freelance work.",
+    // The "who is he" page. It used to carry the role-and-city people-list
+    // title as well, which put it in competition with the homepage for the
+    // same query (see src/data/seo.ts); it now answers the name question and
+    // leaves the role query to the homepage. Role, city and specialties are
+    // still stated in the body, where an answer engine quotes them from.
+    h1: `About ${NAME}`,
+    h1Split: [`About ${NAME}`, "Background, stack, published research and the questions people ask"],
+    searchTitle: `About ${NAME} — Background, Stack and Published Research`,
+    description: `Who ${NAME} is: his role at DemandNXT, what he has built since 2022, his stack, his co-authored IJRTMR paper, and answers to common questions.`,
     intro: identitySentence,
     sections: [
       {
@@ -113,14 +111,12 @@ export const profileDocs: Record<string, Doc> = {
   },
   contact: {
     title: "Contact",
-    h1: `Hire ${NAME} — Freelance AI Engineer in Bengaluru`,
-    // Hiring intent is what brings someone here, and availability for
-    // freelance work is stated on the site (About), so the title can say it.
-    // The AI Mode audit's people lists for "freelance n8n expert Bengaluru"
-    // and "best freelance AI developers in Bangalore" were built from pages
-    // naming the specialty alongside "freelance" and the city.
-    searchTitle: `Freelance AI Engineer in Bengaluru — AI Agents, RAG, n8n | ${NAME}`,
-    description: `Contact ${NAME}, AI Engineer in Bengaluru (Bangalore), India. ${availability}. Email ${EMAIL}.`,
+    h1: `Hire ${NAME} for freelance AI work`,
+    // The hiring page: "hire" and "freelance" with the specialties, but not
+    // "AI Engineer in Bengaluru", which is the homepage's query (see
+    // src/data/seo.ts). Availability for freelance work is stated on the site.
+    searchTitle: `Hire ${NAME} for Freelance AI Work — Agents, RAG, n8n`,
+    description: `Hire ${NAME} for freelance AI work: AI agents, RAG pipelines and n8n automation. ${availability}. Email ${EMAIL}.`,
     intro: `${identitySentence} Email is the direct route, and the form on the homepage reaches the same inbox.`,
     sections: [
       {
