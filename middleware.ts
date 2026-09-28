@@ -596,11 +596,19 @@ export const DOCS_MCP_TOOLS: McpTool[] = [
   {
     name: "list_docs",
     title: "List docs",
-    description: "Every developer document on the site: its path, title and what it covers. Read one with get_doc.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
-    run: async () => ({
-      data: { count: DOCS.length, data: DOCS.map((d) => ({ ...d, url: `${ORIGIN}${d.path}` })) },
-    }),
+    description: "Every developer document on the site: its path, title and what it covers, optionally narrowed to a topic. Read one with get_doc.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Only documents whose title or summary mention this, e.g. \"auth\" or \"MCP\". Omit for every document." },
+      },
+      additionalProperties: false,
+    },
+    run: async (args) => {
+      const query = terms(text(args.query));
+      const docs = DOCS.filter((d) => !query.length || query.some((t) => words(`${d.title} ${d.about} ${d.path}`).has(t)));
+      return { data: { count: docs.length, data: docs.map((d) => ({ ...d, url: `${ORIGIN}${d.path}` })) } };
+    },
   },
   {
     name: "get_doc",
@@ -1491,6 +1499,12 @@ export default function middleware(request: Request) {
   // /.well-known/mcp answers the same protocol for clients that probe the
   // well-known path; a GET there is a discovery read and passes through to
   // the static server card.
+  // Two servers share this host, and /.well-known/mcp/server-card.json can
+  // describe only one. The docs server's card is also served under its own
+  // path, where a client resolving a card relative to the server URL looks.
+  if (path === "/mcp/docs/.well-known/mcp/server-card.json" || path === "/mcp/docs/.well-known/mcp") {
+    return rewrite(new URL("/.well-known/mcp/docs-server-card.json", url));
+  }
   if (path === "/mcp" || path === "/mcp/docs") return handleMcp(request, url, MCP_SERVERS[path]);
   if (path === "/.well-known/mcp" && request.method !== "GET" && request.method !== "HEAD") {
     return handleMcp(request, url, MCP_SERVERS["/mcp"]);
