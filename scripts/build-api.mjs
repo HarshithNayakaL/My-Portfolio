@@ -74,6 +74,7 @@ const caseStudyResource = (cs) => ({
   kicker: cs.kicker,
   outcome: cs.outcome,
   description: cs.metaDescription,
+  category: cs.searchKicker ?? null,
   inProgress: Boolean(cs.inProgress),
   meta: cs.meta,
   problem: cs.problem,
@@ -100,6 +101,12 @@ const collection = (name, items) => ({
   object: "list",
   resource: name,
   count: items.length,
+  total: items.length,
+  // Every list is small enough to serve whole, so the static file is always
+  // the one and only page. ?limit and ?cursor page through it (middleware.ts)
+  // for clients that want smaller responses.
+  has_more: false,
+  next_cursor: null,
   data: items,
   _links: { self: abs(`${API}/${name}`), root: abs(API) },
 });
@@ -243,6 +250,18 @@ const notFound = {
   description: "No resource with that identifier. The body is JSON, never an HTML error page.",
   content: { "application/json": { schema: ref("Error") } },
 };
+const pageParams = [{ $ref: "#/components/parameters/Limit" }, { $ref: "#/components/parameters/Cursor" }];
+const badRequest = {
+  description: "A query parameter is out of range or malformed. The body is JSON, never an HTML error page.",
+  content: { "application/json": { schema: ref("Error") } },
+};
+// Pagination fields every list response carries, whole or paged.
+const pageFields = {
+  total: { type: "integer", description: "How many records the collection holds in all." },
+  has_more: { type: "boolean", description: "True when another page follows this one." },
+  next_cursor: { type: ["string", "null"], description: "Pass as cursor to get the next page; null on the last page." },
+};
+
 const slugParam = (what) => ({
   name: "slug",
   in: "path",
@@ -317,7 +336,8 @@ const openapi = {
         tags: ["Projects"],
         summary: "List projects",
         description: "Every project on the site, ordered strongest first — the same order the homepage grid renders.",
-        responses: { 200: ok(ref("ProjectList"), "All projects.") },
+        parameters: pageParams,
+        responses: { 200: ok(ref("ProjectList"), "All projects, or one page of them."), 400: badRequest },
       },
     },
     "/api/v1/projects/{slug}": {
@@ -345,6 +365,7 @@ const openapi = {
               "Set to \"full\" for every case study in full in one response. That response is large (about 110,000 characters) and exceeds ChatGPT Actions' 100,000-character limit, so from a GPT Action call getCaseStudy per slug instead.",
             schema: { type: "string", enum: ["summary", "full"], default: "summary" },
           },
+          ...pageParams,
         ],
         responses: {
           200: {
@@ -359,7 +380,7 @@ const openapi = {
             },
           },
           400: {
-            description: "`view` is neither summary nor full. The body is JSON, never an HTML error page.",
+            description: "`view`, `limit` or `cursor` is invalid. The body is JSON, never an HTML error page.",
             content: { "application/json": { schema: ref("Error") } },
           },
         },
@@ -381,7 +402,8 @@ const openapi = {
         tags: ["Agent skills"],
         summary: "List agent skills",
         description: "Packaged agent skills — instructions plus executable drivers — each with the failure mode it was built against, what it contains, and the methodological rule it keeps.",
-        responses: { 200: ok(ref("AgentSkillList"), "All agent skills.") },
+        parameters: pageParams,
+        responses: { 200: ok(ref("AgentSkillList"), "All agent skills, or one page of them."), 400: badRequest },
       },
     },
     "/api/v1/faqs": {
@@ -390,11 +412,28 @@ const openapi = {
         tags: ["FAQs"],
         summary: "List FAQs",
         description: "Question and answer pairs covering both the technical questions an answer engine fields and the ones a prospective client asks before starting.",
-        responses: { 200: ok(ref("FaqList"), "All FAQ entries.") },
+        parameters: pageParams,
+        responses: { 200: ok(ref("FaqList"), "All FAQ entries, or one page of them."), 400: badRequest },
       },
     },
   },
   components: {
+    parameters: {
+      Limit: {
+        name: "limit",
+        in: "query",
+        required: false,
+        description: "Return at most this many records, from 1 to 50. Omit for the whole collection in one response.",
+        schema: { type: "integer", minimum: 1, maximum: 50 },
+      },
+      Cursor: {
+        name: "cursor",
+        in: "query",
+        required: false,
+        description: "The next_cursor value from the previous page. Opaque: pass it back unchanged.",
+        schema: { type: "string" },
+      },
+    },
     schemas: {
       Error: {
         type: "object",
@@ -533,6 +572,7 @@ const openapi = {
           kicker: { type: "string" },
           outcome: { type: "string" },
           description: { type: "string", description: "Search-result length summary, 120-160 characters." },
+          category: { type: ["string", "null"], description: "What kind of thing the project is, in a few words (e.g. \"85-tool local MCP server\"), where the kicker names an event or rank instead." },
           inProgress: { type: "boolean" },
           meta: { type: "array", items: ref("LabelledText") },
           problem: { type: "array", items: { type: "string" }, description: "Paragraphs framing the problem." },
@@ -603,11 +643,12 @@ const openapi = {
       },
       ProjectList: {
         type: "object",
-        required: ["object", "count", "data"],
+        required: ["object", "count", "has_more", "next_cursor", "data"],
         properties: {
           object: { type: "string", enum: ["list"] },
           resource: { type: "string" },
-          count: { type: "integer" },
+          count: { type: "integer", description: "How many records this response holds." },
+          ...pageFields,
           data: { type: "array", items: ref("Project") },
           _links: { type: "object", additionalProperties: ref("Link") },
         },
@@ -630,46 +671,50 @@ const openapi = {
       },
       CaseStudySummaryList: {
         type: "object",
-        required: ["object", "view", "count", "data"],
+        required: ["object", "view", "count", "has_more", "next_cursor", "data"],
         properties: {
           object: { type: "string", enum: ["list"] },
           view: { type: "string", const: "summary" },
           resource: { type: "string" },
-          count: { type: "integer" },
+          count: { type: "integer", description: "How many records this response holds." },
+          ...pageFields,
           data: { type: "array", items: ref("CaseStudySummary") },
           _links: { type: "object", additionalProperties: ref("Link") },
         },
       },
       CaseStudyList: {
         type: "object",
-        required: ["object", "view", "count", "data"],
+        required: ["object", "view", "count", "has_more", "next_cursor", "data"],
         properties: {
           object: { type: "string", enum: ["list"] },
           view: { type: "string", const: "full" },
           resource: { type: "string" },
-          count: { type: "integer" },
+          count: { type: "integer", description: "How many records this response holds." },
+          ...pageFields,
           data: { type: "array", items: ref("CaseStudy") },
           _links: { type: "object", additionalProperties: ref("Link") },
         },
       },
       AgentSkillList: {
         type: "object",
-        required: ["object", "count", "data"],
+        required: ["object", "count", "has_more", "next_cursor", "data"],
         properties: {
           object: { type: "string", enum: ["list"] },
           resource: { type: "string" },
-          count: { type: "integer" },
+          count: { type: "integer", description: "How many records this response holds." },
+          ...pageFields,
           data: { type: "array", items: ref("AgentSkill") },
           _links: { type: "object", additionalProperties: ref("Link") },
         },
       },
       FaqList: {
         type: "object",
-        required: ["object", "count", "data"],
+        required: ["object", "count", "has_more", "next_cursor", "data"],
         properties: {
           object: { type: "string", enum: ["list"] },
           resource: { type: "string" },
-          count: { type: "integer" },
+          count: { type: "integer", description: "How many records this response holds." },
+          ...pageFields,
           data: { type: "array", items: ref("Faq") },
           _links: { type: "object", additionalProperties: ref("Link") },
         },
@@ -787,7 +832,7 @@ await put("/.well-known/api-catalog.json", {
 //
 // A2A_SKILLS and A2A_VERSIONS come out of the same transpile and are used by
 // the agent card further down.
-let MCP_TOOLS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS;
+let MCP_TOOLS, DOCS_MCP_TOOLS, MCP_ICONS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS, NLWEB_VERSION;
 //
 // The MCP server itself lives in middleware.ts (POST /mcp). Its tool table is
 // read from that file here, the way scripts/check-negotiation.mjs reads the
@@ -800,24 +845,24 @@ let MCP_TOOLS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS;
     "const rewrite = () => {}, next = () => {};",
   );
   const js = transformSync(src, { loader: "ts", format: "esm" }).code;
-  ({ MCP_TOOLS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS } = await import(
+  ({ MCP_TOOLS, DOCS_MCP_TOOLS, MCP_ICONS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS, NLWEB_VERSION } = await import(
     `data:text/javascript;base64,${Buffer.from(js).toString("base64")}`
   ));
-  const card = {
-    name: "harshith-nayaka-l-portfolio",
-    title: `${NAME} — portfolio`,
-    description:
-      `Read-only MCP server over ${NAME}'s portfolio: profile, projects, case studies, FAQ and agent skills. ` +
-      "The same content as the site and its JSON API; no authentication, nothing can be written or sent.",
-    version: "1.0.0",
-    serverUrl: abs("/mcp"),
+  const serverCard = ({ name, title, description, path, tools }) => ({
+    name,
+    title,
+    description,
+    version: "1.1.0",
+    serverUrl: abs(path),
     websiteUrl: ORIGIN,
+    icon: MCP_ICONS[0].src,
+    icons: MCP_ICONS,
     protocolVersion: MCP_VERSIONS[0],
     supportedProtocolVersions: MCP_VERSIONS,
-    transport: { type: "streamable-http", url: abs("/mcp") },
+    transport: { type: "streamable-http", url: abs(path) },
     authentication: { required: false },
-    capabilities: { tools: { listChanged: false } },
-    tools: MCP_TOOLS.map(({ name, title, description, inputSchema }) => ({
+    capabilities: { tools: { listChanged: false }, resources: { listChanged: false, subscribe: false } },
+    tools: tools.map(({ name, title, description, inputSchema }) => ({
       name,
       title,
       description,
@@ -825,7 +870,24 @@ let MCP_TOOLS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS;
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     })),
     documentation: abs("/developers"),
-  };
+  });
+  const card = serverCard({
+    name: "harshith-nayaka-l-portfolio",
+    title: `${NAME} — portfolio`,
+    description:
+      `Read-only MCP server over ${NAME}'s portfolio: profile, projects, case studies, FAQ and agent skills, and every page as a markdown resource. ` +
+      "The same content as the site and its JSON API; no authentication, nothing can be written or sent.",
+    path: "/mcp",
+    tools: MCP_TOOLS,
+  });
+  await put("/.well-known/mcp/docs-server-card.json", serverCard({
+    name: "harshith-nayaka-l-portfolio-docs",
+    title: `${NAME} — developer docs`,
+    description:
+      "Read-only MCP server over the developer documentation for this site's JSON API, MCP servers, A2A agent and NLWeb endpoint: list, read and search the docs. No authentication.",
+    path: "/mcp/docs",
+    tools: DOCS_MCP_TOOLS,
+  }));
   await put("/.well-known/mcp/server-card.json", card);
 }
 
@@ -889,6 +951,14 @@ const apiLlms = [
   `- [Projects](${abs(`${API}/projects`)}): every project, strongest first. One record: \`${abs(`${API}/projects/maestro`)}\`.`,
   `- [Case studies](${abs(`${API}/case-studies`)}): every case study summarised, with \`?view=full\` for the complete write-ups — problem, build, pipeline stages, results, stack. One record: \`${abs(`${API}/case-studies/maestro`)}\`.`,
   `- [FAQs](${abs(`${API}/faqs`)}): question and answer pairs.`,
+  "",
+  "## Pagination",
+  "",
+  "Every list (projects, case studies, FAQs, skills) is served whole by default. Add `?limit=` (1-50) for a page, then pass the response's `next_cursor` back as `?cursor=` until `has_more` is false. Every list response carries `total`, `has_more` and `next_cursor`, whole or paged, and a paged one links the next page in `_links.next` and a `Link: rel=\"next\"` header.",
+  "",
+  "```",
+  `curl '${abs(`${API}/faqs`)}?limit=5'`,
+  "```",
   "",
   "## Authentication",
   "",
@@ -966,19 +1036,46 @@ const developerPortal = [
   `| GET | [\`/api/v1/faqs\`](${abs(`${API}/faqs`)}) | Question and answer pairs |`,
   `| GET | [\`/api/v1/skills\`](${abs(`${API}/skills`)}) | Packaged agent skills published from this site |`,
   "",
+  "## Pagination",
+  "",
+  "Every list (projects, case studies, FAQs, skills) is served whole by default. Add `?limit=` (1-50) for a page, then pass the response's `next_cursor` back as `?cursor=` until `has_more` is false. Every list response carries `total`, `has_more` and `next_cursor`, whole or paged, and a paged one links the next page in `_links.next` and a `Link: rel=\"next\"` header.",
+  "",
+  "```",
+  `curl '${abs(`${API}/faqs`)}?limit=5'`,
+  "```",
+  "",
   "## MCP server",
   "",
   `The same content is also served over the Model Context Protocol at \`${abs("/mcp")}\` — Streamable HTTP, protocol 2025-11-25, read-only, no authentication. Add that URL as a remote MCP server in any MCP client.`,
   "",
-  "| Tool | Returns |",
-  "| --- | --- |",
-  "| `get_profile` | Name, role, location, availability, contact |",
-  "| `list_projects` | Every project with its outcome, tags and slug |",
-  "| `get_case_study` | The full write-up for one project, by slug |",
-  "| `list_faqs` | The site's question and answer pairs |",
-  "| `list_agent_skills` | The published agent skills |",
+  "| Tool | Arguments | Returns |",
+  "| --- | --- | --- |",
+  ...MCP_TOOLS.map((t) => {
+    const args = Object.entries(t.inputSchema.properties ?? {}).map(([k]) => `\`${k}\`${(t.inputSchema.required ?? []).includes(k) ? "" : " (optional)"}`);
+    return `| \`${t.name}\` | ${args.join(", ") || "none"} | ${t.description.split(". ")[0].replace(/\.$/, "")} |`;
+  }),
+  "",
+  "Every page is also an MCP resource (`resources/list`, `resources/read`), returned as its markdown twin.",
   "",
   `Server card: [\`/.well-known/mcp/server-card.json\`](${abs("/.well-known/mcp/server-card.json")}).`,
+  "",
+  "## Docs MCP server",
+  "",
+  `This documentation is served over MCP too, at \`${abs("/mcp/docs")}\`: same transport, read-only, no authentication. Use it while integrating; use \`/mcp\` for the portfolio content itself.`,
+  "",
+  "| Tool | Returns |",
+  "| --- | --- |",
+  ...DOCS_MCP_TOOLS.map((t) => `| \`${t.name}\` | ${t.description.split(". ")[0].replace(/\.$/, "")} |`),
+  "",
+  `Server card: [\`/.well-known/mcp/docs-server-card.json\`](${abs("/.well-known/mcp/docs-server-card.json")}).`,
+  "",
+  "## NLWeb",
+  "",
+  `\`${abs("/ask")}\` speaks Microsoft's NLWeb protocol (v${NLWEB_VERSION}, list mode): send a question as \`query\` by GET or POST and get back the site's matching published answers and case studies, each with its URL, a score and a schema.org object. Add \`streaming=true\` (or \`Accept: text/event-stream\`) for server-sent events: \`start\`, one \`result\` per item, \`complete\`. Only list mode exists: summarize and generate would need a model writing text, so they are answered as a list.`,
+  "",
+  "```",
+  `curl '${abs("/ask")}?query=is+he+available+for+freelance+work'`,
+  "```",
   "",
   "## A2A agent",
   "",
@@ -1089,6 +1186,30 @@ const authMd = [
 ].join("\n");
 
 await put_text("/auth.md", authMd);
+
+// ------------------------------------------------------------- pricing.md
+//
+// Agents comparing options look for /pricing.md. The honest content is short:
+// the machine surfaces are free, and the site publishes no rates for hiring
+// (deliberately; see AGENTS.md). Saying so outright stops an agent reporting
+// "pricing not found" as if it were a gap.
+await put_text(
+  "/pricing.md",
+  [
+    `# Pricing — ${NAME}`,
+    "",
+    "> Everything on this site is free to use, and the site publishes no rates for hiring.",
+    "",
+    "## Using this site",
+    "",
+    `Free, with no key, account or payment: the pages, the [JSON API](${abs("/api")}), the [MCP servers](${abs("/developers")}), the [A2A agent](${abs("/.well-known/agent-card.json")}) and [NLWeb /ask](${abs("/ask?query=what+has+he+built")}). There is no paid tier and nothing to upgrade to.`,
+    "",
+    `## Hiring ${NAME}`,
+    "",
+    `No rates, packages or turnaround times are published. To ask about a project, email ${EMAIL}. What he has built, with evidence, is at ${abs("/#work")}.`,
+    "",
+  ].join("\n"),
+);
 
 await put_text("/developers/index.md", developerPortal);
 await put_text("/developers.md", developerPortal);
@@ -1323,6 +1444,21 @@ await put("/.well-known/agent-card.json", {
         `ask ${NAME}'s agent what he has built`,
         ...A2A_SKILLS.slice(0, 2).map((s) => s.examples[0]),
       ].slice(0, 5),
+      trustManifest,
+    },
+    {
+      ...base,
+      identifier: urn("mcp", "docs"),
+      displayName: `${NAME} — developer docs MCP server`,
+      type: "application/mcp-server-card+json",
+      url: abs("/.well-known/mcp/docs-server-card.json"),
+      description:
+        `Read-only MCP server (Streamable HTTP, ${abs("/mcp/docs")}) over the documentation for this site's JSON API, MCP servers, A2A agent and NLWeb endpoint. No authentication.`,
+      capabilities: DOCS_MCP_TOOLS.map((t) => t.name),
+      representativeQueries: [
+        `how do I call ${NAME}'s portfolio API`,
+        "search a site's developer docs over MCP",
+      ],
       trustManifest,
     },
     ...agentSkills

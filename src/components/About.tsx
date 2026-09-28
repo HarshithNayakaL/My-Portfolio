@@ -1,8 +1,16 @@
 import Reveal from "./Reveal";
 import { NAME } from "../data/projects";
 
-/** Resolvable DOI — the citable identifier, not just a publisher page link. */
-const PAPER_DOI = "https://www.doi.org/10.59256/ijrtmr.20250506023";
+/** Resolvable DOI — the citable identifier, not just a publisher page link.
+ *  Exported for the homepage markdown twin, which an agent checking the
+ *  paper reads instead of this section. */
+export const paper = {
+  title: "AI-Powered Note-Taking System: A Local Machine Learning Approach DeepSeek R1 Integration",
+  journal: "International Journal of Research Trends and Multidisciplinary Research (IJRTMR)",
+  issue: "Nov–Dec 2025",
+  doi: "10.59256/ijrtmr.20250506023",
+  url: "https://www.doi.org/10.59256/ijrtmr.20250506023",
+};
 
 /**
  * The identity facts, exported because the markdown twins need exactly these
@@ -176,21 +184,19 @@ export default function About() {
               <p className="mt-3 text-base leading-relaxed text-dim">
                 Co-author of{" "}
                 <a
-                  href={PAPER_DOI}
+                  href={paper.url}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="font-medium text-accent-ink underline decoration-line underline-offset-4 transition-colors hover:text-ink"
                 >
-                  “AI-Powered Note-Taking System: A Local Machine Learning
-                  Approach DeepSeek R1 Integration”
+                  “{paper.title}”
                 </a>
-                , published in the International Journal of Research Trends and
-                Multidisciplinary Research (IJRTMR), Nov–Dec 2025. It documents
+                , published in the {paper.journal}, {paper.issue}. It documents
                 the local-inference approach behind the AI Notes project —
                 running the model on-device so notes never leave the machine.
               </p>
               <p className="mt-2 font-mono text-[0.75rem] text-faint">
-                DOI: 10.59256/ijrtmr.20250506023
+                DOI: {paper.doi}
               </p>
             </div>
           </div>

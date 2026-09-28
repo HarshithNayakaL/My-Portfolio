@@ -37,7 +37,7 @@ const pages = new Map(
 
 // ---- internal links resolve
 // Paths served by middleware.ts or vercel.json rather than a file.
-const ROUTED = new Set(["/mcp", "/a2a", "/developers", "/docs", "/.well-known/api-catalog", "/.well-known/mcp", "/data/github-contributions.json", "/api/v1/case-studies"]);
+const ROUTED = new Set(["/mcp", "/mcp/docs", "/ask", "/a2a", "/developers", "/docs", "/.well-known/api-catalog", "/.well-known/mcp", "/data/github-contributions.json", "/api/v1/case-studies"]);
 const resolves = (raw) => {
   const p = raw.split("#")[0].split("?")[0].replace(/\/$/, "") || "/";
   if (p === "/" || ROUTED.has(p)) return true;

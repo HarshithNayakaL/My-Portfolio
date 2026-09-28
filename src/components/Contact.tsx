@@ -239,6 +239,7 @@ export default function Contact() {
                   <input
                     type="checkbox"
                     name="botcheck"
+                    aria-label="Leave unchecked (spam check)"
                     tabIndex={-1}
                     aria-hidden
                     className="hidden"

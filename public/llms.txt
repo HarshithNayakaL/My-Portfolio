@@ -42,7 +42,7 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 
 ## Published research
 
-- [AI-Powered Note-Taking System: A Local Machine Learning Approach DeepSeek R1 Integration](https://www.doi.org/10.59256/ijrtmr.20250506023): Peer-reviewed paper authored by Harshith Nayaka L, published in the International Journal of Research Trends and Multidisciplinary Research (IJRTMR), Nov-Dec 2025, pp. 178-189. DOI: 10.59256/ijrtmr.20250506023. Documents the local-inference architecture behind the AI Notes project: running a model on-device for summarization, writing improvement, idea expansion, and keyword extraction, reporting 87% user satisfaction on summarization with 1.9-3.8 second response times.
+- [AI-Powered Note-Taking System: A Local Machine Learning Approach DeepSeek R1 Integration](https://www.doi.org/10.59256/ijrtmr.20250506023): Peer-reviewed paper co-authored by Harshith Nayaka L, published in the International Journal of Research Trends and Multidisciplinary Research (IJRTMR), Nov-Dec 2025, pp. 178-189. DOI: 10.59256/ijrtmr.20250506023. Documents the local-inference architecture behind the AI Notes project: running a model on-device for summarization, writing improvement, idea expansion, and keyword extraction, reporting 87% user satisfaction on summarization with 1.9-3.8 second response times.
 
 ## Agent skills
 
@@ -62,7 +62,10 @@ Packaged capability rather than deployed product: instructions plus executable d
 
 - [OpenAPI 3.1 description](https://harshith-nayaka-l-portfolio.vercel.app/openapi.json): Every API route, typed, with an operationId and a description on each operation. Also as YAML at /openapi.yaml and /.well-known/openapi.yaml, importable as a ChatGPT Action.
 - [Plugin manifest](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ai-plugin.json): ai-plugin.json (v1) pointing at the YAML spec, for tools that still discover APIs the way ChatGPT plugins did. No auth.
-- [MCP server](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/mcp/server-card.json): The same content over the Model Context Protocol at https://harshith-nayaka-l-portfolio.vercel.app/mcp (Streamable HTTP, read-only, no auth). Tools: get_profile, list_projects, get_case_study, list_faqs, list_agent_skills.
+- [MCP server](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/mcp/server-card.json): The same content over the Model Context Protocol at https://harshith-nayaka-l-portfolio.vercel.app/mcp (Streamable HTTP, read-only, no auth). Tools: get_profile, list_projects, get_case_study, list_faqs, list_agent_skills, answer_question; every page is also a resource.
+- [Docs MCP server](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/mcp/docs-server-card.json): The developer documentation over MCP at https://harshith-nayaka-l-portfolio.vercel.app/mcp/docs (list_docs, get_doc, search_docs).
+- [NLWeb /ask](https://harshith-nayaka-l-portfolio.vercel.app/ask?query=who+is+Harshith+Nayaka+L): NLWeb endpoint (list mode, JSON or SSE). Send a question as query; get the matching published answers and case studies with URLs.
+- [pricing.md](https://harshith-nayaka-l-portfolio.vercel.app/pricing.md): Every surface here is free with no key; no rates for hiring are published.
 - [auth.md](https://harshith-nayaka-l-portfolio.vercel.app/auth.md): How agents authenticate here: they don't. No credentials exist; every surface is public and read-only.
 - [API catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog): RFC 9727 linkset pointing at the service description and its documentation.
 - [Agent resource catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json): Agentic Resource Discovery catalog of every agent-readable resource on this host.

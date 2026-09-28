@@ -36,6 +36,7 @@ const {
   agentSkills,
   profileDocs,
   contentDate,
+  paper,
   facts,
   availability,
   workingTitle,
@@ -551,6 +552,12 @@ function markdownFor(path, seo) {
     "## Questions worth asking",
     "",
     ...faqs.flatMap((f) => [`**${f.q}**`, "", f.a, ""]),
+    "## Published research",
+    "",
+    // The About section's paper, with the DOI written out: an agent asked to
+    // verify the site found the claim here with nothing to check it against.
+    `Co-author of [“${paper.title}”](${paper.url}), published in the ${paper.journal}, ${paper.issue}. DOI: ${paper.doi}. The DOI resolves to the journal's page, which lists every author.`,
+    "",
     "## Agent skills",
     "",
     "Packaged capability rather than deployed product: instructions plus executable drivers, loaded by a coding agent when a task matches.",
@@ -566,6 +573,20 @@ function markdownFor(path, seo) {
     `- [LinkedIn](${LINKEDIN})`,
     `- Email: ${EMAIL}`,
     `- [Every case study in one file](${abs("/llms-full.txt")})`,
+    "",
+    "## For agents",
+    "",
+    // The footer's "For agents" column, with what each surface is for, so
+    // ?mode=agent on the homepage says how to call the site as well as what
+    // it says. Everything is read-only and needs no credentials.
+    "Every surface is public and read-only: no key, no account, no rate limit beyond the CDN's own.",
+    "",
+    `- [JSON API](${abs("/api")}): profile, projects, case studies, FAQ and skills; described by [OpenAPI 3.1](${abs("/openapi.json")}).`,
+    `- [MCP server](${abs("/mcp")}): the same content as MCP tools and resources (Streamable HTTP). Docs over MCP at ${abs("/mcp/docs")}.`,
+    `- [A2A agent](${abs("/a2a")}): answers questions by quoting the site's published answers ([agent card](${abs("/.well-known/agent-card.json")})).`,
+    `- [NLWeb](${abs("/ask")}): \`/ask?query=...\` returns matching published answers and case studies.`,
+    `- [Authentication](${abs("/auth.md")}): none exists, and why. [Pricing](${abs("/pricing.md")}): what is free and what is not published.`,
+    `- [Developer portal](${abs("/developers")}) and [llms.txt](${abs("/llms.txt")}).`,
     "",
   ].join("\n");
 }

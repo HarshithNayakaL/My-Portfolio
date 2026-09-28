@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "harshith-nayaka-l-portfolio",
+  "version": "1.1.0",
+  "description": "Read-only MCP access to Harshith Nayaka L's portfolio (profile, projects, case studies, FAQ, agent skills) and to the developer docs for its API, MCP, A2A and NLWeb surfaces. No authentication.",
+  "author": {
+    "name": "Harshith Nayaka L",
+    "url": "https://harshith-nayaka-l-portfolio.vercel.app/"
+  },
+  "homepage": "https://harshith-nayaka-l-portfolio.vercel.app/developers",
+  "repository": "https://github.com/HarshithNayakaL/My-Portfolio",
+  "keywords": ["portfolio", "ai-engineer", "mcp", "bengaluru", "case-studies"]
+}

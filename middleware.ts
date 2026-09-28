@@ -41,6 +41,15 @@ const DOT_MD_ROUTE = /^(\/work\/[a-z0-9-]+|\/legal\/[a-z0-9-]+|\/about|\/contact
 const HAS_EXTENSION = /\.[a-z0-9]{2,5}$/i;
 
 /**
+ * `<document>.md` for a document that is not a page: /llms.txt.md,
+ * /openapi.json.md, /.well-known/api-catalog.md. An agent that learned "append
+ * .md for markdown" applies it to every URL it holds, and a 404 there reads as
+ * "this site has no markdown" rather than "that one is already plain text".
+ */
+const RESOURCE_MD =
+  /^(\/(?:[a-z0-9._-]+\/)*[a-z0-9_-]+\.(?:txt|json|yaml|xml|jsonl)|\/\.well-known\/(?:api-catalog|mcp))\.md$/i;
+
+/**
  * Extensionless paths that vercel.json rewrites to a static file. Middleware
  * runs before rewrites, so without this a client sending Accept: *\/* (curl,
  * fetch, most agents) fell through to the markdown 404 below — the developer
@@ -208,14 +217,85 @@ function jsonError(
   );
 }
 
+const PAGED = new Set(["projects", "case-studies", "faqs", "skills"]);
+
+/**
+ * One page of a list collection. Every list is small enough to serve whole,
+ * so paging is opt-in: ?limit and ?cursor slice the same static file, and the
+ * cursor is an opaque offset so it can become something else without
+ * breaking a client that only passes it back.
+ */
+async function pageOf(file: string, url: URL): Promise<Response> {
+  const limitParam = url.searchParams.get("limit");
+  const cursorParam = url.searchParams.get("cursor");
+  const limit = limitParam === null ? null : Number(limitParam);
+  if (limit !== null && !(Number.isInteger(limit) && limit >= 1 && limit <= 50)) {
+    return jsonError(400, "invalid_parameter", `limit must be a whole number from 1 to 50, not "${limitParam}".`, "Omit limit for the whole collection.");
+  }
+  let offset = 0;
+  if (cursorParam !== null) {
+    const decoded = (() => {
+      try {
+        return atob(cursorParam.replace(/-/g, "+").replace(/_/g, "/"));
+      } catch {
+        return "";
+      }
+    })();
+    const m = decoded.match(/^o:(\d+)$/);
+    if (!m) {
+      return jsonError(400, "invalid_cursor", "cursor is not one this API issued.", "Pass next_cursor from the previous page unchanged, or omit cursor to start from the first page.");
+    }
+    offset = Number(m[1]);
+  }
+  const res = await fetch(new URL(file, url));
+  if (!res.ok) return jsonError(502, "unavailable", "The collection could not be read.", "Try again shortly.");
+  const list = (await res.json()) as { data: unknown[]; _links?: Record<string, unknown> };
+  const size = limit ?? list.data.length;
+  const data = list.data.slice(offset, offset + size);
+  const end = offset + data.length;
+  const hasMore = end < list.data.length;
+  const nextCursor = hasMore ? btoa(`o:${end}`).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") : null;
+  const self = new URL(url.pathname + url.search, ORIGIN);
+  const next = new URL(self);
+  if (nextCursor) next.searchParams.set("cursor", nextCursor);
+  return new Response(
+    `${JSON.stringify(
+      {
+        ...list,
+        count: data.length,
+        total: list.data.length,
+        has_more: hasMore,
+        next_cursor: nextCursor,
+        data,
+        _links: { ...list._links, self: self.href, ...(nextCursor ? { next: next.href } : {}) },
+      },
+      null,
+      2,
+    )}\n`,
+    {
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Access-Control-Allow-Origin": "*",
+        Link: `<${ORIGIN}/openapi.json>; rel="service-desc"${nextCursor ? `, <${next.href}>; rel="next"` : ""}`,
+        "X-Robots-Tag": "noindex",
+      },
+    },
+  );
+}
+
 /** Map an extensionless API path onto the static JSON the build emitted. */
-function routeApi(path: string, url: URL): Response {
+function routeApi(path: string, url: URL): Response | Promise<Response> {
   if (path === "/api") return rewrite(new URL("/api/index.json", url));
   if (path === "/api/v1") return rewrite(new URL("/api/v1/index.json", url));
 
+  const paged = url.searchParams.has("limit") || url.searchParams.has("cursor");
+
   if (path === "/api/v1/case-studies" && url.searchParams.has("view")) {
     const view = url.searchParams.get("view");
-    if (view === "full") return rewrite(new URL("/api/v1/case-studies.full.json", url));
+    if (view === "full") {
+      return paged ? pageOf("/api/v1/case-studies.full.json", url) : rewrite(new URL("/api/v1/case-studies.full.json", url));
+    }
     if (view !== "summary") {
       return jsonError(
         400,
@@ -228,6 +308,7 @@ function routeApi(path: string, url: URL): Response {
 
   const one = path.match(/^\/api\/v1\/([a-z-]+)$/);
   if (one) {
+    if (paged && PAGED.has(one[1])) return pageOf(`/api/v1/${one[1]}.json`, url);
     return API_COLLECTIONS.has(one[1])
       ? rewrite(new URL(`/api/v1/${one[1]}.json`, url))
       : jsonError(
@@ -300,14 +381,38 @@ const MCP_CORS = {
     "Content-Type, Accept, MCP-Protocol-Version, Mcp-Session-Id, Last-Event-ID",
 };
 
+type McpResult = { data: unknown; text?: string; error?: string };
+
 type McpTool = {
   name: string;
   title: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  /** Static JSON file the tool returns, given its validated arguments. */
-  file: (args: Record<string, unknown>) => string;
+  /** Reads the static JSON the build emitted and shapes it for the call. */
+  run: (args: Record<string, unknown>, url: URL) => Promise<McpResult>;
 };
+
+type McpResource = { uri: string; name: string; title: string; description?: string; mimeType: string };
+
+type McpServer = {
+  name: string;
+  title: string;
+  description: string;
+  instructions: string;
+  tools: McpTool[];
+  /** Readable documents, listed by resources/list and served by resources/read. */
+  resources: (url: URL) => Promise<McpResource[]>;
+};
+
+// The same image the site uses for its logo, so a client listing the server
+// shows the brand a person already saw on the page.
+export const MCP_ICONS = [
+  { src: `${ORIGIN}/logo.png`, mimeType: "image/png", sizes: ["512x512"] },
+  { src: `${ORIGIN}/favicon.svg`, mimeType: "image/svg+xml", sizes: ["any"] },
+];
+
+const text = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+const words = (s: string) => new Set(terms(s));
 
 export const MCP_TOOLS: McpTool[] = [
   {
@@ -316,21 +421,40 @@ export const MCP_TOOLS: McpTool[] = [
     description:
       "Who Harshith Nayaka L is: role, employer, location, availability, contact email and public profiles. Start here for questions about the person rather than a project.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
-    file: () => "/api/v1/profile.json",
+    run: async (_args, url) => ({ data: await loadJson(url, "/api/v1/profile.json") }),
   },
   {
     name: "list_projects",
     title: "Projects",
     description:
-      "Every project in the portfolio with a one-line outcome, tags, status, links and its slug. Use the slug with get_case_study for the full write-up.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
-    file: () => "/api/v1/projects.json",
+      "Every project in the portfolio with a one-line outcome, tags, status, links and its slug, optionally narrowed to one topic. Use the slug with get_case_study for the full write-up.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          description:
+            "Only projects whose title, outcome or tags mention this, e.g. \"RAG\", \"MCP\", \"WhatsApp\", \"multi-agent\". Omit for every project.",
+        },
+      },
+      additionalProperties: false,
+    },
+    run: async (args, url) => {
+      const list = await loadJson<{ data: (Project & { tags?: string[] })[] }>(url, "/api/v1/projects.json");
+      const topic = terms(text(args.topic));
+      if (!topic.length) return { data: list };
+      const data = list.data.filter((p) => {
+        const w = words(`${p.title} ${p.kicker ?? ""} ${p.outcome} ${(p.tags ?? []).join(" ")}`);
+        return topic.some((t) => w.has(t));
+      });
+      return { data: { ...list, count: data.length, data, topic: text(args.topic) } };
+    },
   },
   {
     name: "get_case_study",
     title: "Case study",
     description:
-      "The full case study for one project: the problem, what was built, the pipeline, the engineering decisions, results and stack.",
+      "The full case study for one project: the problem, what was built, the pipeline, the engineering decisions, results, stack and sources.",
     inputSchema: {
       type: "object",
       properties: {
@@ -343,25 +467,239 @@ export const MCP_TOOLS: McpTool[] = [
       required: ["slug"],
       additionalProperties: false,
     },
-    file: (args) => `/api/v1/case-studies/${args.slug}.json`,
+    run: async (args, url) => {
+      const slug = text(args.slug);
+      if (!CASE_STUDY_SLUGS.has(slug)) {
+        return {
+          data: { slugs: [...CASE_STUDY_SLUGS] },
+          error: `No case study with slug "${slug}". Valid slugs: ${[...CASE_STUDY_SLUGS].join(", ")}.`,
+        };
+      }
+      return { data: await loadJson(url, `/api/v1/case-studies/${slug}.json`) };
+    },
   },
   {
     name: "list_faqs",
     title: "FAQ",
     description:
-      "The questions and answers from the site's FAQ: hiring and availability, what an AI workflow engineer does, and technical questions answered from the projects.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
-    file: () => "/api/v1/faqs.json",
+      "The questions and answers from the site's FAQ (hiring and availability, what the role involves, technical questions answered from the projects), optionally ranked against a question.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Only the entries that share words with this, best match first. Omit for every entry in site order.",
+        },
+      },
+      additionalProperties: false,
+    },
+    run: async (args, url) => {
+      const list = await loadJson<{ data: { question: string; answer: string }[] }>(url, "/api/v1/faqs.json");
+      const query = text(args.query);
+      if (!query) return { data: list };
+      const ranked = rank(query, list.data.map((f) => ({ ...f, source: `${ORIGIN}/#faq` })));
+      const data = ranked.map((r) => ({ question: r.doc.question, answer: r.doc.answer, score: Number(r.score.toFixed(3)) }));
+      return { data: { ...list, count: data.length, data, query } };
+    },
   },
   {
     name: "list_agent_skills",
     title: "Agent skills",
     description:
-      "The published agent skills: what each one does, the method behind it, and its repository.",
-    inputSchema: { type: "object", properties: {}, additionalProperties: false },
-    file: () => "/api/v1/skills.json",
+      "The published agent skills: what each one does, the method behind it, and its repository. Pass a name for one skill.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "One skill's name, e.g. \"humanizer\". Omit for every skill." },
+      },
+      additionalProperties: false,
+    },
+    run: async (args, url) => {
+      const list = await loadJson<{ data: { name: string }[] }>(url, "/api/v1/skills.json");
+      const name = text(args.name).toLowerCase();
+      if (!name) return { data: list };
+      const data = list.data.filter((s) => s.name.toLowerCase() === name);
+      if (!data.length) {
+        return {
+          data: { names: list.data.map((s) => s.name) },
+          error: `No skill named "${name}". Skills: ${list.data.map((s) => s.name).join(", ")}.`,
+        };
+      }
+      return { data: { ...list, count: 1, data } };
+    },
+  },
+  {
+    name: "answer_question",
+    title: "Answer a question",
+    description:
+      "Answers a question about Harshith Nayaka L or his work by quoting the site's own published answer, with its source URL. Returns \"no published answer\" rather than composing one.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        question: {
+          type: "string",
+          minLength: 3,
+          description: "The question in plain language, e.g. \"Is he available for freelance work?\" or \"How does Maestro verify answers?\".",
+        },
+      },
+      required: ["question"],
+      additionalProperties: false,
+    },
+    run: async (args, url) => {
+      const question = text(args.question);
+      if (question.length < 3) return { data: {}, error: "question must be at least 3 characters." };
+      const reply = await answer(url, question, null);
+      return { data: reply.data, text: reply.text };
+    },
   },
 ];
+
+// ------------------------------------------------------- docs MCP server
+//
+// POST /mcp/docs: the developer documentation over MCP, separate from the
+// portfolio server above. That one answers "what has he built"; this one
+// answers "how do I use this site's API, MCP, A2A or NLWeb surface", so an
+// agent integrating with the site can read the docs over the same protocol
+// it will call.
+
+const DOCS = [
+  { path: "/developers.md", title: "Developer portal", about: "Every agent surface on the site and how to call it" },
+  { path: "/api/llms.txt", title: "JSON API guide", about: "The read-only REST API: routes, pagination, errors" },
+  { path: "/auth.md", title: "Authentication", about: "Why no credentials exist and what that covers" },
+  { path: "/agents.md", title: "Agent guide", about: "What the site is and is not a good source for" },
+  { path: "/pricing.md", title: "Pricing", about: "What is free, and what the site does not publish" },
+  { path: "/llms.txt", title: "llms.txt", about: "The site index for language models" },
+  { path: "/openapi.yaml", title: "OpenAPI 3.1 description", about: "The REST API as a machine-readable spec" },
+] as const;
+
+const DOC_PATHS = DOCS.map((d) => d.path);
+
+async function readDoc(url: URL, path: string): Promise<string> {
+  const res = await fetch(new URL(path, url));
+  if (!res.ok) throw new Error(`${path} returned ${res.status}`);
+  return res.text();
+}
+
+// A doc split at its headings, so a search returns the section that answers
+// rather than the whole file.
+function sections(path: string, title: string, body: string): Qa[] {
+  const parts = body.split(/\n(?=#{1,3} )/);
+  return parts
+    .map((part) => {
+      const heading = part.match(/^#{1,3} (.+)/)?.[1] ?? title;
+      return { question: `${title}: ${heading}`, answer: part.trim(), source: `${ORIGIN}${path}` };
+    })
+    .filter((s) => s.answer.length > 40);
+}
+
+export const DOCS_MCP_TOOLS: McpTool[] = [
+  {
+    name: "list_docs",
+    title: "List docs",
+    description: "Every developer document on the site: its path, title and what it covers. Read one with get_doc.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    run: async () => ({
+      data: { count: DOCS.length, data: DOCS.map((d) => ({ ...d, url: `${ORIGIN}${d.path}` })) },
+    }),
+  },
+  {
+    name: "get_doc",
+    title: "Get doc",
+    description: "One developer document in full, as markdown (the OpenAPI description is YAML).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string", enum: DOC_PATHS, description: "The document's path, as returned by list_docs." },
+      },
+      required: ["path"],
+      additionalProperties: false,
+    },
+    run: async (args, url) => {
+      const path = text(args.path);
+      if (!(DOC_PATHS as readonly string[]).includes(path)) {
+        return { data: { paths: DOC_PATHS }, error: `No document at "${path}". Paths: ${DOC_PATHS.join(", ")}.` };
+      }
+      const body = await readDoc(url, path);
+      return { data: { path, url: `${ORIGIN}${path}`, content: body }, text: body };
+    },
+  },
+  {
+    name: "search_docs",
+    title: "Search docs",
+    description: "The documentation sections that best match a question, each with its source URL, best first.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", minLength: 2, description: "What you want to know, e.g. \"how do I page through case studies\" or \"is there a rate limit\"." },
+        limit: { type: "integer", minimum: 1, maximum: 10, default: 5, description: "How many sections to return." },
+      },
+      required: ["query"],
+      additionalProperties: false,
+    },
+    run: async (args, url) => {
+      const query = text(args.query);
+      const limit = Math.min(10, Math.max(1, Number.isInteger(args.limit) ? (args.limit as number) : 5));
+      const docs = (
+        await Promise.all(
+          // llms.txt is an index of the site's content, not documentation; left
+          // in, its "Case studies" heading outranked the Pagination section
+          // for "how do I page through case studies".
+          DOCS.filter((d) => /\.(md|txt)$/.test(d.path) && d.path !== "/llms.txt").map(async (d) =>
+            sections(d.path, d.title, await readDoc(url, d.path)),
+          ),
+        )
+      ).flat();
+      const hits = rank(query, docs)
+        .slice(0, limit)
+        .map((r) => ({ section: r.doc.question, source: r.doc.source, score: Number(r.score.toFixed(3)), content: r.doc.answer.slice(0, 2000) }));
+      return { data: { query, count: hits.length, data: hits } };
+    },
+  },
+];
+
+const MCP_SERVERS: Record<string, McpServer> = {
+  "/mcp": {
+    name: "harshith-nayaka-l-portfolio",
+    title: "Harshith Nayaka L — portfolio",
+    description: "Read-only access to Harshith Nayaka L's portfolio: profile, projects, case studies, FAQ and agent skills.",
+    instructions:
+      "Read-only. Call get_profile for who Harshith Nayaka L is and how to reach him, list_projects to see the work, then get_case_study with a slug for depth. answer_question quotes the site's published answer to a question. Every page is also a resource in markdown. Nothing can be written or sent.",
+    tools: MCP_TOOLS,
+    resources: async (url) => {
+      const studies = (await loadJson<{ data: { slug: string; title: string; outcome: string }[] }>(url, "/api/v1/case-studies.json")).data;
+      const page = (path: string, name: string, title: string, description?: string): McpResource => ({
+        uri: `${ORIGIN}${path === "/" ? "" : path}/index.md`,
+        name,
+        title,
+        ...(description ? { description } : {}),
+        mimeType: "text/markdown",
+      });
+      return [
+        page("/", "home", "Home", "Selected work, the FAQ and contact"),
+        page("/about", "about", "About Harshith Nayaka L", "Role, background, stack and the questions people ask about him"),
+        page("/contact", "contact", "Contact"),
+        ...studies.map((s) => page(`/work/${s.slug}`, s.slug, s.title, s.outcome)),
+        { uri: `${ORIGIN}/llms-full.txt`, name: "llms-full", title: "Every case study in one file", mimeType: "text/markdown" },
+      ];
+    },
+  },
+  "/mcp/docs": {
+    name: "harshith-nayaka-l-portfolio-docs",
+    title: "Harshith Nayaka L — developer docs",
+    description: "The developer documentation for the site's JSON API, MCP servers, A2A agent and NLWeb endpoint.",
+    instructions:
+      "Read-only documentation. list_docs shows every document, get_doc returns one, search_docs finds the section that answers a question. For the portfolio content itself, use the MCP server at " + `${ORIGIN}/mcp.`,
+    tools: DOCS_MCP_TOOLS,
+    resources: async () =>
+      DOCS.map((d) => ({
+        uri: `${ORIGIN}${d.path}`,
+        name: d.path.replace(/^\//, ""),
+        title: d.title,
+        description: d.about,
+        mimeType: d.path.endsWith(".yaml") ? "application/yaml" : "text/markdown",
+      })),
+  },
+};
 
 type JsonRpcId = string | number | null;
 
@@ -382,7 +720,7 @@ const rpcResult = (id: JsonRpcId, result: unknown) => mcpJson({ jsonrpc: "2.0", 
 const rpcError = (id: JsonRpcId, code: number, message: string, data?: unknown, status = 200) =>
   mcpJson({ jsonrpc: "2.0", id, error: { code, message, ...(data ? { data } : {}) } }, status);
 
-async function handleMcp(request: Request, url: URL): Promise<Response> {
+async function handleMcp(request: Request, url: URL, server: McpServer): Promise<Response> {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: { ...MCP_CORS, "Access-Control-Max-Age": "86400" } });
   }
@@ -420,56 +758,63 @@ async function handleMcp(request: Request, url: URL): Promise<Response> {
       const requested = String(params.protocolVersion ?? "");
       return rpcResult(id, {
         protocolVersion: MCP_VERSIONS.includes(requested) ? requested : MCP_VERSIONS[0],
-        capabilities: { tools: { listChanged: false } },
+        capabilities: { tools: { listChanged: false }, resources: { listChanged: false, subscribe: false } },
         serverInfo: {
-          name: "harshith-nayaka-l-portfolio",
-          title: "Harshith Nayaka L — portfolio",
-          version: "1.0.0",
-          description: "Read-only access to Harshith Nayaka L's portfolio: profile, projects, case studies, FAQ and agent skills.",
+          name: server.name,
+          title: server.title,
+          version: "1.1.0",
+          description: server.description,
           websiteUrl: ORIGIN,
+          icons: MCP_ICONS,
         },
-        instructions:
-          "Read-only. Call get_profile for who Harshith Nayaka L is and how to reach him, list_projects to see the work, then get_case_study with a slug for depth. Everything here is also on the public site; nothing can be written or sent.",
+        instructions: server.instructions,
       });
     }
     case "ping":
       return rpcResult(id, {});
     case "tools/list":
       return rpcResult(id, {
-        tools: MCP_TOOLS.map(({ file: _file, ...tool }) => ({
+        tools: server.tools.map(({ run: _run, ...tool }) => ({
           ...tool,
           annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
         })),
       });
     case "tools/call": {
-      const tool = MCP_TOOLS.find((t) => t.name === params.name);
+      const tool = server.tools.find((t) => t.name === params.name);
       if (!tool) {
         return rpcError(id, -32602, `Unknown tool "${String(params.name)}".`, {
-          tools: MCP_TOOLS.map((t) => t.name),
+          tools: server.tools.map((t) => t.name),
         });
       }
       const args = (params.arguments ?? {}) as Record<string, unknown>;
-      if (tool.name === "get_case_study" && !CASE_STUDY_SLUGS.has(String(args.slug))) {
+      let result: McpResult;
+      try {
+        result = await tool.run(args, url);
+      } catch {
         return rpcResult(id, {
           isError: true,
-          content: [{
-            type: "text",
-            text: `No case study with slug "${String(args.slug)}". Valid slugs: ${[...CASE_STUDY_SLUGS].join(", ")}.`,
-          }],
+          content: [{ type: "text", text: `The site could not return this data. Try again, or read ${ORIGIN}/llms.txt.` }],
         });
       }
-      const res = await fetch(new URL(tool.file(args), url));
-      if (!res.ok) {
-        return rpcResult(id, {
-          isError: true,
-          content: [{ type: "text", text: `The site returned ${res.status} for this data. Try again, or read ${ORIGIN}/llms.txt.` }],
-        });
+      if (result.error) {
+        return rpcResult(id, { isError: true, content: [{ type: "text", text: result.error }], structuredContent: result.data });
       }
-      const data = await res.json();
       return rpcResult(id, {
-        content: [{ type: "text", text: JSON.stringify(data) }],
-        structuredContent: data,
+        content: [{ type: "text", text: result.text ?? JSON.stringify(result.data) }],
+        structuredContent: result.data,
       });
+    }
+    case "resources/list":
+      return rpcResult(id, { resources: await server.resources(url) });
+    case "resources/templates/list":
+      return rpcResult(id, { resourceTemplates: [] });
+    case "resources/read": {
+      const uri = String(params.uri ?? "");
+      const resource = (await server.resources(url)).find((r) => r.uri === uri);
+      if (!resource) return rpcError(id, -32002, `Resource not found: ${uri}`, { uri });
+      const res = await fetch(new URL(new URL(uri).pathname, url), { headers: { Accept: "text/markdown" } });
+      if (!res.ok) return rpcError(id, -32603, `The site returned ${res.status} for ${uri}.`);
+      return rpcResult(id, { contents: [{ uri, mimeType: resource.mimeType, text: await res.text() }] });
     }
     default:
       return rpcError(id, -32601, `Method not found: ${String(msg.method)}.`);
@@ -610,7 +955,18 @@ const STOP = new Set(
     "should i you he his him me my it its this that there which who whom where when why about from by as at " +
     "into than then so if any some your yours tell know please get give show much many also just has have had me").split(" "),
 );
-const SYNONYM: Record<string, string> = { bangalore: "bengaluru", hiring: "hire", hired: "hire", freelancer: "freelance" };
+const SYNONYM: Record<string, string> = {
+  bangalore: "bengaluru",
+  hiring: "hire",
+  hired: "hire",
+  freelancer: "freelance",
+  // "page through" and "Pagination" are one idea; the stemmer cannot see it.
+  pagination: "page",
+  paginate: "page",
+  paging: "page",
+  paged: "page",
+  pages: "page",
+};
 
 function terms(s: string): string[] {
   return s
@@ -650,6 +1006,32 @@ async function loadJson<T>(url: URL, path: string): Promise<T> {
   const res = await fetch(new URL(path, url));
   if (!res.ok) throw new Error(`${path} returned ${res.status}`);
   return (await res.json()) as T;
+}
+
+// Every answer the site publishes, as one retrieval corpus: the profile
+// summary and questions, the FAQ, and each case study's questions. Shared by
+// the A2A agent, the MCP answer_question tool and NLWeb /ask so all three quote
+// the same text.
+async function publishedAnswers(url: URL, studies: Study[]): Promise<Qa[]> {
+  const [faqs, profile] = await Promise.all([
+    loadJson<{ data: { question: string; answer: string }[] }>(url, "/api/v1/faqs.json").then((r) => r.data),
+    loadJson<{ summary?: string; questions?: { question: string; answer: string }[] }>(url, "/api/v1/profile.json"),
+  ]);
+  return [
+    ...(profile.summary
+      ? [{
+          question: "About Harshith Nayaka L",
+          answer: profile.summary,
+          source: `${ORIGIN}/about`,
+          keywords: "who current job role title position employer company works demandnxt based location city",
+        }]
+      : []),
+    ...(profile.questions ?? []).map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/about` })),
+    ...faqs.map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/#faq` })),
+    ...studies.flatMap((s) =>
+      (s.questions ?? []).map((q) => ({ question: q.q, answer: q.a, source: `${ORIGIN}/work/${s.slug}` })),
+    ),
+  ];
 }
 
 type Answer = { skill: string; text: string; data: Record<string, unknown> };
@@ -752,25 +1134,7 @@ async function answer(url: URL, text: string, request: Record<string, unknown> |
     };
   }
 
-  const [faqs, profile] = await Promise.all([
-    loadJson<{ data: { question: string; answer: string }[] }>(url, "/api/v1/faqs.json").then((r) => r.data),
-    loadJson<{ summary?: string; questions?: { question: string; answer: string }[] }>(url, "/api/v1/profile.json"),
-  ]);
-  const docs: Qa[] = [
-    ...(profile.summary
-      ? [{
-          question: "About Harshith Nayaka L",
-          answer: profile.summary,
-          source: `${ORIGIN}/about`,
-          keywords: "who current job role title position employer company works demandnxt based location city",
-        }]
-      : []),
-    ...(profile.questions ?? []).map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/about` })),
-    ...faqs.map((f) => ({ question: f.question, answer: f.answer, source: `${ORIGIN}/#faq` })),
-    ...studies.flatMap((s) =>
-      (s.questions ?? []).map((q) => ({ question: q.q, answer: q.a, source: `${ORIGIN}/work/${s.slug}` })),
-    ),
-  ];
+  const docs = await publishedAnswers(url, studies);
   const ranked = rank(text, docs);
   const named = studies.find((s) => new RegExp(`\\b(${s.slug.replace(/-/g, "[- ]")}|${s.title.replace(/[^\w\s]/g, ".?")})\\b`, "i").test(text));
 
@@ -917,6 +1281,152 @@ async function handleA2a(request: Request, url: URL): Promise<Response> {
   return a2aError(id, version, "METHOD_NOT_FOUND", `Method not found: ${method}.`);
 }
 
+// ------------------------------------------------------------ NLWeb /ask
+//
+// GET or POST /ask: Microsoft's NLWeb protocol, list mode. Same corpus and
+// ranking as the A2A agent, returned as NLWeb results (url, name, site,
+// score, description, schema_object) rather than one quoted answer, so a
+// client that speaks NLWeb gets the site's matching published answers and
+// case studies in one call.
+//
+// Only list mode exists. summarize and generate would need a model writing
+// text, and nothing on this surface may say what the site does not; a
+// request for either is answered as a list and says so in _meta.mode.
+//
+// JSON by default. Streaming (SSE start / result / complete, the v0.55 event
+// names) when asked: streaming=true, prefer.streaming, or
+// Accept: text/event-stream.
+
+export const NLWEB_VERSION = "0.55";
+const NLWEB_SITE = "harshith-nayaka-l-portfolio";
+
+const ASK_CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Accept",
+};
+
+type AskItem = {
+  url: string;
+  name: string;
+  site: string;
+  score: number;
+  description: string;
+  schema_object: Record<string, unknown>[];
+};
+
+async function askResults(url: URL, query: string, limit: number): Promise<AskItem[]> {
+  const studies = (await loadJson<{ data: (Study & { tech?: string[]; description?: string; category?: string | null })[] }>(url, "/api/v1/case-studies.full.json")).data;
+  const answers = await publishedAnswers(url, studies);
+  // Each case study is also a result in its own right, so "who built Maestro"
+  // or "an MCP server project" can return the project, not only a question
+  // about it.
+  const projectDocs: Qa[] = studies.map((s) => ({
+    question: `${s.title} ${s.category ?? ""} ${s.kicker ?? ""}`,
+    answer: `${s.outcome} ${s.description ?? ""}`,
+    source: `${ORIGIN}/work/${s.slug}`,
+    // The stack only: words every project shares ("project", the author's
+    // name) would lift all eleven equally and bury the one that matches.
+    keywords: (s.tech ?? []).join(" "),
+  }));
+  const byStudy = new Map(studies.map((s) => [`${ORIGIN}/work/${s.slug}`, s]));
+  return rank(query, [...projectDocs, ...answers])
+    .filter((r) => r.score >= 0.15)
+    .slice(0, limit)
+    .map(({ doc, score }) => {
+      const study = projectDocs.includes(doc) ? byStudy.get(doc.source) : undefined;
+      return {
+        url: doc.source,
+        name: study ? study.title : doc.question,
+        site: NLWEB_SITE,
+        score: Number(score.toFixed(3)),
+        description: study ? study.outcome : doc.answer,
+        schema_object: [
+          study
+            ? {
+                "@type": "Article",
+                headline: study.title,
+                description: study.outcome,
+                url: doc.source,
+                author: { "@type": "Person", name: "Harshith Nayaka L", url: `${ORIGIN}/` },
+              }
+            : {
+                "@type": "Question",
+                name: doc.question,
+                url: doc.source,
+                acceptedAnswer: { "@type": "Answer", text: doc.answer },
+              },
+        ],
+      };
+    });
+}
+
+function askJson(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex", ...ASK_CORS },
+  });
+}
+
+async function handleAsk(request: Request, url: URL): Promise<Response> {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: { ...ASK_CORS, "Access-Control-Max-Age": "86400" } });
+  }
+  if (request.method !== "GET" && request.method !== "POST" && request.method !== "HEAD") {
+    return new Response(null, { status: 405, headers: { Allow: "GET, POST, OPTIONS", ...ASK_CORS } });
+  }
+
+  // Flat parameters (query=, streaming=, mode=) from the URL or a form or
+  // JSON body, plus the v0.55 structured body: { query: { text, site },
+  // prefer: { streaming, mode }, meta: { version } }.
+  const p: Record<string, unknown> = Object.fromEntries(url.searchParams);
+  if (request.method === "POST") {
+    const type = request.headers.get("content-type") ?? "";
+    try {
+      if (type.includes("application/json")) Object.assign(p, await request.json());
+      else if (type.includes("application/x-www-form-urlencoded")) Object.assign(p, Object.fromEntries(new URLSearchParams(await request.text())));
+    } catch {
+      return askJson({ _meta: { response_type: "failure", version: NLWEB_VERSION }, error: { code: "invalid_body", message: "The body is not valid JSON." } }, 400);
+    }
+  }
+  const structured = p.query && typeof p.query === "object" ? (p.query as Record<string, unknown>) : null;
+  const prefer = p.prefer && typeof p.prefer === "object" ? (p.prefer as Record<string, unknown>) : {};
+  const query = String(structured ? structured.text ?? "" : p.query ?? p.q ?? "").trim();
+  const mode = String(prefer.mode ?? p.mode ?? "list");
+  const flag = prefer.streaming ?? p.streaming;
+  const streaming =
+    flag === true || /^(true|1)$/i.test(String(flag ?? "")) || (request.headers.get("accept") ?? "").includes("text/event-stream");
+  const limit = Math.min(20, Math.max(1, Number.parseInt(String(p.limit ?? "10"), 10) || 10));
+  const queryId = String(p.query_id ?? crypto.randomUUID());
+
+  if (!query) {
+    return askJson(
+      {
+        _meta: { response_type: "failure", version: NLWEB_VERSION },
+        error: { code: "missing_query", message: "Send the question as query, e.g. /ask?query=who+is+Harshith+Nayaka+L" },
+      },
+      400,
+    );
+  }
+
+  const meta = { response_type: "answer", version: NLWEB_VERSION, mode: "list", site: NLWEB_SITE, ...(mode !== "list" ? { requested_mode: mode } : {}) };
+  const results = await askResults(url, query, limit);
+  const empty = results.length
+    ? {}
+    : { message: `No published answer matches. Everything the site covers is listed at ${ORIGIN}/llms.txt.` };
+
+  if (!streaming) return askJson({ _meta: meta, query_id: queryId, query, results, ...empty });
+
+  const event = (name: string, data: unknown) => `event: ${name}\ndata: ${JSON.stringify(data)}\n\n`;
+  const body =
+    event("start", { _meta: meta, query_id: queryId, streaming: true }) +
+    results.map((item, index) => event("result", { index, item })).join("") +
+    event("complete", { _meta: { version: NLWEB_VERSION }, query_id: queryId, count: results.length, ...empty });
+  return new Response(body, {
+    headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex", ...ASK_CORS },
+  });
+}
+
 /**
  * Case studies that were retired, not renamed. These used to 301 to /#work,
  * which Google treats as a soft 404 and keeps the old URL indexed: a Google AI
@@ -943,6 +1453,34 @@ function gone(): Response {
   });
 }
 
+/** The document at `path`, served as markdown: text that already is
+ *  markdown as-is, anything else fenced under a heading naming its source. */
+async function resourceAsMarkdown(path: string, url: URL): Promise<Response> {
+  const res = await fetch(new URL(path, url));
+  const headers = {
+    "Content-Type": "text/markdown; charset=utf-8",
+    "Cache-Control": "public, max-age=0, must-revalidate",
+    Link: `<${ORIGIN}${path}>; rel="alternate"`,
+    "X-Robots-Tag": "noindex",
+  };
+  if (!res.ok) return new Response(NOT_FOUND_MD, { status: 404, headers });
+  const body = await res.text();
+  if (/\.txt$/.test(path) && /^#\s/.test(body)) return new Response(body, { headers });
+  const type = (res.headers.get("content-type") ?? "text/plain").split(";")[0];
+  const lang = /json/.test(type) ? "json" : /yaml/.test(type) ? "yaml" : /xml/.test(type) ? "xml" : "text";
+  const md = [
+    `# ${path}`,
+    "",
+    `The markdown view of [${ORIGIN}${path}](${ORIGIN}${path}), a \`${type}\` document, unchanged below. Every page and document on this site is listed at ${ORIGIN}/llms.txt.`,
+    "",
+    "```" + lang,
+    body.trimEnd(),
+    "```",
+    "",
+  ].join("\n");
+  return new Response(md, { headers });
+}
+
 export default function middleware(request: Request) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/(.)\/$/, "$1");
@@ -953,10 +1491,12 @@ export default function middleware(request: Request) {
   // /.well-known/mcp answers the same protocol for clients that probe the
   // well-known path; a GET there is a discovery read and passes through to
   // the static server card.
-  if (path === "/mcp" || (path === "/.well-known/mcp" && request.method !== "GET" && request.method !== "HEAD")) {
-    return handleMcp(request, url);
+  if (path === "/mcp" || path === "/mcp/docs") return handleMcp(request, url, MCP_SERVERS[path]);
+  if (path === "/.well-known/mcp" && request.method !== "GET" && request.method !== "HEAD") {
+    return handleMcp(request, url, MCP_SERVERS["/mcp"]);
   }
   if (path === "/a2a") return handleA2a(request, url);
+  if (path === "/ask") return handleAsk(request, url);
 
   if (request.method !== "GET" && request.method !== "HEAD") return next();
 
@@ -964,6 +1504,10 @@ export default function middleware(request: Request) {
   // anything with a dot straight through to the filesystem.
   // /api has no HTML page to twin; its markdown form is the API guide.
   if (path === "/api.md") return rewrite(new URL("/api/llms.txt", url));
+  if (path === "/docs.md") return rewrite(new URL("/developers.md", url));
+
+  const resourceMd = path.match(RESOURCE_MD);
+  if (resourceMd) return resourceAsMarkdown(resourceMd[1], url);
 
   const dotMd = path.match(DOT_MD_ROUTE);
   if (dotMd && dotMd[1] !== "/index") {
