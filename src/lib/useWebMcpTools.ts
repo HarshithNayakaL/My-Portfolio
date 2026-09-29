@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { projects, NAME, EMAIL } from "../data/projects";
-import { caseStudies } from "../data/caseStudies";
 
 /**
  * Registers this site's WebMCP tools with the browser.
@@ -30,7 +29,10 @@ function whenHeadingShows(title: string, timeoutMs = 4000): Promise<boolean> {
   return new Promise((resolve) => {
     const start = performance.now();
     const check = () => {
-      if (document.querySelector("h1")?.textContent?.trim() === title) return resolve(true);
+      // The case-study <h1> is "Title: kicker" (the kicker in its own span, for
+      // search), so the title is its first child, not its whole text. Comparing
+      // the whole heading never matched and every call waited out the timeout.
+      if (document.querySelector("h1")?.firstElementChild?.textContent?.trim() === title) return resolve(true);
       if (performance.now() - start > timeoutMs) return resolve(false);
       requestAnimationFrame(check);
     };
@@ -49,9 +51,11 @@ export function useWebMcpTools() {
     const controller = new AbortController();
     const opts = { signal: controller.signal };
 
-    const withCaseStudies = projects.filter(
-      (p) => p.hasCaseStudy && caseStudies[p.slug],
-    );
+    // projects.ts rather than the case studies themselves: every page runs
+    // this hook, and importing caseStudies here put all eleven write-ups
+    // (the largest module in the app) into the bundle every visitor loads.
+    // build-api fails the build if hasCaseStudy and the case studies disagree.
+    const withCaseStudies = projects.filter((p) => p.hasCaseStudy);
     const slugs = withCaseStudies.map((p) => p.slug);
 
     const register = async () => {
@@ -107,7 +111,7 @@ export function useWebMcpTools() {
               return `No case study with slug "${slug}". Available: ${slugs.join(", ")}.`;
             }
             navigate(`/work/${slug}`);
-            const shown = await whenHeadingShows(caseStudies[slug].title);
+            const shown = await whenHeadingShows(project.title);
             return shown
               ? `Opened the ${project.title} case study; it is on screen now. Contact: ${EMAIL}`
               : `Navigating to the ${project.title} case study at /work/${slug}; the page is still loading. Contact: ${EMAIL}`;

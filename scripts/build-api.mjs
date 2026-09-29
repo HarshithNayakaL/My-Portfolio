@@ -1632,6 +1632,19 @@ for (const [name, want] of [
   }
 }
 
+// The browser's WebMCP tools (src/lib/useWebMcpTools.ts) read hasCaseStudy
+// and the project title from projects.ts so the case studies stay out of the
+// main bundle. That only works while the two agree.
+for (const p of projects) {
+  const cs = caseStudies[p.slug];
+  if (p.hasCaseStudy !== Boolean(cs)) {
+    throw new Error(`build-api: project "${p.slug}" has hasCaseStudy=${p.hasCaseStudy} but ${cs ? "a" : "no"} case study.`);
+  }
+  if (cs && cs.title !== p.title) {
+    throw new Error(`build-api: project "${p.slug}" is titled "${p.title}" but its case study "${cs.title}".`);
+  }
+}
+
 // Same failure, other table: an extensionless rewrite in vercel.json that
 // middleware.ts does not pass through is answered with the markdown 404 for
 // any client that doesn't ask for text/html, because middleware runs first.
