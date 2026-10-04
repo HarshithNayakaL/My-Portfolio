@@ -13,10 +13,14 @@ const GitHubGraph = lazy(loadGraph);
  * fetch the page as HTML truncate it. The prerendered markup reserves the
  * graph's height so nothing shifts when it appears.
  *
- * Data comes from this origin: the live endpoint (api/github-contributions.mjs),
- * or, if that fails, the snapshot written at build time. The data and the
- * graph's code are both requested only once the section is near the viewport,
- * in parallel.
+ * Data comes from this origin, from two sources requested in parallel once
+ * the section is near the viewport: the snapshot written at build time, a
+ * static file the CDN serves in a fraction of a second, and the live endpoint
+ * (api/github-contributions.mjs). The graph draws from whichever arrives
+ * first and switches to the live data when it lands. It used to wait for the
+ * live endpoint and fall back to the snapshot only on failure, and when the
+ * upstream API timed out from Vercel's functions every visitor waited about
+ * nine seconds for a graph that then showed the snapshot anyway.
  */
 export default function GitHubActivity({ className }: { className?: string }) {
   const { ref, inView } = useInView<HTMLDivElement>();
@@ -28,10 +32,19 @@ export default function GitHubActivity({ className }: { className?: string }) {
     loadGraph().catch(() => {}); // start the chunk download alongside the data
     const get = (url: string) =>
       fetch(url).then((r) => (r.ok ? (r.json() as Promise<Contributions>) : Promise.reject()));
-    get("/data/github-contributions.json")
-      .catch(() => get("/data/github-contributions.snapshot.json"))
-      .then(setData)
-      .catch(() => setFailed(true));
+    let live = false;
+    const liveData = get("/data/github-contributions.json").then((d) => {
+      live = true;
+      setData(d);
+    });
+    // The snapshot only fills the gap: if the live data is already in, it
+    // must not overwrite it with an older copy.
+    const snapshot = get("/data/github-contributions.snapshot.json").then((d) => {
+      if (!live) setData(d);
+    });
+    Promise.allSettled([liveData, snapshot]).then((results) => {
+      if (results.every((r) => r.status === "rejected")) setFailed(true);
+    });
   }, [inView, data, failed]);
 
   if (failed) return null;

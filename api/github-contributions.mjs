@@ -11,13 +11,16 @@ import { fetchContributions } from "./_contributions.mjs";
  * request an hour, and the visitor's browser still talks only to this origin.
  * Browsers always revalidate, so nobody keeps yesterday's graph in their cache.
  *
- * On an upstream failure this answers 502 and is not cached; the page then
- * falls back to the snapshot the build wrote.
+ * On an upstream failure this answers 502 and is not cached. The page never
+ * waits on this endpoint: it draws the snapshot the build wrote first and
+ * switches to this data only when it arrives.
  */
 export default {
   async fetch() {
     try {
-      const data = await fetchContributions(undefined, 8_000);
+      // Short: the page no longer waits for this (it draws the build-time
+      // snapshot first), so a slow upstream only costs function time.
+      const data = await fetchContributions(undefined, 4_000);
       return Response.json(data, {
         headers: {
           "Cache-Control": "public, max-age=0, must-revalidate",

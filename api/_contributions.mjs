@@ -13,7 +13,13 @@ const SOURCE = "https://github.com/grubersjoe/github-contributions-api";
 export async function fetchContributions(user = GITHUB_USER, timeoutMs = 15_000) {
   const res = await fetch(
     `https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(user)}?y=last`,
-    { signal: AbortSignal.timeout(timeoutMs) },
+    {
+      // A named client rather than Node's anonymous default: a free public
+      // API is entitled to know who is calling, and anonymous datacenter
+      // traffic is what gets throttled first.
+      headers: { "User-Agent": `${user}-portfolio (+https://github.com/${user}/My-Portfolio)` },
+      signal: AbortSignal.timeout(timeoutMs),
+    },
   );
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const body = await res.json();
