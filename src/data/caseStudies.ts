@@ -1453,7 +1453,7 @@ const octo: CaseStudy = {
     "A research workspace where a director agent hands questions to specialist agents with live web search and returns cited reports and structured company records, built so a lost response can never turn into a second paid session.",
   meta: [
     { label: "Type", value: "Agent research workspace" },
-    { label: "Providers", value: "OpenAI Agents API, Google Antigravity" },
+    { label: "Providers", value: "OpenAI Agents API (primary), Google Antigravity (secondary)" },
     { label: "Role", value: "Solo build" },
     { label: "Status", value: "Tested with mocks; live runs not yet verified" },
   ],
@@ -1462,7 +1462,7 @@ const octo: CaseStudy = {
     "The operational side is just as unforgiving. Hosted agent sessions are billed, so a server restart or a response lost in transit must never quietly start the same paid job twice.",
   ],
   build: [
-    "Octo is a TypeScript workspace (React 19 and Express 5) built around the OpenAI Agents API. A research director delegates independent questions to specialist agents, at most two at a time: market, competitor, pricing and regulation specialists for market research, and company-discovery and company-evidence specialists for sales research. Google Antigravity on Gemini Interactions is supported as an alternative provider, chosen per run.",
+    "Octo is a TypeScript workspace (React 19 and Express 5) built around the OpenAI Agents API. A research director delegates independent questions to specialist agents, at most two at a time: market, competitor, pricing and regulation specialists for market research, and company-discovery and company-evidence specialists for sales research. Google Antigravity on Gemini Interactions is the secondary provider: a run can be started on it instead, for example to test on a Google free-tier project before spending OpenAI credit.",
     "There are three workflows. Market intelligence covers market structure, company comparisons, public pricing and regulation, ending in an investor briefing. Sales research takes an explicit ideal customer profile and a target of 1 to 100 companies, and returns fit evidence, potential needs, public decision makers and source links. Ongoing research keeps a saved session and re-checks it on a schedule against what it found before. Each run takes a brief and up to five context files and returns a Markdown report and JSON, plus CSV for sales.",
     "The evidence rules are part of the job, not an afterthought. Every material claim needs a dated source URL; unknown values stay unknown; facts, estimates and hypotheses are kept apart; and websites and uploaded files are treated as data, never as instructions. Structured output from either provider is validated before any company record is shown, and CSV export neutralises spreadsheet formulas.",
     "It runs locally on Node's built-in SQLite, or on Vercel as one function backed by Postgres, where each run advances in short leased steps because a serverless function cannot hold a background worker.",
