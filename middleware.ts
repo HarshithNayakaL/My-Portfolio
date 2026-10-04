@@ -78,6 +78,10 @@ const PROJECT_SLUGS = new Set([
   "replydesk",
   "nova-ai",
   "ai-notes",
+  "octo",
+  "airtable-ai-company-briefs",
+  "youtube-scraper-google-sheets",
+  "slack-weekly-report-bot",
 ]);
 const CASE_STUDY_SLUGS = new Set([
   "spectra",
@@ -91,6 +95,10 @@ const CASE_STUDY_SLUGS = new Set([
   "nova-ai",
   "ai-notes",
   "maestro",
+  "octo",
+  "airtable-ai-company-briefs",
+  "youtube-scraper-google-sheets",
+  "slack-weekly-report-bot",
 ]);
 
 /**

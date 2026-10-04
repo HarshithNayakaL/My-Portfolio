@@ -76,6 +76,7 @@ const caseStudyResource = (cs) => ({
   description: cs.metaDescription,
   category: cs.searchKicker ?? null,
   inProgress: Boolean(cs.inProgress),
+  statusNote: cs.inProgress ?? null,
   meta: cs.meta,
   problem: cs.problem,
   build: cs.build,
@@ -574,6 +575,7 @@ const openapi = {
           description: { type: "string", description: "Search-result length summary, 120-160 characters." },
           category: { type: ["string", "null"], description: "What kind of thing the project is, in a few words (e.g. \"85-tool local MCP server\"), where the kicker names an event or rank instead." },
           inProgress: { type: "boolean" },
+          statusNote: { type: ["string", "null"], description: "While inProgress is true: what is not yet done or verified." },
           meta: { type: "array", items: ref("LabelledText") },
           problem: { type: "array", items: { type: "string" }, description: "Paragraphs framing the problem." },
           build: { type: "array", items: { type: "string" }, description: "Paragraphs describing what was built." },
@@ -1642,6 +1644,11 @@ for (const p of projects) {
   }
   if (cs && cs.title !== p.title) {
     throw new Error(`build-api: project "${p.slug}" is titled "${p.title}" but its case study "${cs.title}".`);
+  }
+  // The card's "In progress" badge and the case study's notice must agree, or
+  // one of them is wrong about the state of the work.
+  if (cs && (p.status === "in-progress") !== Boolean(cs.inProgress)) {
+    throw new Error(`build-api: project "${p.slug}" status (${p.status ?? "done"}) disagrees with its case study's inProgress.`);
   }
 }
 

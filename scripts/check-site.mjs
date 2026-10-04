@@ -195,9 +195,15 @@ for (const f of files.filter((f) => TEXT.test(f))) {
 
 // ---- counts and twins
 const studies = JSON.parse(read(join(DIST, "api/v1/case-studies.json"))).count;
+// Words as well as digits: llms.txt said "all eleven projects" long after
+// that stopped being true, because this check only matched "11 projects".
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+  "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+const countRe = new RegExp(`\\b(\\d+|${NUMBER_WORDS.join("|")}) (?:projects|case studies)\\b`, "gi");
 for (const f of files.filter((f) => /\.(html|md|txt)$/.test(f))) {
-  for (const m of read(f).matchAll(/\b(\d+) (?:projects|case studies)\b/g)) {
-    if (Number(m[1]) !== studies) fail("project count", `${rel(f)} says "${m[0]}", there are ${studies}`);
+  for (const m of read(f).matchAll(countRe)) {
+    const n = /^\d+$/.test(m[1]) ? Number(m[1]) : NUMBER_WORDS.indexOf(m[1].toLowerCase());
+    if (n !== studies) fail("project count", `${rel(f)} says "${m[0]}", there are ${studies}`);
   }
 }
 for (const route of pages.keys()) {

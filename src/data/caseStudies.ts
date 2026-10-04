@@ -21,10 +21,21 @@ export type CaseStudy = {
   outcome: string;
   kicker: string;
   meta: { label: string; value: string }[];
-  inProgress?: boolean;
+  /** Set while the work is unfinished: the note says exactly what is not yet
+   *  done or verified, and is shown on the page and in its markdown twin.
+   *  A per-study note rather than fixed wording, because the old fixed notice
+   *  described one particular write-up and would have been false on any other.
+   *  The project's card shows "In progress" when this is set (build-checked). */
+  inProgress?: string;
   problem: string[];
   build: string[];
   pipeline: PipelineStage[];
+  /** Replaces the default line above the pipeline diagram, which says every
+   *  stage "assumes the model can be wrong" — false for a workflow with no
+   *  model in it. Set explicitly rather than inferred from the diagram:
+   *  Personal MCP OS has no model node (the model is the MCP client), and the
+   *  default line is exactly right for it. */
+  pipelineIntro?: string;
   howItWorks: HowItWorksItem[];
   results: { label: string; body: string }[];
   tech: string[];
@@ -1431,6 +1442,392 @@ const personalOsMcp: CaseStudy = {
   ],
 };
 
+const octo: CaseStudy = {
+  slug: "octo",
+  published: "2026-10-04T16:45:37Z",
+  title: "Octo",
+  kicker: "Multi-agent research workspace",
+  inProgress:
+    "Octo is built and tested, but not yet proven live. Its 49 backend tests and browser suite run against mocked OpenAI and Google responses; it has not run a real paid session, has not been deployed, and has no real CRM connected. Everything below describes the code as it stands.",
+  outcome:
+    "A research workspace where a director agent hands questions to specialist agents with live web search and returns cited reports and structured company records, built so a lost response can never turn into a second paid session.",
+  meta: [
+    { label: "Type", value: "Agent research workspace" },
+    { label: "Providers", value: "OpenAI Agents API, Google Antigravity" },
+    { label: "Role", value: "Solo build" },
+    { label: "Status", value: "Tested with mocks; live runs not yet verified" },
+  ],
+  problem: [
+    "Agent research tools are easy to demo and hard to trust. A report without dated sources can't be checked, a company list with an invented decision maker is worse than no list, and an agent that reads the open web will meet pages that try to give it instructions.",
+    "The operational side is just as unforgiving. Hosted agent sessions are billed, so a server restart or a response lost in transit must never quietly start the same paid job twice.",
+  ],
+  build: [
+    "Octo is a TypeScript workspace (React 19 and Express 5) built around the OpenAI Agents API. A research director delegates independent questions to specialist agents, at most two at a time: market, competitor, pricing and regulation specialists for market research, and company-discovery and company-evidence specialists for sales research. Google Antigravity on Gemini Interactions is supported as an alternative provider, chosen per run.",
+    "There are three workflows. Market intelligence covers market structure, company comparisons, public pricing and regulation, ending in an investor briefing. Sales research takes an explicit ideal customer profile and a target of 1 to 100 companies, and returns fit evidence, potential needs, public decision makers and source links. Ongoing research keeps a saved session and re-checks it on a schedule against what it found before. Each run takes a brief and up to five context files and returns a Markdown report and JSON, plus CSV for sales.",
+    "The evidence rules are part of the job, not an afterthought. Every material claim needs a dated source URL; unknown values stay unknown; facts, estimates and hypotheses are kept apart; and websites and uploaded files are treated as data, never as instructions. Structured output from either provider is validated before any company record is shown, and CSV export neutralises spreadsheet formulas.",
+    "It runs locally on Node's built-in SQLite, or on Vercel as one function backed by Postgres, where each run advances in short leased steps because a serverless function cannot hold a background worker.",
+  ],
+  pipeline: [
+    {
+      title: "Brief",
+      nodes: [{ id: "brief", label: "Brief + files", detail: "Workflow, ICP, up to 5 documents", kind: "input" }],
+    },
+    {
+      title: "Direct",
+      nodes: [{ id: "director", label: "Research director", detail: "Splits the work, sets the rules", kind: "model" }],
+    },
+    {
+      title: "Research",
+      nodes: [
+        { id: "specialists", label: "Specialist agents", detail: "Two at a time, live web search", kind: "model" },
+        { id: "sandbox", label: "Hosted sandbox", detail: "Inputs, notes, outputs", kind: "logic" },
+      ],
+    },
+    {
+      title: "Check",
+      nodes: [{ id: "validate", label: "Validate output", detail: "Schema + dated sources", kind: "gate" }],
+    },
+    {
+      title: "Deliver",
+      nodes: [
+        { id: "report", label: "Report + records", detail: "Markdown, JSON, CSV", kind: "output" },
+        { id: "crm", label: "CRM export", detail: "Separate session, after review", kind: "gate" },
+      ],
+    },
+  ],
+  howItWorks: [
+    {
+      title: "A lost response never becomes a second paid session",
+      body: "If the server restarts or a create response is lost, Octo searches the project's saved sessions for the local run ID before doing anything else. If the outcome is still uncertain and no match is found, it stops for manual inspection instead of creating another billed session. On Google, which has no way to look a session up by local ID, an uncertain submission is never repeated automatically.",
+    },
+    {
+      title: "The database decides which instance advances a run",
+      body: "On Vercel there is no single long-running worker, so any request can trigger the next step. A database lease lets exactly one function instance advance a run at a time, with steps spaced at least four seconds apart. A test simulates two instances stepping the same run and requires exactly one remote session; deliberately breaking the lease makes that test fail.",
+    },
+    {
+      title: "No silent switching between providers",
+      body: "Each run is pinned to the provider, agent and model it started with. If that provider is unavailable or rejects a request, the run reports the error; it is never quietly retried on the other provider, which would change both the cost and the quality of the result without anyone choosing it.",
+    },
+    {
+      title: "CRM writes are walled off from research",
+      body: "Research sessions have no CRM access at all. Exporting results is a separate session that can use only an allow-listed set of CRM tools, and only after a person reviews the company list and confirms the export. The agent is told to deduplicate by website and never to contact anyone.",
+    },
+  ],
+  results: [
+    {
+      label: "Tested",
+      body: "49 backend tests on mocked provider responses and temporary databases, including Postgres run through PGlite, plus a Playwright suite of four runs across desktop and mobile, and a local Vercel build of the serverless function.",
+    },
+    {
+      label: "Honest scope",
+      body: "No live paid OpenAI or Google session has been run, it has not been deployed, and no real CRM is connected. It is a single-workspace, self-hosted starter, not a multi-tenant SaaS; its README lists what a hosted service would still need, from per-user isolation to enforced budgets.",
+    },
+  ],
+  tech: [
+    "TypeScript",
+    "React 19",
+    "Express 5",
+    "OpenAI Agents API",
+    "Google Antigravity (Gemini Interactions)",
+    "SQLite (Node built-in)",
+    "Postgres on Vercel (Neon)",
+    "Zod",
+    "Vitest",
+    "Playwright",
+  ],
+  questions: [
+    {
+      q: "How do you stop an AI research agent from inventing companies or sources?",
+      a: "Make the evidence rules part of the task and check the output before showing it. In Octo, a research workspace built by Harshith Nayaka L, every material claim needs a dated source URL, unknown values must stay unknown, and the agents are told never to invent a company, decision maker, price, citation or financial figure; retrieved pages are treated as data, not instructions. Structured output is validated before any company record appears. Octo's tests run on mocked provider responses, so its live research quality has not yet been verified.",
+    },
+  ],
+  metaDescription:
+    "Multi-agent research workspace on the OpenAI Agents API: specialist agents, live web search, cited reports and company records, with no duplicate paid runs.",
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/octo" }],
+};
+
+const airtableCompanyBriefs: CaseStudy = {
+  slug: "airtable-ai-company-briefs",
+  published: "2026-10-04T16:45:37Z",
+  title: "AI Company Briefs",
+  kicker: "32-node n8n workflow",
+  searchKicker: "n8n workflow: Airtable to Google Docs",
+  outcome:
+    "Every morning, an AI brief on each company in an Airtable contact list, saved as its own Google Doc, with one Slack digest linking them all and naming any company it couldn't finish.",
+  meta: [
+    { label: "Type", value: "n8n workflow automation" },
+    { label: "Flow", value: "Airtable → ChatGPT → Google Docs → Slack" },
+    { label: "Role", value: "Solo build" },
+    { label: "Status", value: "Live run on n8n 2.8.4" },
+  ],
+  problem: [
+    "A contact list tells you who to talk to, not what their company does. Someone still has to look each company up, write a summary and put it where the team will find it, and a job like that, done by hand every morning, quietly stops happening.",
+    "Automating it is easy to do badly. An AI call that times out, a Docs request that fails or a malformed answer can crash the whole run, or worse, produce a cheerful report with gaps nobody notices.",
+  ],
+  build: [
+    "A 32-node n8n workflow with two entry points. Seed Contacts creates the Contacts table in Airtable (Name, Email, Company Name) if it doesn't exist and adds sample contacts at real companies. The daily 7:00 AM run reads every contact with pagination, groups them by company, and asks ChatGPT for a structured brief on each: overview, products and services, market, business model, notable facts, a sales angle and the contacts.",
+    "Each brief becomes its own Google Doc through the Drive and Docs APIs, optionally shared with anyone who has the link or with one domain. The run ends with a single Slack digest: a link to every Doc, a confidence level, and any problem met along the way. Setup is one import and one CONFIG node, with no code changes.",
+    "The AI step is treated as untrusted input. Briefs are requested in JSON mode, then parsed (including answers wrapped in code fences), checked for truncation and refusals, and validated before anything is written to Google.",
+  ],
+  pipeline: [
+    {
+      title: "Trigger",
+      nodes: [{ id: "cron", label: "Daily 7:00 AM", detail: "Or Seed Contacts, run by hand", kind: "input" }],
+    },
+    {
+      title: "Read",
+      nodes: [
+        { id: "config", label: "CONFIG check", detail: "Placeholders and ID formats", kind: "gate" },
+        { id: "airtable", label: "Airtable contacts", detail: "Paginated, grouped by company", kind: "logic" },
+      ],
+    },
+    {
+      title: "Summarise",
+      nodes: [
+        { id: "openai", label: "ChatGPT brief", detail: "JSON mode, one per company", kind: "model" },
+        { id: "validate", label: "Validate", detail: "Truncation, refusal, shape", kind: "gate" },
+      ],
+    },
+    {
+      title: "Write",
+      nodes: [{ id: "docs", label: "Google Doc", detail: "Created, written, optionally shared", kind: "logic" }],
+    },
+    {
+      title: "Report",
+      nodes: [{ id: "slack", label: "Slack digest", detail: "Doc links, confidence, issues", kind: "output" }],
+    },
+  ],
+  howItWorks: [
+    {
+      title: "CONFIG checks itself before anything runs",
+      body: "A placeholder left in place or an ID in the wrong format, such as an Airtable base ID that isn't 17 characters starting with app, stops the run at the CONFIG node with a message that names the fix, before a single API call is made.",
+    },
+    {
+      title: "API errors come back as data, translated into fixes",
+      body: "Every HTTP node returns the full response instead of throwing, so each failure can be explained: a token missing the schema.bases:write scope, the Google Drive API not enabled, a bot that needs to be invited to the channel. The person reading the error is told what to change, not just what broke.",
+    },
+    {
+      title: "Partial failure is reported; total failure is loud",
+      body: "One company's timeout, truncated answer or Docs error is listed in the Slack digest while every other company is still delivered. If every summary fails, the run throws instead of finishing as a success with nothing in it, so the error-alert workflow fires.",
+    },
+    {
+      title: "Retries only where they are safe",
+      body: "Reads retry three times on network errors. Writes and AI calls are never retried automatically, so a flaky connection can't create duplicate Docs or pay for the same summary twice. Airtable writes go in batches of ten spaced 250 ms apart, inside Airtable's limit of five requests a second, and the Slack digest stays inside its block and character limits.",
+    },
+  ],
+  results: [
+    {
+      label: "Live run",
+      body: "On n8n 2.8.4 with real accounts: 10 contacts seeded, 7 companies summarised with gpt-5.4-mini, 7 Google Docs created, and the digest posted to Slack.",
+    },
+    {
+      label: "Tested",
+      body: "Validated inside a real n8n instance against strict mocks of Airtable, OpenAI, Drive, Docs and Slack: pagination, partial OpenAI failures (a 500, truncated output, fenced JSON, a dropped connection), Doc create and write failures, the Drive API disabled, the bot missing from the channel, an empty or missing table, placeholder config and the per-run company cap.",
+    },
+  ],
+  tech: [
+    "n8n",
+    "Airtable API",
+    "OpenAI Chat Completions (JSON mode)",
+    "Google Drive API",
+    "Google Docs API",
+    "Slack API (Block Kit)",
+    "JavaScript (Code nodes)",
+  ],
+  questions: [
+    {
+      q: "How do you automate company research from an Airtable contact list with n8n?",
+      a: "With an n8n workflow that reads the list, groups the contacts by company, asks ChatGPT for a structured brief on each company, and writes every brief to its own Google Doc. The version Harshith Nayaka L built runs daily at 7:00 AM, posts one Slack digest linking every Doc, and reports any company it couldn't finish instead of failing the whole run. In a live run on n8n 2.8.4 it summarised 7 companies into 7 Google Docs.",
+    },
+  ],
+  metaDescription:
+    "n8n workflow that turns an Airtable contact list into a daily ChatGPT brief per company, one Google Doc each, and a Slack digest that reports any failures.",
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/airtable-ai-company-briefs-n8n" }],
+};
+
+const youtubeScraperSheets: CaseStudy = {
+  slug: "youtube-scraper-google-sheets",
+  published: "2026-10-04T16:45:37Z",
+  title: "YouTube to Sheets Scraper",
+  kicker: "24-node n8n workflow",
+  searchKicker: "n8n YouTube Data API scraper",
+  outcome:
+    "Turns search terms, videos, playlists and channels listed in a Google Sheet into one clean, de-duplicated row per video, using the official YouTube Data API instead of scraping pages that break.",
+  meta: [
+    { label: "Type", value: "n8n workflow automation" },
+    { label: "Flow", value: "YouTube Data API v3 → Google Sheets" },
+    { label: "Role", value: "Solo build" },
+    { label: "Status", value: "Live run on n8n 2.8.4" },
+  ],
+  problem: [
+    "Tracking YouTube videos in a spreadsheet usually means one of two bad options: copying details by hand, or an HTML scraper that breaks whenever YouTube changes its page and sits outside its terms of service.",
+    "A sheet that is written to on a schedule has failure modes of its own: duplicate rows on every run, one broken input stopping all the others, and video titles a spreadsheet will happily treat as formulas.",
+  ],
+  build: [
+    "A 24-node n8n workflow on the official YouTube Data API v3. What to scrape is managed from an Inputs tab: column A takes search words, a video URL (watch, youtu.be, Shorts or live), a playlist URL or a channel (@handle, /channel/ or /user/ URL); column B sets the most videos for that row, from 1 to 50; column C pauses a row. Every run writes back the last run time, a status with its reason, and the number of videos found.",
+    "Each input is classified, channel handles are resolved to the channel's uploads playlist, searches and playlists are listed, and video details are fetched 50 IDs per call. Results land in a Videos tab, one row per video: title, channel, description, publish date, view, like and comment counts, duration, tags, thumbnail, IDs and URL, plus the input it came from and first-seen and last-updated dates.",
+    "Re-runs update existing rows in place, keyed by video ID, so nothing is duplicated even when inputs overlap, and the original first-seen date is kept. The first run creates both tabs with headers and two example inputs, then scrapes them.",
+  ],
+  pipeline: [
+    {
+      title: "Trigger",
+      nodes: [{ id: "cron", label: "Daily 6:00 AM", detail: "Or Run Scraper, by hand", kind: "input" }],
+    },
+    {
+      title: "Prepare",
+      nodes: [{ id: "tabs", label: "Open the sheet", detail: "Create tabs if missing", kind: "logic" }],
+    },
+    {
+      title: "Plan",
+      nodes: [{ id: "classify", label: "Classify inputs", detail: "Search, video, playlist, channel", kind: "logic" }],
+    },
+    {
+      title: "Fetch",
+      nodes: [
+        { id: "resolve", label: "Resolve channels", detail: "@handle → uploads playlist", kind: "logic" },
+        { id: "details", label: "Video details", detail: "50 IDs per API call", kind: "logic" },
+      ],
+    },
+    {
+      title: "Write",
+      nodes: [
+        { id: "write", label: "Batch write", detail: "Update in place, append new", kind: "gate" },
+        { id: "status", label: "Per-row status", detail: "✅ / ⚠️ / ❌ with the reason", kind: "output" },
+      ],
+    },
+  ],
+  pipelineIntro:
+    "The pipeline, end to end. Every stage assumes an input or an API call can fail, so the interesting work is in the checks, not just the happy path.",
+  howItWorks: [
+    {
+      title: "One bad input never stops the others",
+      body: "A private playlist, a deleted video, an unknown handle or a legacy /c/ URL gets a ❌ and the reason in its own row of the Inputs tab, and every other row is still scraped. Exhausted quota, an invalid key, a disabled API or a sheet that isn't shared each produce a message that names the fix.",
+    },
+    {
+      title: "Writes can't smuggle in a formula",
+      body: "Values are written with the RAW input option, so a video titled =HYPERLINK(…) stays text instead of becoming a live formula. Control characters are stripped and cell lengths are capped before anything reaches the sheet.",
+    },
+    {
+      title: "It won't overwrite a tab it didn't create",
+      body: "If the Videos tab already holds data this workflow didn't write, the run stops and asks for an empty tab or a different tab name rather than writing over someone else's work.",
+    },
+    {
+      title: "Quota is guarded, not hoped for",
+      body: "The free tier allows 10,000 units a day, a search costs 100 and most lookups cost 1. Video details are fetched 50 at a time, and a per-run cap on searches (20 by default) makes it impossible to spend the whole day's quota in one run.",
+    },
+  ],
+  results: [
+    {
+      label: "Live run",
+      body: "On n8n 2.8.4 with real accounts: 10 videos written to the sheet, and both inputs marked ✅.",
+    },
+    {
+      label: "Tested",
+      body: "Validated inside a real n8n instance against strict mocks of the YouTube and Sheets APIs: a first run on an empty sheet, eleven mixed input types, in-place updates, max-results clamping, formula injection, deleted videos, exhausted quota, a tab the workflow didn't create, empty inputs and a wrong sheet ID.",
+    },
+  ],
+  tech: ["n8n", "YouTube Data API v3", "Google Sheets API", "JavaScript (Code nodes)"],
+  questions: [
+    {
+      q: "How do you scrape YouTube video data into Google Sheets reliably?",
+      a: "Use the official YouTube Data API v3 rather than scraping the page, which breaks when YouTube changes its layout. Harshith Nayaka L's n8n workflow reads search terms, video, playlist and channel URLs from an Inputs tab, fetches video details 50 at a time, and writes one row per video to Google Sheets, updating existing rows in place so re-runs never duplicate. Values are written as raw text so a title can't inject a formula, and each input row gets its own status and reason.",
+    },
+  ],
+  metaDescription:
+    "n8n workflow pulling YouTube videos, playlists and channels into Google Sheets through the official Data API: one row per video, no duplicates on re-runs.",
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/youtube-scraper-google-sheets-n8n" }],
+};
+
+const slackWeeklyReport: CaseStudy = {
+  slug: "slack-weekly-report-bot",
+  published: "2026-10-04T16:45:37Z",
+  title: "Slack Weekly Report Bot",
+  kicker: "n8n Slack bot + error alerts",
+  searchKicker: "n8n weekly outreach report",
+  outcome:
+    "Posts the week's outreach numbers to a private Slack channel every Monday at 9:00 AM, and refuses to post anything it can't stand behind: stale weeks, half-filled rows or a public channel.",
+  meta: [
+    { label: "Type", value: "n8n workflow + Slack bot" },
+    { label: "Flow", value: "Google Sheets → Slack" },
+    { label: "Role", value: "Solo build" },
+    { label: "Status", value: "Live run on n8n 2.8.4" },
+  ],
+  problem: [
+    "A weekly numbers post looks trivial until it goes wrong in front of the team: last week's figures reposted as this week's, a half-filled row reported as zero, or the report landing in a public channel it was never meant for.",
+    "Those mistakes are worse than a missing report, because people act on the numbers they see.",
+  ],
+  build: [
+    "A 14-node n8n workflow plus a Slack app manifest that creates the bot in about a minute. Every Monday at 9:00 AM, or on demand, it takes the week's leads contacted, replies, meetings booked and positive replies, either from a Weekly Metrics tab in Google Sheets with one row per week or from CONFIG, and posts them in exactly the requested plain-text format so notifications read correctly. The Slack view adds reply, positive and meeting rates and week-over-week change.",
+    "Before posting, a preflight call to Slack checks that the channel exists, isn't archived, is private and has the bot as a member, and each failure says exactly what to do. If the Weekly Metrics tab is missing, the workflow creates it with headers and stops so the numbers can be filled in.",
+    "A separate four-node error workflow posts any failed run to Slack with the failing node, the error and a link, and is shared by the other workflows.",
+  ],
+  pipeline: [
+    {
+      title: "Trigger",
+      nodes: [{ id: "cron", label: "Monday 9:00 AM", detail: "Or Send Now, by hand", kind: "input" }],
+    },
+    {
+      title: "Preflight",
+      nodes: [{ id: "preflight", label: "Channel check", detail: "Exists, private, not archived, bot in", kind: "gate" }],
+    },
+    {
+      title: "Read",
+      nodes: [{ id: "sheet", label: "Weekly Metrics", detail: "Sheet tab, or numbers from CONFIG", kind: "logic" }],
+    },
+    {
+      title: "Check",
+      nodes: [{ id: "checks", label: "Data checks", detail: "Complete, numeric, not stale", kind: "gate" }],
+    },
+    {
+      title: "Deliver",
+      nodes: [
+        { id: "post", label: "Post to Slack", detail: "Exact text + Block Kit", kind: "output" },
+        { id: "verify", label: "Verify delivery", detail: "Fails loudly if rejected", kind: "gate" },
+      ],
+    },
+  ],
+  pipelineIntro:
+    "The pipeline, end to end. Every stage assumes an input or an API call can fail, so the interesting work is in the checks, not just the happy path.",
+  howItWorks: [
+    {
+      title: "Private is enforced, not assumed",
+      body: "With requirePrivate on, the default, the report refuses to post to a public channel. The preflight runs before any numbers are read, so a wrong channel ID fails early with the fix spelled out.",
+    },
+    {
+      title: "No bad numbers get posted",
+      body: "Nothing is posted if the latest week has an empty or non-numeric cell, if the newest data is older than 14 days, or if the tab holds only headers. A report that can't be trusted is held back rather than sent.",
+    },
+    {
+      title: "Forgiving about input, strict about output",
+      body: "It accepts real date cells, ISO dates, day-first dates such as 05/10/2026 and numbers written with commas, and it flags impossible data such as more replies than leads contacted, while the posted text always matches the exact format.",
+    },
+    {
+      title: "Failures reach a person",
+      body: "Any failed run, from this workflow or the others that use it, is posted to Slack with the node that failed, the error and a link to the execution, so a broken schedule doesn't fail silently for weeks.",
+    },
+  ],
+  results: [
+    {
+      label: "Live run",
+      body: "On n8n 2.8.4 with real accounts, the report was posted to a private channel. The error-alert workflow was verified in production mode: a forced failure in a scheduled run posted an alert to Slack.",
+    },
+    {
+      label: "Tested",
+      body: "Validated inside a real n8n instance against strict mocks of the Slack and Sheets APIs: the exact text output, week-over-week deltas, the manual source, a missing tab, stale data, an incomplete row, a public channel, the bot not being a member, a channel that doesn't exist and a rejected post.",
+    },
+  ],
+  tech: ["n8n", "Slack Web API (Block Kit)", "Google Sheets API", "Slack app manifest", "JavaScript (Code nodes)"],
+  questions: [
+    {
+      q: "How do you post an automated weekly report to Slack with n8n?",
+      a: "Schedule an n8n workflow to read the week's numbers, check them, and post with the Slack API. Harshith Nayaka L's version runs every Monday at 9:00 AM, reads leads contacted, replies, meetings booked and positive replies from Google Sheets, and posts them to a private channel. Before posting it confirms the channel is private and the bot is in it, and it refuses to post a week with missing, non-numeric or stale numbers.",
+    },
+  ],
+  metaDescription:
+    "n8n Slack bot that posts weekly outreach numbers to a private channel every Monday, and refuses to post stale, incomplete or public-channel reports.",
+  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/slack-weekly-report-bot-n8n" }],
+};
+
 export const caseStudies: Record<string, CaseStudy> = {
   spectra,
   "personal-os-mcp": personalOsMcp,
@@ -1443,6 +1840,10 @@ export const caseStudies: Record<string, CaseStudy> = {
   replydesk,
   "nova-ai": novaAi,
   "ai-notes": aiNotes,
+  octo,
+  "airtable-ai-company-briefs": airtableCompanyBriefs,
+  "youtube-scraper-google-sheets": youtubeScraperSheets,
+  "slack-weekly-report-bot": slackWeeklyReport,
 };
 
 export const getCaseStudy = (slug: string): CaseStudy | undefined =>

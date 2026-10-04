@@ -136,12 +136,7 @@ export default function CaseStudy() {
           {study.inProgress && (
             <div className="mt-8 flex items-start gap-3 rounded-[var(--radius-lg)] border border-accent/25 bg-accent-dim px-4 py-3.5 text-sm text-dim">
               <Info weight="bold" size={18} className="mt-0.5 shrink-0 text-accent-ink" />
-              <p>
-                This is the flagship write-up, still being finished. The
-                architecture and engineering approach below are real; the full
-                walkthrough with sample runs is on its way. It's a clean rebuild
-                on public APIs, with no client data or proprietary logic.
-              </p>
+              <p>{study.inProgress}</p>
             </div>
           )}
         </div>
@@ -205,8 +200,8 @@ export default function CaseStudy() {
             How it's wired
           </h2>
           <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-dim">
-            The pipeline, end to end. Every stage assumes the model can be wrong,
-            so the interesting work is in the verify steps, not just generation.
+            {study.pipelineIntro ??
+              "The pipeline, end to end. Every stage assumes the model can be wrong, so the interesting work is in the verify steps, not just generation."}
           </p>
         </Reveal>
         <Reveal delay={0.1}>

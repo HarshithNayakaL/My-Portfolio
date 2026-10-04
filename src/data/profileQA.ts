@@ -64,7 +64,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `Does ${NAME} work with n8n?`,
-    a: `Yes. ${NAME} builds AI workflow automation in n8n. His Creative-Ops Pipeline is a roughly 90-node n8n workflow with model routing, schema-constrained output and QA gates, and BrandForge's orchestration can run on n8n.`,
+    a: `Yes. ${NAME} builds AI workflow automation in n8n. His Creative-Ops Pipeline is a roughly 90-node n8n workflow with model routing, schema-constrained output and QA gates, and BrandForge's orchestration can run on n8n. His public n8n workflows include AI Company Briefs (Airtable contacts to a ChatGPT brief per company, saved as Google Docs with a Slack digest), a YouTube to Google Sheets scraper on the official YouTube Data API, and a Slack weekly report bot that refuses to post stale or incomplete numbers, each tested live on n8n 2.8.4.`,
   },
   {
     q: `What is ${NAME}'s tech stack?`,

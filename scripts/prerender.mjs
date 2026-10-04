@@ -407,6 +407,9 @@ const mdPathFor = (path) =>
 function caseStudyBody(cs, depth) {
   const h = "#".repeat(depth);
   const L = [];
+  // The page's in-progress notice, so an agent reading the twin gets the
+  // same caveat a person reading the page does.
+  if (cs.inProgress) L.push(`**Status: in progress.** ${cs.inProgress}`, "");
   if (cs.meta?.length) {
     L.push(cs.meta.map((m) => `- **${m.label}:** ${m.value}`).join("\n"), "");
   }

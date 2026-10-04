@@ -119,6 +119,17 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
+    slug: "octo",
+    title: "Octo",
+    kicker: "Multi-agent research workspace",
+    outcome:
+      "A research director agent hands questions to specialist agents with live web search and returns cited reports and company records \u2014 built so a lost response can never start a second paid session.",
+    tags: ["OpenAI Agents API", "Multi-agent", "Cited research", "Serverless"],
+    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/octo" }],
+    hasCaseStudy: true,
+    status: "in-progress",
+  },
+  {
     slug: "nova-ai",
     title: "Nova",
     kicker: "Cost-tiered model routing",
@@ -143,6 +154,42 @@ export const projects: Project[] = [
         label: "GitHub",
         href: "https://github.com/HarshithNayakaL/Whatsapp-Agent-Dashboard",
       },
+    ],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "airtable-ai-company-briefs",
+    title: "AI Company Briefs",
+    kicker: "32-node n8n workflow",
+    outcome:
+      "Every morning, a ChatGPT brief on each company in an Airtable contact list, saved as its own Google Doc, with a Slack digest that links them all and names any company it couldn't finish.",
+    tags: ["n8n", "Airtable", "OpenAI", "Google Docs + Slack"],
+    links: [
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/airtable-ai-company-briefs-n8n" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "youtube-scraper-google-sheets",
+    title: "YouTube to Sheets Scraper",
+    kicker: "24-node n8n workflow",
+    outcome:
+      "Search terms, videos, playlists and channels listed in a Google Sheet become one de-duplicated row per video, through the official YouTube Data API rather than a scraper that breaks.",
+    tags: ["n8n", "YouTube Data API", "Google Sheets", "Idempotent writes"],
+    links: [
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/youtube-scraper-google-sheets-n8n" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "slack-weekly-report-bot",
+    title: "Slack Weekly Report Bot",
+    kicker: "n8n Slack bot + error alerts",
+    outcome:
+      "Posts the week's outreach numbers to a private Slack channel every Monday, and refuses to post stale weeks, half-filled rows or to a public channel.",
+    tags: ["n8n", "Slack", "Google Sheets", "Data checks"],
+    links: [
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/slack-weekly-report-bot-n8n" },
     ],
     hasCaseStudy: true,
   },
