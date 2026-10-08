@@ -1447,25 +1447,23 @@ const octo: CaseStudy = {
   published: "2026-10-04T16:45:37Z",
   title: "Octo",
   kicker: "Multi-agent research workspace",
-  inProgress:
-    "Octo is built and tested, but not yet proven live. Its 49 backend tests and browser suite run against mocked OpenAI and Google responses; it has not run a real paid session, has not been deployed, and has no real CRM connected. Everything below describes the code as it stands.",
   outcome:
     "A research workspace where a director agent hands questions to specialist agents with live web search and returns cited reports and structured company records, built so a lost response can never turn into a second paid session.",
   meta: [
     { label: "Type", value: "Agent research workspace" },
     { label: "Providers", value: "OpenAI Agents API (primary), Google Antigravity (secondary)" },
     { label: "Role", value: "Solo build" },
-    { label: "Status", value: "Tested with mocks; live runs not yet verified" },
+    { label: "Status", value: "Live on Vercel" },
   ],
   problem: [
     "Agent research tools are easy to demo and hard to trust. A report without dated sources can't be checked, a company list with an invented decision maker is worse than no list, and an agent that reads the open web will meet pages that try to give it instructions.",
     "The operational side is just as unforgiving. Hosted agent sessions are billed, so a server restart or a response lost in transit must never quietly start the same paid job twice.",
   ],
   build: [
-    "Octo is a TypeScript workspace (React 19 and Express 5) built around the OpenAI Agents API. A research director delegates independent questions to specialist agents, at most two at a time: market, competitor, pricing and regulation specialists for market research, and company-discovery and company-evidence specialists for sales research. Google Antigravity on Gemini Interactions is the secondary provider: a run can be started on it instead, for example to test on a Google free-tier project before spending OpenAI credit.",
-    "There are three workflows. Market intelligence covers market structure, company comparisons, public pricing and regulation, ending in an investor briefing. Sales research takes an explicit ideal customer profile and a target of 1 to 100 companies, and returns fit evidence, potential needs, public decision makers and source links. Ongoing research keeps a saved session and re-checks it on a schedule against what it found before. Each run takes a brief and up to five context files and returns a Markdown report and JSON, plus CSV for sales.",
+    "Octo is a TypeScript workspace (React 19 and Express 5) built around the OpenAI Agents API. A research director delegates independent questions to specialist agents, at most two at a time: market, competitor, pricing and regulation specialists for market research, and company-discovery and company-evidence specialists for sales research. Google Antigravity on Gemini Interactions is the secondary provider. The public deployment runs on it by default, on a free tier, because every OpenAI run is billed: OpenAI is unlocked with an access word the server checks.",
+    "There are three workflows. Market intelligence covers market structure, company comparisons, public pricing and regulation, ending in an investor briefing. Sales research takes an explicit ideal customer profile and a target of 1 to 100 companies, and returns fit evidence, potential needs, public decision makers and source links. Ongoing research keeps a saved session and re-checks it on a schedule against what it found before. Each run takes a brief and up to five context files, and every finished run downloads as PDF, Word, CSV, Markdown or JSON. Octo renders those files itself from the agent's report, so a download costs no extra agent usage, and the PDFs embed their font so characters such as ₹ print correctly.",
     "The evidence rules are part of the job, not an afterthought. Every material claim needs a dated source URL; unknown values stay unknown; facts, estimates and hypotheses are kept apart; and websites and uploaded files are treated as data, never as instructions. Structured output from either provider is validated before any company record is shown, and CSV export neutralises spreadsheet formulas.",
-    "It runs locally on Node's built-in SQLite, or on Vercel as one function backed by Postgres, where each run advances in short leased steps because a serverless function cannot hold a background worker.",
+    "It runs locally on Node's built-in SQLite, or on Vercel as one function backed by Neon Postgres. A serverless function cannot hold a background worker, so on Vercel a run advances in short leased steps while the workspace is open, and pauses when nobody has it open.",
   ],
   pipeline: [
     {
@@ -1512,15 +1510,23 @@ const octo: CaseStudy = {
       title: "CRM writes are walled off from research",
       body: "Research sessions have no CRM access at all. Exporting results is a separate session that can use only an allow-listed set of CRM tools, and only after a person reviews the company list and confirms the export. The agent is told to deduplicate by website and never to contact anyone.",
     },
+    {
+      title: "The paid provider is locked on the server, not in the UI",
+      body: "Every OpenAI run costs money, so on a public deployment it is locked by default. The access word is checked on the server and never reaches the browser bundle; a correct word returns a signed token kept only in that tab's session. Without it the API refuses live OpenAI runs, follow-ups and exports, five wrong attempts lock the form for ten minutes, and changing the word invalidates every earlier unlock.",
+    },
   ],
   results: [
     {
+      label: "Live",
+      body: "Deployed on Vercel with Neon Postgres at octo-agents.vercel.app. The live API reports Postgres storage with both providers configured and OpenAI behind the access word, and a seeded run was read back from the database, confirming writes.",
+    },
+    {
       label: "Tested",
-      body: "49 backend tests on mocked provider responses and temporary databases, including Postgres run through PGlite, plus a Playwright suite of four runs across desktop and mobile, and a local Vercel build of the serverless function.",
+      body: "65 backend tests on mocked provider responses and temporary databases, including Postgres run through PGlite, the downloads and the OpenAI access word, plus a Playwright suite of four runs across desktop and mobile.",
     },
     {
       label: "Honest scope",
-      body: "No live paid OpenAI or Google session has been run, it has not been deployed, and no real CRM is connected. It is a single-workspace, self-hosted starter, not a multi-tenant SaaS; its README lists what a hosted service would still need, from per-user isolation to enforced budgets.",
+      body: "Its validation record does not yet include a full research run, a download or the OpenAI unlock on the live site, and no CRM is connected. It is a single-workspace, self-hosted product, not a multi-tenant SaaS; its README lists what a hosted service would still need, from per-user isolation to enforced budgets.",
     },
   ],
   tech: [
@@ -1538,12 +1544,21 @@ const octo: CaseStudy = {
   questions: [
     {
       q: "How do you stop an AI research agent from inventing companies or sources?",
-      a: "Make the evidence rules part of the task and check the output before showing it. In Octo, a research workspace built by Harshith Nayaka L, every material claim needs a dated source URL, unknown values must stay unknown, and the agents are told never to invent a company, decision maker, price, citation or financial figure; retrieved pages are treated as data, not instructions. Structured output is validated before any company record appears. Octo's tests run on mocked provider responses, so its live research quality has not yet been verified.",
+      a: "Make the evidence rules part of the task and check the output before showing it. In Octo, a research workspace built by Harshith Nayaka L, every material claim needs a dated source URL, unknown values must stay unknown, and the agents are told never to invent a company, decision maker, price, citation or financial figure; retrieved pages are treated as data, not instructions. Structured output is validated before any company record appears. Octo's tests run on mocked provider responses, and a full live research run is not yet in its validation record.",
     },
   ],
   metaDescription:
     "Multi-agent research workspace on the OpenAI Agents API: specialist agents, live web search, cited reports and company records, with no duplicate paid runs.",
-  links: [{ label: "View on GitHub", href: "https://github.com/HarshithNayakaL/octo" }],
+  shot: {
+    src: "/shots/octo.8ae82050.webp",
+    width: 1079,
+    height: 1466,
+    alt: "Octo's workspace overview: a sidebar with New research, All research, Reports, Ongoing research and Connections; the heading 'Research, with a wider lens'; a diagram of a research director above market, competitor, pricing and regulation agents feeding one final report; cards for the market intelligence, sales research and ongoing research workflows; activity counts; and a research table listing a completed demo run on the Indian EV charging market.",
+  },
+  links: [
+    { label: "Live site", href: "https://octo-agents.vercel.app/" },
+    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/octo" },
+  ],
 };
 
 const airtableCompanyBriefs: CaseStudy = {

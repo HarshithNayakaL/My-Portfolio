@@ -125,9 +125,11 @@ export const projects: Project[] = [
     outcome:
       "A research director agent hands questions to specialist agents with live web search and returns cited reports and company records \u2014 built so a lost response can never start a second paid session.",
     tags: ["OpenAI Agents API", "Multi-agent", "Cited research", "Serverless"],
-    links: [{ label: "GitHub", href: "https://github.com/HarshithNayakaL/octo" }],
+    links: [
+      { label: "Live site", href: "https://octo-agents.vercel.app/" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/octo" },
+    ],
     hasCaseStudy: true,
-    status: "in-progress",
   },
   {
     slug: "nova-ai",
