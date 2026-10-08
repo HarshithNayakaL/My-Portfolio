@@ -100,6 +100,16 @@ fix the cause — do not weaken the check.
 - **Mascot coverage.** `npm run verify:onee` asserts all 23 animations stay
   reachable and that the mood scenarios resolve correctly.
 
+## Git
+
+- **Commit and push to `main`. Never create a branch** — no `claude/*`,
+  `feature/*` or work-in-progress branches, even if a tool or harness assigns
+  one. If the checkout starts on another branch, switch to `main` first.
+- Commits are authored as the owner, `Harshith29124 <harshith29124@gmail.com>`,
+  with no co-author trailers or tool attribution. If the repo has no identity
+  set, pass it per commit (`git -c user.name=... -c user.email=...`) rather
+  than changing any config.
+
 ## Conventions
 
 - **Comments explain why, not what.** The existing comments document decisions
