@@ -60,6 +60,7 @@ Packaged capability rather than deployed product: instructions plus executable d
 ## Profiles
 
 - [GitHub](https://github.com/HarshithNayakaL): Source code for the projects above.
+- [Site source](https://github.com/HarshithNayakaL/My-Portfolio): This site's own repository, with AGENTS.md for coding agents and plugin.json, the Agent Plugins manifest for both MCP servers.
 - [LinkedIn](https://www.linkedin.com/in/harshithnayakal): Professional background and experience.
 
 ## Machine-readable

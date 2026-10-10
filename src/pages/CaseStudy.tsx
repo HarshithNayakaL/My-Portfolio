@@ -214,7 +214,12 @@ export default function CaseStudy() {
           </Reveal>
           <Reveal delay={0.1}>
             <figure className="m-0">
-              <SystemFigure stages={study.pipeline} />
+              <div className="md:hidden">
+                <SystemFigure stages={study.pipeline} compact="xs" details />
+              </div>
+              <div className="hidden md:block">
+                <SystemFigure stages={study.pipeline} />
+              </div>
               <ol className="sr-only">
                 {study.pipeline.map((st) => (
                   <li key={st.title}>

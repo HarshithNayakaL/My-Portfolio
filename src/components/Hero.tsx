@@ -72,13 +72,11 @@ export default function Hero() {
               </span>
             </span>
           ))}
-          <span className="word-mask">
-            <span
-              className="word-rise hero-serif"
-              style={d(wordDelay(HEAD_LEAD.length))}
-            >
-              production.
-            </span>
+          {/* No clip mask: the serif word is set larger than the line, so a
+              mask would either cut its glyphs or force the line taller. It
+              fades up instead. */}
+          <span className="anim-rise hero-serif" style={d(wordDelay(HEAD_LEAD.length))}>
+            production.
           </span>
         </p>
 

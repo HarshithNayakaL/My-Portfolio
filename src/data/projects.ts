@@ -10,6 +10,8 @@ export type Project = {
 };
 
 export const GITHUB = "https://github.com/HarshithNayakaL";
+/** This site's own repository: AGENTS.md and the Agent Plugins manifest live there. */
+export const SITE_REPO = `${GITHUB}/My-Portfolio`;
 export const LINKEDIN =
   "https://www.linkedin.com/in/harshithnayakal";
 export const EMAIL = "harshith28124@gmail.com";

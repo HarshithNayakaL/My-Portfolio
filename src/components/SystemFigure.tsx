@@ -34,8 +34,18 @@ const isAccent = (n: PipelineNode) => n.kind === "gate" || n.kind === "output";
 type Box = { x: number; y: number; w: number; h: number; node: PipelineNode; label: string[]; sub: string[]; fs: number };
 
 export default function SystemFigure({
-  stages, compact = "",
-}: { stages: PipelineStage[]; compact?: "" | "lg" | "sm" }) {
+  stages, compact = "", details = false,
+}: {
+  stages: PipelineStage[];
+  compact?: "" | "lg" | "sm" | "xs";
+  /** xs only: show each step's detail line inside its box (case-study page). */
+  details?: boolean;
+}) {
+  // xs: the phone layout. A single narrow column with only step numbers in
+  // the gutter; the gate rules move out of the SVG into a numbered HTML list
+  // under it, because a notes column beside the boxes left the boxes at half
+  // size on a 390px screen and the notes unreadable.
+  if (compact === "xs") return <PhoneFigure stages={stages} details={details} />;
   const sm = compact === "sm";
   const LH = sm ? 20 : compact ? 18 : 17, SFS = 10.5, GAP = compact ? 26 : 54;
   const AFS = sm ? 18 : compact ? 16 : 15; // margin note
@@ -141,5 +151,88 @@ export default function SystemFigure({
         );
       })}
     </svg>
+  );
+}
+
+function PhoneFigure({ stages, details }: { stages: PipelineStage[]; details: boolean }) {
+  const X0 = 30, span = 310, G = 12, LH = 17, SFS = 10.5, GAP = 28;
+  let y = 4;
+  const rows: Box[][] = [];
+  const nums: { y: number }[] = [];
+  const notes: { box: Box; label: string; text: string }[] = [];
+
+  stages.forEach((st, si) => {
+    const n = st.nodes.length;
+    const bw = n === 1 ? 220 : (span - G * (n - 1)) / n;
+    const sx = X0 + span / 2 - (n * bw + (n - 1) * G) / 2;
+    const FS = n === 3 ? 12.5 : 13.5;
+    const gate = [...st.nodes].reverse().find((nd) => nd.kind === "gate" && nd.detail);
+    const boxes = st.nodes.map((nd, i) => {
+      const label = wrap(nd.label, Math.floor((bw - (nd === gate ? 34 : 20)) / (FS * 0.58)), 3);
+      const sub = details && nd !== gate && nd.detail ? wrap(nd.detail, Math.floor((bw - 20) / 5.6), 3) : [];
+      const h = 18 + label.length * LH + (sub.length ? 4 + sub.length * (SFS + 4) : 0);
+      return { x: sx + i * (bw + G), y, w: bw, h, node: nd, label, sub, fs: FS } as Box;
+    });
+    const rh = Math.max(...boxes.map((b) => b.h));
+    boxes.forEach((b) => (b.h = rh));
+    rows.push(boxes);
+    nums.push({ y });
+    if (gate) notes.push({ box: boxes.find((b) => b.node === gate)!, label: gate.label, text: gate.detail! });
+    y += rh + (si < stages.length - 1 ? GAP : 4);
+  });
+
+  const cx = (b: Box) => b.x + b.w / 2;
+  const noteNo = (b: Box) => notes.findIndex((nt) => nt.box === b) + 1;
+
+  return (
+    <div>
+      <svg viewBox={`0 0 ${X0 + span + 2} ${y}`} className="fig-diag h-auto w-full" aria-hidden>
+        {nums.map((g, i) => (
+          <text key={i} x={0} y={g.y + 16} className="sn" style={{ fontSize: 16 }}>{String(i + 1).padStart(2, "0")}</text>
+        ))}
+        {rows.slice(1).map((row, i) => {
+          const prev = rows[i];
+          const top = row[0].y, bottom = prev[0].y + prev[0].h, bus = bottom + (top - bottom) / 2;
+          const xs = [...prev, ...row].map(cx);
+          const d =
+            prev.map((b) => `M${cx(b)} ${bottom} V${bus}`).join(" ") +
+            ` M${Math.min(...xs)} ${bus} H${Math.max(...xs)} ` +
+            row.map((b) => `M${cx(b)} ${bus} V${top}`).join(" ");
+          return <path key={i} d={d} className="ln" />;
+        })}
+        {rows.flat().map((b) => {
+          const k = noteNo(b);
+          return (
+            <g key={b.node.id}>
+              <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={9} className={isAccent(b.node) ? "dn acc" : "dn"} />
+              {b.label.map((l, i) => (
+                <text key={i} x={b.x + 10} y={b.y + 9 + b.fs * 0.85 + i * LH} className="dt" style={{ fontSize: b.fs }}>{l}</text>
+              ))}
+              {b.sub.map((l, i) => (
+                <text key={i} x={b.x + 10} y={b.y + 9 + b.fs * 0.85 + b.label.length * LH + 2 + SFS + i * (SFS + 4)} className="ds">{l}</text>
+              ))}
+              {k > 0 && (
+                <g>
+                  <rect x={b.x + b.w - 20} y={b.y + 7} width={14} height={14} rx={3} fill="var(--color-btn)" />
+                  <text x={b.x + b.w - 13} y={b.y + 18} textAnchor="middle" className="fig-num">{k}</text>
+                </g>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      {notes.length > 0 && (
+        <ol className="fig-notes mt-4" aria-hidden>
+          {notes.map((nt, i) => (
+            <li key={nt.label}>
+              <span className="fig-notes-n">{i + 1}</span>
+              <span>
+                <b>{nt.label}:</b> {nt.text}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
   );
 }

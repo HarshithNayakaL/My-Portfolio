@@ -870,11 +870,12 @@
 }
 
 /* Hero: the headline keeps Poppins; only "production." is the serif. The
-   serif's x-height is about three quarters of Poppins', so it is set larger to
-   sit on the same line at the same visual size. line-height 0 stops the bigger
-   glyphs from pushing the line box open. */
+   serif's x-height is about three quarters of Poppins', so it is set 1.3x
+   larger to read at the same size. A small line-height keeps its box inside
+   the headline's line, so the bigger glyphs neither open a gap above the
+   last line nor push it off the shared baseline. */
 .hero-head { font-family: var(--font-hero); font-weight: 600; letter-spacing: -0.02em; }
-.hero-serif { font-family: var(--font-display); font-weight: 400; font-size: 1.3em; line-height: 0; letter-spacing: -0.015em; color: var(--color-accent-ink); }
+.hero-serif { display: inline-block; font-family: var(--font-display); font-weight: 400; font-size: 1.3em; line-height: 0.6; letter-spacing: -0.015em; color: var(--color-accent-ink); }
 
 /* Floating tool tiles in the hero's empty half (decorative, desktop only). */
 .orbit-tile {
@@ -931,3 +932,11 @@
 /* Single-colour black logos (Rust, Bun, OpenAI, MCP, TypeSafe) would vanish
    on the dark pills and tiles; invert them there. */
 .dark .icon-mono { filter: invert(0.92); }
+
+/* Phone layout of the system figure: numbered gate markers in the SVG, the
+   rules themselves as real text underneath. */
+.fig-diag .fig-num { font-size: 10px; font-weight: 700; fill: var(--color-on-btn); }
+.fig-notes { display: grid; gap: 0.5rem; font-size: 0.875rem; line-height: 1.45; color: var(--color-dim); }
+.fig-notes li { display: flex; gap: 0.6rem; align-items: baseline; }
+.fig-notes b { font-weight: 600; color: var(--color-ink); }
+.fig-notes-n { flex: none; display: inline-grid; place-items: center; width: 1.15rem; height: 1.15rem; border-radius: 4px; background: var(--color-btn); color: var(--color-on-btn); font-size: 0.6875rem; font-weight: 700; }

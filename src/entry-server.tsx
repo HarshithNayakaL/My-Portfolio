@@ -8,7 +8,7 @@ import App from "./App";
 // and one bundle for the build step to import.
 export { routeSeo, allRoutes, ORIGIN } from "./data/seo";
 export { caseStudies } from "./data/caseStudies";
-export { projects, NAME, EMAIL, GITHUB, LINKEDIN } from "./data/projects";
+export { projects, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO } from "./data/projects";
 export { agentSkills } from "./data/skills";
 // Page copy the markdown versions are generated from. Re-exported rather than
 // retyped so /work/maestro/index.md and the rendered page can never disagree.

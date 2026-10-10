@@ -19,7 +19,12 @@ export default function WorkCard({ project, size = "lg" }: { project: Project; s
 
   return (
     <article className="wcard group">
-      <div className={`wfig ${big ? "h-[400px]" : "h-[300px]"}`}>
+      {/* The figure follows the card's width, not the screen's: below xl every
+          card is under ~480px wide (one column on phones, two or three
+          columns on tablets and small laptops), too narrow for the desktop
+          figure's notes column, so it gets the stacked phone layout and a
+          frame that grows to fit it. From xl the cards are wide enough. */}
+      <div className={`wfig ${shot ? (big ? "h-[400px]" : "h-[300px]") : big ? "md:min-h-[400px] xl:h-[400px]" : "md:min-h-[300px] xl:h-[300px]"}`}>
         {shot ? (
           <img
             src={shot.src}
@@ -33,9 +38,14 @@ export default function WorkCard({ project, size = "lg" }: { project: Project; s
             decoding="async"
           />
         ) : cs ? (
-          <div className="h-full w-full px-7 pb-5 pt-12">
-            <SystemFigure stages={cs.pipeline} compact={big ? "lg" : "sm"} />
-          </div>
+          <>
+            <div className="w-full px-4 pb-5 pt-12 xl:hidden">
+              <SystemFigure stages={cs.pipeline} compact="xs" />
+            </div>
+            <div className="hidden h-full w-full px-7 pb-5 pt-12 xl:block">
+              <SystemFigure stages={cs.pipeline} compact={big ? "lg" : "sm"} />
+            </div>
+          </>
         ) : null}
         <span className="wfig-tag" aria-hidden>{shot ? "Screenshot" : "System figure"}</span>
       </div>

@@ -24,7 +24,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
 
 const {
-  caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN,
+  caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO,
   facts, availability, headlineRole, workingTitle, previousTitle, identitySentence, stack, stackSentence, profileQA,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
@@ -1023,6 +1023,8 @@ const developerPortal = [
   "```",
   "",
   "That is the whole setup. There is no authentication step because there is nothing here that is not already public on the page.",
+  "",
+  `The site's own source is public at ${SITE_REPO}: \`AGENTS.md\` there tells a coding agent how the repository works, and \`plugin.json\` bundles both MCP servers as an Agent Plugin.`,
   "",
   "## Endpoints",
   "",

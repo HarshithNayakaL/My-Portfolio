@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { scrollToSection } from "../lib/scrollToSection";
-import { EMAIL, LINKEDIN, GITHUB, NAME } from "../data/projects";
+import { EMAIL, LINKEDIN, GITHUB, NAME, SITE_REPO } from "../data/projects";
 import { headlineRole } from "./About";
 import { contentDate } from "../lib/contentDate";
 
@@ -46,6 +46,9 @@ const connect = [
   { href: `mailto:${EMAIL}`, label: "Email", ext: false },
   { href: LINKEDIN, label: "LinkedIn", ext: true },
   { href: GITHUB, label: "GitHub", ext: true },
+  // Agent-readiness scanners look for a public repo with AGENTS.md and a
+  // plugin.json; nothing on the site pointed at it, so none found one.
+  { href: SITE_REPO, label: "Site source", ext: true },
 ];
 
 export default function Footer() {
