@@ -164,6 +164,8 @@ export default function CaseStudy() {
               <div className="elev overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface/50">
                 <img
                   src={study.shot.src}
+                  srcSet={study.shot.small ? `${study.shot.small} 640w, ${study.shot.src} ${study.shot.width}w` : undefined}
+                  sizes="(min-width: 800px) 720px, calc(100vw - 2.5rem)"
                   width={study.shot.width}
                   height={study.shot.height}
                   alt={study.shot.alt}

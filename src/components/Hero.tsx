@@ -12,7 +12,9 @@ const HEAD_LEAD = "I build AI systems — agents, RAG, end-to-end AI apps — en
   " ",
 );
 const d = (s: number) => ({ "--delay": `${s}s` }) as CSSProperties;
-const wordDelay = (i: number) => 0.15 + i * 0.04;
+// The last word, "production.", is the page's LCP element, so the stagger is
+// kept tight: at 0.04s a word it started 0.67s in and LCP waited for it.
+const wordDelay = (i: number) => 0.1 + i * 0.03;
 
 export default function Hero() {
   const goTo = (id: string) => scrollToSection(id);

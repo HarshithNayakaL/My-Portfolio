@@ -21,7 +21,17 @@ export default function WorkCard({ project, size = "lg" }: { project: Project; s
     <article className="wcard group">
       <div className={`wfig ${big ? "h-[400px]" : "h-[300px]"}`}>
         {shot ? (
-          <img src={shot.src} alt="" width={shot.width} height={shot.height} loading="lazy" decoding="async" />
+          <img
+            src={shot.src}
+            srcSet={shot.small ? `${shot.small} 640w, ${shot.src} ${shot.width}w` : undefined}
+            // The frame shows the image at 86% of the card's width.
+            sizes={big ? "(min-width: 1280px) 520px, (min-width: 768px) 40vw, 86vw" : "(min-width: 1024px) 300px, (min-width: 768px) 40vw, 86vw"}
+            alt=""
+            width={shot.width}
+            height={shot.height}
+            loading="lazy"
+            decoding="async"
+          />
         ) : cs ? (
           <div className="h-full w-full px-7 pb-5 pt-12">
             <SystemFigure stages={cs.pipeline} compact={big ? "lg" : "sm"} />

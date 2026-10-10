@@ -61,7 +61,7 @@ export type CaseStudy = {
   /** Real screenshot of the running product. Intrinsic size is the full
    *  capture; the page frames a preview of it, but the served file is whole
    *  so image search and AI surfaces get the entire thing. */
-  shot?: { src: string; width: number; height: number; alt: string };
+  shot?: { src: string; width: number; height: number; alt: string; /** 640px-wide copy for srcset */ small?: string };
   links: { label: string; href: string }[];
   /** The published research or documentation a claim on the page rests on,
    *  listed under "Sources" and as the Article's schema.org citation. Only
@@ -171,6 +171,7 @@ const craftconnect: CaseStudy = {
   ],
   shot: {
     src: "/shots/craftconnect.7e7af1fa.webp",
+    small: "/shots/craftconnect-640.46746c16.webp",
     width: 1440,
     height: 900,
     alt: "CraftConnect's assistant screen: the heading 'How can I help you today?' above a large microphone button, prompting the user to speak about their business, with a Type control beside it for switching to text and Marketplace, Resources and Community navigation across the top.",
@@ -672,6 +673,7 @@ const novaAi: CaseStudy = {
   ],
   shot: {
     src: "/shots/nova-ai.bf8eb4ca.webp",
+    small: "/shots/nova-ai-640.8695222c.webp",
     width: 1080,
     height: 962,
     alt: "Nova's opening screen: an AUTO / L1 / L2 / L3 lane switch above the heading \"One prompt in. The right model out.\", three coloured lane cards naming gpt-oss-20b, qwen3.6-27b and gpt-oss-120b with their per-million-token prices, and four example prompts each tagged with the lane they would route to.",
@@ -778,6 +780,7 @@ const aiNotes: CaseStudy = {
   ],
   shot: {
     src: "/shots/ai-notes.f7ec4d0e.webp",
+    small: "/shots/ai-notes-640.8bfda5bf.webp",
     width: 1440,
     height: 900,
     alt: "AI Notes with one entry open: a catalog sidebar headed 'local archive · DeepSeek R1', the note in a ruled editor with Save, Delete and Ask Archive actions above it, an 'AI Offline' badge in the top corner, and 'stored on this device' in the sidebar footer.",
@@ -905,6 +908,7 @@ const maestro: CaseStudy = {
   ],
   shot: {
     src: "/shots/maestro.0a5f6953.webp",
+    small: "/shots/maestro-640.564490c1.webp",
     width: 1080,
     height: 1583,
     alt: "Maestro's main screen: the task box with a question typed into it, the Conductor, Consensus and Single mode selector, an optional API key field, and below them the orchestration timeline — Conductor, Thinker, Worker and a passing Verifier — each labelled with the model that ran it and its token and latency cost.",
@@ -1038,6 +1042,7 @@ const cannon: CaseStudy = {
   ],
   shot: {
     src: "/shots/cannon.63aeed47.webp",
+    small: "/shots/cannon-640.9b414900.webp",
     width: 1080,
     height: 1180,
     alt: "Cannon's dispatch view: a sidebar of domain desks (Dispatch, Fitness, Work, Finance, Learning, Race Engineer) beside an agent grid where each desk lists its own tool count and retrieval scope, plus a card inviting a new agent to be described and built.",
@@ -1154,6 +1159,7 @@ const replydesk: CaseStudy = {
   ],
   shot: {
     src: "/shots/replydesk.b0b90439.webp",
+    small: "/shots/replydesk-640.d5fcd449.webp",
     width: 1080,
     height: 1310,
     alt: "ReplyDesk's lead operations dashboard: KPI tiles for average response time, leads today, hot leads, after-hours answers and percentage auto-handled; an 8-second agent reply compared against a 29-hour typical manual reply; and a live lead feed showing inbound WhatsApp messages with the agent's reply, a lead score, and whether each was auto-handled or routed to the owner.",
@@ -1285,6 +1291,7 @@ const spectra: CaseStudy = {
   ],
   shot: {
     src: "/shots/spectra.0f11b4f7.webp",
+    small: "/shots/spectra-640.075e4be4.webp",
     width: 1079,
     height: 1738,
     alt: "SPECTRA's audit screen on a near-black canvas: an AEO badge over the heading \"Are you in the answer?\", fields for a site and for the questions buyers ask AI, a Gemini 3.1 Flash Lite model selector and a magenta Run audit button, above a panel reading \"27 checks, 4 layers, 1 score\" and a four-step explanation \u2014 crawl like an AI, ask like a buyer, read the answer, fix with code.",
@@ -1551,6 +1558,7 @@ const octo: CaseStudy = {
     "Multi-agent research workspace on the OpenAI Agents API: specialist agents, live web search, cited reports and company records, with no duplicate paid runs.",
   shot: {
     src: "/shots/octo.8ae82050.webp",
+    small: "/shots/octo-640.f65fcbbc.webp",
     width: 1079,
     height: 1466,
     alt: "Octo's workspace overview: a sidebar with New research, All research, Reports, Ongoing research and Connections; the heading 'Research, with a wider lens'; a diagram of a research director above market, competitor, pricing and regulation agents feeding one final report; cards for the market intelligence, sales research and ongoing research workflows; activity counts; and a research table listing a completed demo run on the Indian EV charging market.",
