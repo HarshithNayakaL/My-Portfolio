@@ -25,11 +25,21 @@ export const paper = {
  * title stays on record because it is true and people still search for it.
  */
 export const workingTitle = "AI Engineer - Full Stack";
+
+/**
+ * The role he is known by: AI Engineer. It is the headline on every surface
+ * (H1s, the Person jobTitle, social cards, twin frontmatter). The DemandNXT
+ * designation above appears only beside the employer's name, as a title,
+ * because as a headline Google rewrote it to "Full Stack AI Engineer" and
+ * filed him with full-stack developers, which is not the work.
+ */
+export const headlineRole = "AI Engineer";
 export const previousTitle = "AI Workflow Engineer";
 
 export const facts = [
-  { k: "Role", v: workingTitle },
+  { k: "Role", v: headlineRole },
   { k: "Company", v: "DemandNXT" },
+  { k: "Title at DemandNXT", v: workingTitle },
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
 ];
@@ -43,7 +53,7 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is an ${workingTitle} at DemandNXT in Bengaluru (Bangalore), India, where he was previously ${previousTitle}. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
+export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He works at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /**
  * The stack, stated once in words. AI Mode fans a question like "AI engineer

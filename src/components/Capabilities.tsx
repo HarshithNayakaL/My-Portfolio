@@ -24,7 +24,7 @@ const tiles: Tile[] = [
     span: "lg:col-span-1",
   },
   {
-    title: "Full-stack AI apps",
+    title: "AI apps, end to end",
     body: "The whole thing shipped: the model, the backend, and the interface a person uses.",
     span: "lg:col-span-1",
   },

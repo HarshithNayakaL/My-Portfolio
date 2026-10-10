@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { scrollToSection } from "../lib/scrollToSection";
 import { EMAIL, LINKEDIN, GITHUB, NAME } from "../data/projects";
-import { workingTitle } from "./About";
+import { headlineRole } from "./About";
 import { contentDate } from "../lib/contentDate";
 
 // UTC so the server render and the browser print the same day.
@@ -83,7 +83,7 @@ export default function Footer() {
               {NAME}
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-dim">
-              {workingTitle} at DemandNXT — agents, RAG, and production-grade
+              {headlineRole} at DemandNXT — agents, RAG, and production-grade
               AI systems.
             </p>
           </div>

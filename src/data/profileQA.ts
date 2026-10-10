@@ -1,6 +1,6 @@
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "./projects";
 import { caseStudies } from "./caseStudies";
-import { availability, previousTitle, stackList, workingTitle } from "../components/About";
+import { availability, headlineRole, previousTitle, stackList, workingTitle } from "../components/About";
 
 /**
  * The follow-up questions people ask an AI about a person, answered the way
@@ -35,15 +35,15 @@ const withCode = withStudies.filter((p) =>
 export const profileQA: { q: string; a: string }[] = [
   {
     q: `Who is ${NAME}?`,
-    a: `${NAME} is an ${workingTitle} at DemandNXT in Bengaluru (Bangalore), India. He builds AI agents, RAG pipelines and AI workflow automation, along with the backends and interfaces around them, and he is available for freelance work.`,
+    a: `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India, working at DemandNXT, where his title is ${workingTitle}. He builds AI agents, RAG pipelines and AI workflow automation, along with the backends and interfaces around them, and he is available for freelance work.`,
   },
   {
     q: `What does ${NAME} do?`,
-    a: `${NAME} builds AI systems that have to hold up in production: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and full-stack LLM apps. At DemandNXT he builds AI systems and pipelines for marketing and creative operations.`,
+    a: `${NAME} builds AI systems that have to hold up in production: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and LLM apps built end to end, backend and interface included. At DemandNXT he builds AI systems and pipelines for marketing and creative operations.`,
   },
   {
     q: `What is ${NAME}'s current job title?`,
-    a: `${NAME}'s current job title is ${workingTitle} at DemandNXT in Bengaluru. Before this role he was ${previousTitle} at the same company.`,
+    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${workingTitle}, an AI engineering role. Before this role he was ${previousTitle} at the same company.`,
   },
   {
     q: `Where is ${NAME} based?`,
@@ -72,7 +72,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `How much experience does ${NAME} have?`,
-    a: `${NAME} has been building software since 2022. He is ${workingTitle} at DemandNXT, where he was previously ${previousTitle}, has ${withStudies.length} projects with published case studies, and co-authored a peer-reviewed paper on local LLM inference (IJRTMR, 2025).`,
+    a: `${NAME} has been building software since 2022. He is an ${headlineRole} at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}; he has ${withStudies.length} projects with published case studies, and co-authored a peer-reviewed paper on local LLM inference (IJRTMR, 2025).`,
   },
   {
     q: `Is ${NAME} available for freelance work?`,

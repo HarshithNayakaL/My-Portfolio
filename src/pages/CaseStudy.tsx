@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Info } from "@phosphor-icons/react";
 import { getCaseStudy } from "../data/caseStudies";
 import { EMAIL, NAME, projects } from "../data/projects";
-import { workingTitle } from "../components/About";
+import { headlineRole } from "../components/About";
 import PipelineDiagram from "../components/PipelineDiagram";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
@@ -94,7 +94,7 @@ export default function CaseStudy() {
             <span aria-hidden className="text-faint">
               ·
             </span>
-            <span>{workingTitle} · Bengaluru, India</span>
+            <span>{headlineRole} · Bengaluru, India</span>
             <span aria-hidden className="text-faint">
               ·
             </span>

@@ -25,7 +25,7 @@ const DIST = join(ROOT, "dist");
 
 const {
   caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN,
-  facts, availability, workingTitle, previousTitle, identitySentence, stack, stackSentence, profileQA,
+  facts, availability, headlineRole, workingTitle, previousTitle, identitySentence, stack, stackSentence, profileQA,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
@@ -156,7 +156,7 @@ await put(`${API}/index.json`, {
 
 await put(`${API}/profile.json`, {
   name: NAME,
-  headline: workingTitle,
+  headline: headlineRole,
   // The same sentence the About section leads with, so an agent quoting the
   // API quotes what the page says.
   summary: identitySentence,
@@ -176,7 +176,7 @@ await put(`${API}/profile.json`, {
     "Retrieval-augmented generation",
     "LLM integration and output reliability",
     "Multi-modal pipelines (voice, vision, text)",
-    "Full-stack application engineering around AI",
+    "The backend and interface around AI systems",
   ],
   counts: {
     projects: projectList.length,

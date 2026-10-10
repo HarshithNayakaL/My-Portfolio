@@ -75,6 +75,15 @@ for (const [route, s] of pages) {
   if (description.length < 25 || description.length > 160) fail("description length", `${route} is ${description.length}`);
   const h1 = (s.match(/<h1[\s>]/g) ?? []).length;
   if (h1 !== 1) fail("h1", `${route} has ${h1}`);
+  // The role is "AI Engineer". "AI Engineer - Full Stack" is the employer's
+  // designation and appears only beside DemandNXT: as a headline, Google
+  // rewrote it to "Full Stack AI Engineer" and filed him as a full-stack
+  // developer. Headline surfaces are the title, the H1 and the social titles.
+  const h1Text = unescape((s.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "").replace(/<[^>]+>/g, " "));
+  const socialTitles = [...s.matchAll(/<meta\s+(?:property|name)="(?:og|twitter):title"\s+content="([^"]*)"/g)].map((m) => unescape(m[1]));
+  for (const [where, text] of [["title", title], ["h1", h1Text], ...socialTitles.map((t) => ["social title", t])]) {
+    if (/full[ -]?stack/i.test(text)) fail("headline role", `${route} ${where} says "${text.trim()}": the headline role is AI Engineer`);
+  }
 }
 for (const loc of sitemap) {
   const route = loc.slice(ORIGIN.length).replace(/\/$/, "") || "/";
@@ -82,6 +91,13 @@ for (const loc of sitemap) {
 }
 for (const [t, rs] of titles) if (rs.length > 1) fail("duplicate title", `"${t}" on ${rs.join(", ")}`);
 for (const [d, rs] of descriptions) if (rs.length > 1) fail("duplicate description", rs.join(", "));
+
+// The Person node's jobTitle is the headline role, not the designation.
+for (const [route, s] of pages) {
+  for (const m of s.matchAll(/"jobTitle":\s*"([^"]*)"/g)) {
+    if (m[1] !== "AI Engineer") fail("headline role", `${route} JSON-LD jobTitle is "${m[1]}", expected "AI Engineer"`);
+  }
+}
 
 // ---- structured data: parses, no placeholders, references resolve, FAQ visible
 const ldBlocks = (s) => [...s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);

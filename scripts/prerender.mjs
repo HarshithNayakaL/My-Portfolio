@@ -40,6 +40,7 @@ const {
   facts,
   availability,
   workingTitle,
+  headlineRole,
   previousTitle,
   stackList,
   identitySentence,
@@ -463,7 +464,7 @@ function markdownFor(path, seo) {
       "",
       `> ${cs.outcome}`,
       "",
-      `Case study by ${NAME}, ${workingTitle}, Bengaluru, India.`,
+      `Case study by ${NAME}, ${headlineRole}, Bengaluru, India.`,
       `Canonical page: ${seo.canonical}`,
       "",
       ...caseStudyBody(cs, 2),
@@ -510,7 +511,7 @@ function markdownFor(path, seo) {
   // Homepage: the overview an agent should read first, with every onward link
   // pointing at markdown rather than back into HTML.
   return [
-    `# ${NAME} — ${workingTitle}`,
+    `# ${NAME} — ${headlineRole}`,
     "",
     `> ${routeSeo["/"].description}`,
     "",
@@ -626,7 +627,8 @@ function frontmatter(path, seo) {
     // study should still be able to say who wrote it, where they are and how
     // to reach them, without a second fetch.
     `author-role: ${yaml(facts.find((f) => f.k === "Role")?.v ?? "")}`,
-    `author-title: ${yaml(workingTitle)}`,
+    `author-title: ${yaml(headlineRole)}`,
+    `author-employer: ${yaml(`DemandNXT (title: ${workingTitle})`)}`,
     `author-location: ${yaml(facts.find((f) => f.k === "Based in")?.v ?? "")}`,
     `author-availability: ${yaml(availability)}`,
     `author-email: ${yaml(EMAIL)}`,
@@ -841,7 +843,7 @@ const header = llmsTxt
 const full = [
   header.replace(
     /^# .*$/m,
-    `# ${NAME} — ${workingTitle} (full content)`,
+    `# ${NAME} — ${headlineRole} (full content)`,
   ),
   "",
   // The llms.txt spec allows one H1 only, followed by a blockquote, then any

@@ -3,11 +3,11 @@ import { ArrowDown } from "@phosphor-icons/react";
 import Magnetic from "./Magnetic";
 import { scrollToSection } from "../lib/scrollToSection";
 import { NAME } from "../data/projects";
-import { workingTitle } from "./About";
+import { headlineRole } from "./About";
 import Icon from "./Icon";
 
 // Headline split so each word rises on its own beat (CSS mask reveal).
-const HEAD_LEAD = "I build AI systems — agents, RAG, full-stack apps — engineered for".split(
+const HEAD_LEAD = "I build AI systems — agents, RAG, end-to-end AI apps — engineered for".split(
   " ",
 );
 const d = (s: number) => ({ "--delay": `${s}s` }) as CSSProperties;
@@ -43,7 +43,7 @@ export default function Hero() {
               "Full-StackAI Engineer". */}
           <h1 className="flex flex-wrap items-center gap-x-4 gap-y-2 font-sans">
             <span className="text-base font-semibold tracking-tight text-ink">
-              {NAME} <span className="text-dim">— {workingTitle}</span>
+              {NAME} <span className="text-dim">— {headlineRole}</span>
             </span>{" "}
             <span className="hidden h-4 w-px bg-line-strong sm:block" aria-hidden />
             <span className="text-[0.9375rem] font-medium text-dim">
@@ -84,7 +84,7 @@ export default function Hero() {
           className="anim-rise mt-8 max-w-xl text-pretty text-base leading-relaxed text-dim md:text-lg"
           style={d(0.55)}
         >
-          Concretely: LLM agents, RAG pipelines, and full-stack AI apps — plus
+          Concretely: LLM agents, RAG pipelines, and AI apps built end to end — plus
           the automation that ties them together. Built to hold up in
           production, not just in a demo.
         </p>

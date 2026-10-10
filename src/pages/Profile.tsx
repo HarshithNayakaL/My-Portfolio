@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
-import { facts, availability, workingTitle, previousTitle, identitySentence, stackSentence } from "../components/About";
+import { facts, availability, headlineRole, workingTitle, previousTitle, identitySentence, stackSentence } from "../components/About";
 import { caseStudies } from "../data/caseStudies";
 import { profileQA } from "../data/profileQA";
 
@@ -56,8 +56,8 @@ export const profileDocs: Record<string, Doc> = {
       {
         h: "At a glance",
         p: [
-          `${workingTitle} at ${facts.find((f) => f.k === "Company")?.v} · Bengaluru (Bangalore), India · ${availability}.`,
-          "Specialties: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and LLM apps built full stack.",
+          `${headlineRole} at ${facts.find((f) => f.k === "Company")?.v} (title: ${workingTitle}) · Bengaluru (Bangalore), India · ${availability}.`,
+          "Specialties: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and LLM apps built end to end.",
           "Shipped: Personal MCP OS, an 85-tool local MCP server where risky actions wait for one-time human approval; a roughly 90-node n8n content pipeline with QA gates; Maestro, a live open-source multi-model LLM orchestration engine; and Cannon, a multi-agent assistant with 91 unit tests.",
           stackSentence,
         ],
@@ -65,10 +65,10 @@ export const profileDocs: Record<string, Doc> = {
       {
         h: "The short version",
         p: [
-          `Role: ${workingTitle} at ${facts.find((f) => f.k === "Company")?.v} (previously ${previousTitle}). Based in ${
+          `Role: ${headlineRole} at ${facts.find((f) => f.k === "Company")?.v}, title ${workingTitle} (previously ${previousTitle}). Based in ${
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
-          "The work is AI agents, retrieval pipelines and full-stack AI applications — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",
+          "The work is AI agents, retrieval pipelines and AI applications built end to end — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",
         ],
       },
       {

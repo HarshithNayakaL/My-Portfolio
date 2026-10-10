@@ -6,7 +6,7 @@ import { NAME } from "./projects";
  *  so moving to a custom domain is a one-line change here plus vercel.json. */
 export const ORIGIN = "https://harshith-nayaka-l-portfolio.vercel.app";
 
-export const SITE_TITLE = `${NAME} — AI Engineer - Full Stack`;
+export const SITE_TITLE = `${NAME} — AI Engineer`;
 
 export type RouteSeo = {
   /** Full <title>. Kept under ~60 chars where possible. */
@@ -40,7 +40,7 @@ export const routeSeo: Record<string, RouteSeo> = {
     // It keeps the exact phrase the previous title ranked for.
     title: `${NAME} — AI Engineer in Bengaluru | AI Agents, RAG & n8n Automation`,
     description:
-      `${NAME}, AI Engineer - Full Stack in Bengaluru (Bangalore): AI agents, RAG pipelines, n8n automation and LLM apps. Available for freelance work.`,
+      `${NAME}, AI Engineer in Bengaluru (Bangalore): AI agents, RAG pipelines, n8n automation and LLM apps, built end to end. Available for freelance work.`,
     canonical: abs("/"),
     ogType: "profile",
   },
