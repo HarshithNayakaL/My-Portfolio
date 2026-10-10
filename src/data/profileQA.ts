@@ -60,7 +60,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `Does ${NAME} build AI agents and RAG pipelines?`,
-    a: `Yes. ${NAME} builds AI agents, multi-agent systems and RAG pipelines. Cannon is a multi-agent assistant where each agent has its own tools and its own retrieval over Postgres with pgvector; Maestro routes one task across thinker, worker and verifier models; and Personal MCP OS is an 85-tool MCP server where risky actions wait for human approval.`,
+    a: `Yes. ${NAME} builds AI agents, multi-agent systems and RAG pipelines. Octo is a live research workspace where a director agent delegates to specialist agents on the OpenAI Agents API; Maestro routes one task across thinker, worker and verifier models; Personal MCP OS is an 85-tool MCP server where risky actions wait for human approval; and Cannon is a multi-agent assistant where each agent has its own tools and its own retrieval over Postgres with pgvector.`,
   },
   {
     q: `Does ${NAME} work with n8n?`,

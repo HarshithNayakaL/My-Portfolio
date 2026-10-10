@@ -304,7 +304,7 @@ const brandforge: CaseStudy = {
   published: "2026-09-10T00:51:52Z",
   searchKicker: "AI brand campaign pipeline",
   title: "BrandForge",
-  kicker: "Flagship",
+  kicker: "Self-verifying campaign engine",
   outcome:
     "Give it a brand's website and one product photo. It researches the brand from that site, pins what cannot change about the product, plans its own campaign, generates six images, grades its own work, repairs what it can and refuses what it cannot safely fix.",
   meta: [

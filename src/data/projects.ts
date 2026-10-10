@@ -20,17 +20,21 @@ export const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as
   | string
   | undefined;
 
-/** Ordered by strength - the grid renders them in this order. */
+/** Ordered by how distinctive the work is, not by date: the grid, the case
+ *  study nav, the API and the A2A agent all list projects in this order.
+ *  Octo leads (multi-agent research on the OpenAI Agents API, live); the
+ *  compact automations and the front-end prototype sit lower. */
 export const projects: Project[] = [
   {
-    slug: "brandforge",
-    title: "BrandForge",
-    kicker: "Flagship",
+    slug: "octo",
+    title: "Octo",
+    kicker: "Multi-agent research workspace",
     outcome:
-      "Give it a brand's site and one product photo: it researches the brand, pins what can't change about the product, generates a six-shot campaign, then grades its own output and blocks what it can't safely fix.",
-    tags: ["Multi-model", "Brand fidelity", "Self-verifying QA", "n8n"],
+      "A research director agent hands questions to specialist agents with live web search and returns cited reports and company records \u2014 built so a lost response can never start a second paid session.",
+    tags: ["OpenAI Agents API", "Multi-agent", "Cited research", "Serverless"],
     links: [
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/BrandForge" },
+      { label: "Live site", href: "https://octo-agents.vercel.app/" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/octo" },
     ],
     hasCaseStudy: true,
   },
@@ -60,6 +64,41 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
+    slug: "brandforge",
+    title: "BrandForge",
+    kicker: "Self-verifying campaign engine",
+    outcome:
+      "Give it a brand's site and one product photo: it researches the brand, pins what can't change about the product, generates a six-shot campaign, then grades its own output and blocks what it can't safely fix.",
+    tags: ["Multi-model", "Brand fidelity", "Self-verifying QA", "n8n"],
+    links: [
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/BrandForge" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "maestro",
+    title: "Maestro",
+    kicker: "Multi-model LLM orchestration",
+    outcome:
+      "A glass-box engine that routes one task across free LLMs — conductor, thinker, worker, verifier — and returns a single verified answer with a full decision-log of every step.",
+    tags: ["LLM orchestration", "Verifier gates", "FastAPI", "Decision-log"],
+    links: [
+      { label: "Live site", href: "https://maestro-psi-neon.vercel.app/" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "brand-audit-platform",
+    title: "Multi-Brand Audit Platform",
+    kicker: "Internal tooling, in production",
+    outcome:
+      "An internal audit platform a marketing team runs on across a multi-brand portfolio \u2014 real-browser crawling, and a score where every weight traces to something Google actually published.",
+    tags: ["Internal tooling", "Playwright", "Defensible scoring", "Next.js"],
+    links: [],
+    hasCaseStudy: true,
+  },
+  {
     slug: "creative-ops-pipeline",
     title: "Creative-Ops Pipeline",
     kicker: "~90-node n8n workflow",
@@ -80,25 +119,15 @@ export const projects: Project[] = [
     hasCaseStudy: true,
   },
   {
-    slug: "brand-audit-platform",
-    title: "Multi-Brand Audit Platform",
-    kicker: "Internal tooling, in production",
+    slug: "nova-ai",
+    title: "Nova",
+    kicker: "Cost-tiered model routing",
     outcome:
-      "An internal audit platform a marketing team runs on across a multi-brand portfolio \u2014 real-browser crawling, and a score where every weight traces to something Google actually published.",
-    tags: ["Internal tooling", "Playwright", "Defensible scoring", "Next.js"],
-    links: [],
-    hasCaseStudy: true,
-  },
-  {
-    slug: "maestro",
-    title: "Maestro",
-    kicker: "Multi-model LLM orchestration",
-    outcome:
-      "A glass-box engine that routes one task across free LLMs — conductor, thinker, worker, verifier — and returns a single verified answer with a full decision-log of every step.",
-    tags: ["LLM orchestration", "Verifier gates", "FastAPI", "Decision-log"],
+      "A chat app that scores every turn for difficulty and sends it to the smallest model that can carry it \u2014 lane, reasoning and cost stamped on every answer.",
+    tags: ["Model routing", "Cost tiering", "Arbiter model", "Serverless"],
     links: [
-      { label: "Live site", href: "https://maestro-psi-neon.vercel.app/" },
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/Maestro" },
+      { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
     ],
     hasCaseStudy: true,
   },
@@ -114,47 +143,6 @@ export const projects: Project[] = [
       {
         label: "GitHub",
         href: "https://github.com/HarshithNayakaL/cannon-multi-agents",
-      },
-    ],
-    hasCaseStudy: true,
-  },
-  {
-    slug: "octo",
-    title: "Octo",
-    kicker: "Multi-agent research workspace",
-    outcome:
-      "A research director agent hands questions to specialist agents with live web search and returns cited reports and company records \u2014 built so a lost response can never start a second paid session.",
-    tags: ["OpenAI Agents API", "Multi-agent", "Cited research", "Serverless"],
-    links: [
-      { label: "Live site", href: "https://octo-agents.vercel.app/" },
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/octo" },
-    ],
-    hasCaseStudy: true,
-  },
-  {
-    slug: "nova-ai",
-    title: "Nova",
-    kicker: "Cost-tiered model routing",
-    outcome:
-      "A chat app that scores every turn for difficulty and sends it to the smallest model that can carry it \u2014 lane, reasoning and cost stamped on every answer.",
-    tags: ["Model routing", "Cost tiering", "Arbiter model", "Serverless"],
-    links: [
-      { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
-    ],
-    hasCaseStudy: true,
-  },
-  {
-    slug: "replydesk",
-    title: "ReplyDesk",
-    kicker: "WhatsApp lead agent",
-    outcome:
-      "A WhatsApp lead agent that captures every inbound message and auto-replies in ~8 seconds, with a live dashboard for the lead feed, pipeline, and response-time KPIs.",
-    tags: ["WhatsApp", "Lead automation", "Real-time dashboard", "Agent"],
-    links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/HarshithNayakaL/Whatsapp-Agent-Dashboard",
       },
     ],
     hasCaseStudy: true,
@@ -192,6 +180,21 @@ export const projects: Project[] = [
     tags: ["n8n", "Slack", "Google Sheets", "Data checks"],
     links: [
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/slack-weekly-report-bot-n8n" },
+    ],
+    hasCaseStudy: true,
+  },
+  {
+    slug: "replydesk",
+    title: "ReplyDesk",
+    kicker: "WhatsApp lead agent",
+    outcome:
+      "A WhatsApp lead agent that captures every inbound message and auto-replies in ~8 seconds, with a live dashboard for the lead feed, pipeline, and response-time KPIs.",
+    tags: ["WhatsApp", "Lead automation", "Real-time dashboard", "Agent"],
+    links: [
+      {
+        label: "GitHub",
+        href: "https://github.com/HarshithNayakaL/Whatsapp-Agent-Dashboard",
+      },
     ],
     hasCaseStudy: true,
   },

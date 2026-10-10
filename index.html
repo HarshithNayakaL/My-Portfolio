@@ -7,8 +7,10 @@
          whichever theme the script resolved. -->
     <meta name="color-scheme" content="light dark" />
     <script>
-      // Set theme before first paint (no flash). Stored choice wins,
-      // otherwise follow the OS preference.
+      // Set theme before first paint (no flash). Light by default: the
+      // owner's choice, since the dark theme is not the one the site is
+      // designed around. Dark only for a visitor who picked it with the
+      // toggle, which stores the choice.
       // Inline (not external) so there's no extra render-blocking network
       // round-trip; kept CSP-strict via a script-src hash in vercel.json
       // instead of 'unsafe-inline'. If you edit this script, the hash in
@@ -23,21 +25,14 @@
         // reveals only under `.js`, so no-JS keeps the content on screen.
         document.documentElement.classList.add("js");
         try {
-          var t = localStorage.getItem("theme");
-          if (!t)
-            t = window.matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light";
-          if (t === "dark") document.documentElement.classList.add("dark");
-        } catch (e) {
-          document.documentElement.classList.add("dark");
-        }
+          if (localStorage.getItem("theme") === "dark")
+            document.documentElement.classList.add("dark");
+        } catch (e) {}
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F3F4F6" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0B0F" />
+    <meta name="theme-color" content="#F3F4F6" />
 
     <!-- Preload the self-hosted fonts so none is discovered late via the CSS
          @font-face parse. A font that finishes loading mid-render forces the

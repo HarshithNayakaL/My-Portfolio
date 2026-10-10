@@ -166,10 +166,10 @@ export default function About() {
               <p className="text-ink">{identitySentence}</p>
               <p>
                 In practice that means the model, the backend, and the
-                interface around it. My public work includes Maestro, a
-                multi-model LLM orchestration engine, and Cannon, a
-                multi-agent assistant with query-level domain isolation —
-                both live and open-source.
+                interface around it. My public work includes Octo, a
+                multi-agent research workspace on the OpenAI Agents API,
+                and Maestro, a multi-model LLM orchestration engine — both
+                live and open-source.
               </p>
               <p>{stackSentence}</p>
               <p>

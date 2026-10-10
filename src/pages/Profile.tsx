@@ -58,7 +58,7 @@ export const profileDocs: Record<string, Doc> = {
         p: [
           `${headlineRole} at ${facts.find((f) => f.k === "Company")?.v} (title: ${workingTitle}) · Bengaluru (Bangalore), India · ${availability}.`,
           "Specialties: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and LLM apps built end to end.",
-          "Shipped: Personal MCP OS, an 85-tool local MCP server where risky actions wait for one-time human approval; a roughly 90-node n8n content pipeline with QA gates; Maestro, a live open-source multi-model LLM orchestration engine; and Cannon, a multi-agent assistant with 91 unit tests.",
+          "Shipped: Octo, a live multi-agent research workspace on the OpenAI Agents API; Personal MCP OS, an 85-tool local MCP server where risky actions wait for one-time human approval; Maestro, a live open-source multi-model LLM orchestration engine; and a roughly 90-node n8n content pipeline with QA gates.",
           stackSentence,
         ],
       },
