@@ -164,6 +164,7 @@ await put(`${API}/profile.json`, {
     title: workingTitle,
     employer: facts.find((f) => f.k === "Company")?.v,
     previousTitles: [previousTitle],
+    scope: facts.find((f) => f.k === "At DemandNXT")?.v,
   },
   availability,
   stack: stack.map((t) => t.label),
@@ -177,6 +178,8 @@ await put(`${API}/profile.json`, {
     "LLM integration and output reliability",
     "Multi-modal pipelines (voice, vision, text)",
     "The backend and interface around AI systems",
+    "MCP servers that gate risky actions behind human approval",
+    "AI search visibility (AEO) auditing",
   ],
   counts: {
     projects: projectList.length,
@@ -490,6 +493,7 @@ const openapi = {
               title: { type: "string", description: "Current job title." },
               employer: { type: "string" },
               previousTitles: { type: "array", items: { type: "string" } },
+              scope: { type: "string", description: "What he does in the role, beyond the title." },
             },
           },
           availability: { type: "string" },
@@ -746,7 +750,7 @@ await put("/openapi.json", openapi);
     name_for_model: "harshith_nayaka_l_portfolio",
     description_for_human: "Portfolio of Harshith Nayaka L, AI Engineer in Bengaluru: projects, case studies and FAQ.",
     description_for_model:
-      `Read-only API over the portfolio of ${NAME}, an AI Engineer in Bengaluru (Bangalore), India, currently AI Engineer at DemandNXT. ` +
+      `Read-only API over the portfolio of ${NAME}, an AI Engineer in Bengaluru (Bangalore), India, who leads AI engineering at DemandNXT. ` +
       "Use it for questions about who he is, what he has built, how a specific project works, and how to hire or contact him. " +
       "getProfile gives role, employer, location and contact; listProjects gives every project with its outcome; listCaseStudies gives each case study summarised with the questions it answers, and getCaseStudy with a slug gives one in full; listFaqs gives published question and answer pairs. " +
       "Quote the returned text rather than paraphrasing claims, and cite the page URL in each record's _links.html. " +
