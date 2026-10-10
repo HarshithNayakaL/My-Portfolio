@@ -1,25 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
-  <rect width="1200" height="630" fill="#0A0B0F"/>
-  <!-- faint grid -->
-  <g stroke="#FFFFFF" stroke-opacity="0.04">
+  <rect width="1200" height="630" fill="#F3F4F6"/>
+  <!-- faint grid, as on the site -->
+  <g stroke="#14161C" stroke-opacity="0.05">
     <path d="M0 90 H1200 M0 180 H1200 M0 270 H1200 M0 360 H1200 M0 450 H1200 M0 540 H1200"/>
     <path d="M150 0 V630 M300 0 V630 M450 0 V630 M600 0 V630 M750 0 V630 M900 0 V630 M1050 0 V630"/>
   </g>
   <!-- eyebrow -->
-  <text x="80" y="150" fill="#B85C38" font-family="'DM Mono', monospace" font-size="24" letter-spacing="6">AI ENGINEER · BENGALURU</text>
-  <!-- headline: mirrors the site's h1 -->
-  <text x="78" y="270" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="60" font-weight="700">I build AI systems —</text>
-  <text x="78" y="348" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="60" font-weight="700">agents, RAG, end-to-end AI apps</text>
-  <text x="78" y="426" fill="#ECEEF3" font-family="Poppins, Arial, sans-serif" font-size="60" font-weight="700">— engineered for <tspan fill="#B85C38">production.</tspan></text>
+  <circle cx="86" cy="142" r="6" fill="#B85C38"/>
+  <text x="104" y="150" fill="#9A4527" font-family="'Inter Variable', Inter, Arial, sans-serif" font-size="26" font-weight="600">AI Engineer · Bengaluru, India</text>
+  <!-- headline: mirrors the site's hero, Poppins with the serif "production." -->
+  <text x="78" y="262" fill="#14161C" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="600" letter-spacing="-1.2">I build AI systems —</text>
+  <text x="78" y="340" fill="#14161C" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="600" letter-spacing="-1.2">agents, RAG, end-to-end AI apps</text>
+  <text x="78" y="424" fill="#14161C" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="600" letter-spacing="-1.2">— engineered for <tspan fill="#9A4527" font-family="'Instrument Serif', Georgia, serif" font-size="82" font-weight="400" letter-spacing="-0.8">production.</tspan></text>
   <!-- footer line -->
-  <text x="80" y="560" fill="#6C7280" font-family="'DM Mono', monospace" font-size="22">Harshith Nayaka L  ·  Bengaluru, India  ·  AI agents  ·  RAG  ·  production systems</text>
-  <!-- node mark -->
-  <g transform="translate(1000,120)">
-    <g stroke="#B85C38" stroke-width="2" opacity="0.6">
-      <path d="M0 0 L40 20 M0 40 L40 20"/>
-    </g>
-    <circle cx="0" cy="0" r="6" fill="#B85C38"/>
-    <circle cx="0" cy="40" r="6" fill="#B85C38"/>
-    <circle cx="40" cy="20" r="7" fill="#ECEEF3"/>
-  </g>
+  <text x="80" y="556" fill="#565B67" font-family="'Inter Variable', Inter, Arial, sans-serif" font-size="24" font-weight="500">Harshith Nayaka L  ·  Leads AI engineering at DemandNXT</text>
 </svg>

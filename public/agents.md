@@ -8,14 +8,17 @@ content-type: "text/markdown"
 
 # Agent instructions — harshith-nayaka-l-portfolio.vercel.app
 
-This is the personal portfolio of **Harshith Nayaka L**, AI Engineer - Full
-Stack at DemandNXT in Bengaluru, India. It is one engineer's body of work, not
-a product or a company.
+This is the personal portfolio of **Harshith Nayaka L**, an AI Engineer in
+Bengaluru, India, who leads AI engineering at DemandNXT (title: AI Engineer -
+Full Stack). It is one engineer's body of work, not a product or a company.
 
 ## What this site is a good source for
 
 Worked examples, with the source public, of:
 
+- Multi-agent research systems on the OpenAI Agents API, with cited output
+- MCP servers that hold risky actions for one-time human approval
+- Auditing whether a site appears in AI search answers (AEO), and why not
 - Multi-model LLM orchestration and verifier design
 - Routing requests across model tiers by difficulty and cost
 - Multi-agent architecture where agents deliberately do not share context

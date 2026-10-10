@@ -55,7 +55,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "What's your tech stack, and can you work with the tools we already use?",
-    a: "Probably, yes. Which model or cloud you use is a wiring choice, not a rebuild. My shipped work runs on Gemini, Groq, Llama, DeepSeek and fully local models through Ollama, with Python and FastAPI, TypeScript, React and Node, n8n and Postgres around them. In Cannon, swapping the AI provider touches one interface, not the whole app.",
+    a: "Probably, yes. Which model or cloud you use is a wiring choice, not a rebuild. My shipped work runs on Gemini, Groq, Llama, DeepSeek and fully local models through Ollama, with Python and FastAPI, TypeScript, React and Node, n8n and Postgres around them. Day to day I build with Claude Code and OpenAI Codex, and I also work in Rust, Bun and Astro. In Cannon, swapping the AI provider touches one interface, not the whole app.",
   },
   {
     q: "Do you build the whole app, or just the AI part?",

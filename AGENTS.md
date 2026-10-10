@@ -128,6 +128,18 @@ fix the cause — do not weaken the check.
   bar, a seam across the glass, unreadable labels — passed an automated check
   while being obviously wrong in a screenshot. If a number and an image
   disagree, the image is right and the metric is measuring the wrong pixels.
+- **Typography is decided; do not drift from it.** Display headings are
+  Instrument Serif, upright only: no italic serif anywhere. The hero headline
+  is Poppins 600, with only "production." in the serif. Everything else,
+  every small label included, is Inter in sentence case. There is no
+  monospace, all-caps, wide-tracked label style on this site: the owner reads
+  it as the giveaway of AI-generated design, and it was removed on purpose.
+  A heading that is really a small label opts out of the serif with
+  `font-sans`.
+- **Work cards and figures.** Projects render as `WorkCard`s; a card shows
+  the product screenshot, or the case study's `SystemFigure` when there is
+  none. "How it's wired" on a case study is the same figure at full size. Both
+  are generated from the case study's `pipeline` data, never drawn by hand.
 - **Accessibility is enforced.** The site scores 100 on axe/Lighthouse
   accessibility. Watch list structure in particular: a `<dl>` may wrap each
   `<dt>`/`<dd>` pair in one `<div>`, never two nested ones.
