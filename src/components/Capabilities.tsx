@@ -63,7 +63,7 @@ function TileCard({ tile, index }: { tile: Tile; index: number }) {
         className="group glass-card spotlight relative flex h-full min-h-[200px] flex-col justify-start overflow-hidden rounded-[var(--radius-lg)] p-6 active:scale-[0.99]"
       >
         <div className="relative" style={{ transform: "translateZ(20px)" }}>
-          <h3 className="text-lg font-semibold tracking-tight text-ink transition-colors duration-500 group-hover:text-accent-ink">
+          <h3 className="text-2xl tracking-tight text-ink transition-colors duration-500 group-hover:text-accent-ink">
             {tile.title}
           </h3>
           <p className="mt-2 max-w-md text-[0.9375rem] leading-relaxed text-dim">

@@ -3,7 +3,7 @@ import { ArrowLeft, Info } from "@phosphor-icons/react";
 import { getCaseStudy } from "../data/caseStudies";
 import { EMAIL, NAME, projects } from "../data/projects";
 import { headlineRole } from "../components/About";
-import PipelineDiagram from "../components/PipelineDiagram";
+import SystemFigure from "../components/SystemFigure";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
 
@@ -26,7 +26,7 @@ export default function CaseStudy() {
   if (!study) {
     return (
       <div className="shell flex min-h-[60vh] flex-col items-start justify-center gap-5 py-32">
-        <p className="font-mono text-sm text-faint">404 / case study not found</p>
+        <p className="text-sm text-faint">404 / case study not found</p>
         <h1 className="text-3xl font-semibold tracking-tight">
           That case study isn't here.
         </h1>
@@ -53,7 +53,7 @@ export default function CaseStudy() {
         <div>
           <Link
             to="/#work"
-            className="inline-flex items-center gap-1.5 font-mono text-[0.8125rem] text-dim transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 text-[0.8125rem] text-dim transition-colors hover:text-ink"
           >
             <ArrowLeft size={15} weight="bold" /> All work
           </Link>
@@ -68,7 +68,7 @@ export default function CaseStudy() {
             <span className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
               {study.title}
             </span>
-            <span className="font-mono text-[0.75rem] font-normal uppercase leading-normal tracking-[0.2em] text-accent-ink">
+            <span className="text-[0.8125rem] font-normal leading-normal text-accent-ink">
               <span className="sr-only">: </span>
               {study.searchKicker ?? study.kicker}
             </span>
@@ -108,7 +108,7 @@ export default function CaseStudy() {
           <dl className="mt-10 grid gap-px border-t border-line sm:grid-cols-2 lg:grid-cols-4">
             {study.meta.map((m) => (
               <div key={m.label} className="border-b border-line py-4 pr-4 sm:border-b-0">
-                <dt className="font-mono text-[0.6875rem] font-medium uppercase tracking-wider text-dim">
+                <dt className="text-[0.8125rem] font-medium text-dim">
                   {m.label}
                 </dt>
                 <dd className="mt-1.5 text-sm leading-snug text-ink">{m.value}</dd>
@@ -171,7 +171,7 @@ export default function CaseStudy() {
                   className="block h-auto w-full"
                 />
               </div>
-              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 font-mono text-[0.75rem] text-faint">
+              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-faint">
                 <span>{study.title}, running.</span>
                 <a
                   href={study.shot.src}
@@ -193,29 +193,46 @@ export default function CaseStudy() {
       {/* What I built */}
       <Section title="What I built" body={study.build} />
 
-      {/* Architecture */}
+      {/* Architecture: the pipeline as an annotated figure. The SVG is
+          decorative to assistive tech; the same stages, steps and rules are
+          in the list beside it, which is also what a crawler reads. */}
       <section className="shell py-12 md:py-16">
-        <Reveal>
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-            How it's wired
-          </h2>
-          <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-dim">
-            {study.pipelineIntro ??
-              "The pipeline, end to end. Every stage assumes the model can be wrong, so the interesting work is in the verify steps, not just generation."}
-          </p>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="mt-8">
-            <PipelineDiagram stages={study.pipeline} />
-            <Legend />
-          </div>
-        </Reveal>
+        <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-14">
+          <Reveal>
+            <div className="lg:sticky lg:top-28">
+              <h2 className="text-[2.4rem] leading-[1.02] tracking-tight md:text-5xl">How it's wired</h2>
+              <p className="mt-4 max-w-md text-[0.9375rem] leading-relaxed text-dim">
+                {study.pipelineIntro ??
+                  "The pipeline, end to end. Every stage assumes the model can be wrong, so the interesting work is in the verify steps, not just generation."}
+              </p>
+              <p className="mt-6 flex items-center gap-2 font-display text-lg text-accent-ink">
+                <span className="h-[7px] w-[7px] bg-accent" aria-hidden /> The rule each gate enforces
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <figure className="m-0">
+              <SystemFigure stages={study.pipeline} />
+              <ol className="sr-only">
+                {study.pipeline.map((st) => (
+                  <li key={st.title}>
+                    {st.title}:{" "}
+                    {st.nodes.map((n) => (n.detail ? `${n.label} (${n.detail})` : n.label)).join("; ")}
+                  </li>
+                ))}
+              </ol>
+              <figcaption className="fig-cap mt-4 border-t border-line pt-3">
+                <b>Fig. {study.shot ? 2 : 1}</b> — {study.title}, end to end.
+              </figcaption>
+            </figure>
+          </Reveal>
+        </div>
       </section>
 
       {/* How it works */}
       <section className="shell py-12 md:py-16">
         <Reveal>
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+          <h2 className="text-3xl tracking-tight md:text-[2.6rem] md:leading-[1.05]">
             The judgment calls
           </h2>
         </Reveal>
@@ -223,7 +240,7 @@ export default function CaseStudy() {
           {study.howItWorks.map((item, i) => (
             <Reveal key={item.title} delay={(i % 2) * 0.06}>
               <div className="h-full border-t border-line py-7 md:pr-8">
-                <h3 className="text-lg font-medium tracking-tight text-ink">
+                <h3 className="text-xl tracking-tight text-ink md:text-2xl">
                   {item.title}
                 </h3>
                 <p className="mt-2.5 text-[0.9375rem] leading-relaxed text-dim">
@@ -238,7 +255,7 @@ export default function CaseStudy() {
       {/* Results */}
       <section className="shell py-12 md:py-16">
         <Reveal>
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+          <h2 className="text-3xl tracking-tight md:text-[2.6rem] md:leading-[1.05]">
             What it changed
           </h2>
         </Reveal>
@@ -246,7 +263,7 @@ export default function CaseStudy() {
           {study.results.map((r, i) => (
             <Reveal key={r.label} delay={i * 0.05}>
               <div className="elev grid gap-2 rounded-[var(--radius-lg)] border border-line bg-surface/50 p-6 md:grid-cols-[180px_1fr] md:gap-8">
-                <p className="font-mono text-[0.75rem] uppercase tracking-wider text-accent-ink">
+                <p className="text-[0.8125rem] text-accent-ink">
                   {r.label}
                 </p>
                 <p className="text-[0.9375rem] leading-relaxed text-dim">{r.body}</p>
@@ -259,14 +276,14 @@ export default function CaseStudy() {
       {/* Tech */}
       <section className="shell py-12 md:py-16">
         <Reveal>
-          <h2 className="mb-6 font-mono text-[0.75rem] font-medium uppercase tracking-[0.18em] text-dim">
+          <h2 className="mb-6 font-sans text-[0.8125rem] font-semibold text-dim">
             Built with
           </h2>
           <ul className="flex flex-wrap gap-2">
             {study.tech.map((t) => (
               <li
                 key={t}
-                className="rounded-[6px] border border-line px-3.5 py-1.5 font-mono text-[0.8125rem] text-dim"
+                className="rounded-[6px] border border-line px-3.5 py-1.5 text-[0.8125rem] text-dim"
               >
                 {t}
               </li>
@@ -280,7 +297,7 @@ export default function CaseStudy() {
       {/* CTA */}
       <section className="shell border-t border-line py-20 md:py-28">
         <Reveal>
-          <h2 className="max-w-2xl text-balance text-2xl font-semibold tracking-tight md:text-4xl">
+          <h2 className="max-w-2xl text-balance text-3xl tracking-tight md:text-5xl">
             Want something like this built for your work?
           </h2>
           <div className="mt-8 flex flex-wrap items-center gap-5">
@@ -318,7 +335,7 @@ export default function CaseStudy() {
 function StudyQuestions({ items }: { items: { q: string; a: string }[] }) {
   return (
     <div className="mt-16 max-w-3xl border-t border-line pt-8">
-      <h2 className="font-mono text-[0.75rem] font-medium uppercase tracking-wider text-dim">
+      <h2 className="font-sans text-[0.8125rem] font-semibold text-dim">
         Questions this answers
       </h2>
       <div className="mt-4">
@@ -343,7 +360,7 @@ function StudyQuestions({ items }: { items: { q: string; a: string }[] }) {
 function StudySources({ items }: { items: { label: string; href: string }[] }) {
   return (
     <section className="shell pb-12 md:pb-16">
-      <h2 className="mb-4 font-mono text-[0.75rem] font-medium uppercase tracking-[0.18em] text-dim">
+      <h2 className="mb-4 font-sans text-[0.8125rem] font-semibold text-dim">
         Sources
       </h2>
       <ol className="flex max-w-3xl list-decimal flex-col gap-2 pl-5 text-[0.875rem] leading-relaxed text-dim marker:text-faint">
@@ -375,7 +392,7 @@ function StudyNav({ slug }: { slug: string }) {
           to={`/work/${p.slug}`}
           className={`group rounded-[var(--radius)] border border-line p-4 transition-colors hover:border-line-strong ${align}`}
         >
-          <span className="block font-mono text-[0.6875rem] uppercase tracking-wider text-faint">{label}</span>
+          <span className="block text-[0.8125rem] text-faint">{label}</span>
           <span className="mt-1 block font-display text-lg font-semibold text-ink transition-colors group-hover:text-accent-ink">
             {p.title}
           </span>
@@ -391,7 +408,7 @@ function Section({ title, body }: { title: string; body: string[] }) {
     <section className="shell py-12 md:py-16">
       <div className="grid gap-6 md:grid-cols-[180px_1fr] md:gap-12">
         <Reveal>
-          <h2 className="text-2xl font-semibold tracking-tight md:sticky md:top-28 md:text-2xl">
+          <h2 className="text-3xl tracking-tight md:sticky md:top-28 md:text-4xl">
             {title}
           </h2>
         </Reveal>
@@ -407,23 +424,3 @@ function Section({ title, body }: { title: string; body: string[] }) {
   );
 }
 
-function Legend() {
-  const items = [
-    { dot: "bg-ink", label: "model" },
-    { dot: "bg-dim", label: "logic" },
-    { dot: "bg-accent", label: "verify / output" },
-  ];
-  return (
-    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-      {items.map((it) => (
-        <span
-          key={it.label}
-          className="inline-flex items-center gap-2 font-mono text-[0.6875rem] font-medium text-dim"
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${it.dot}`} aria-hidden />
-          {it.label}
-        </span>
-      ))}
-    </div>
-  );
-}

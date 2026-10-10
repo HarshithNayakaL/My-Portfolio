@@ -48,7 +48,6 @@ export default function GitHubGraph({ data }: { data: Contributions }) {
         blockRadius={2}
         fontSize={12}
         labels={{ totalCount: "{{count}} contributions in the last year" }}
-        className="font-mono"
       >
         <ContributionGraphCalendar
           role="img"

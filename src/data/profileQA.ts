@@ -35,7 +35,7 @@ const withCode = withStudies.filter((p) =>
 export const profileQA: { q: string; a: string }[] = [
   {
     q: `Who is ${NAME}?`,
-    a: `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India, working at DemandNXT, where his title is ${workingTitle}. He builds AI agents, RAG pipelines and AI workflow automation, along with the backends and interfaces around them, and he is available for freelance work.`,
+    a: `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India, where he leads AI engineering at DemandNXT; his title there is ${workingTitle}. He builds AI agents, RAG pipelines and AI workflow automation, along with the backends and interfaces around them, and he is available for freelance work.`,
   },
   {
     q: `What does ${NAME} do?`,
@@ -43,7 +43,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `What is ${NAME}'s current job title?`,
-    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${workingTitle}, an AI engineering role. Before this role he was ${previousTitle} at the same company.`,
+    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${workingTitle}, an AI engineering role; in practice he leads the company's AI engineering. Before this role he was ${previousTitle} at the same company.`,
   },
   {
     q: `Where is ${NAME} based?`,

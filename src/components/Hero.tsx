@@ -5,6 +5,7 @@ import { scrollToSection } from "../lib/scrollToSection";
 import { NAME } from "../data/projects";
 import { headlineRole } from "./About";
 import Icon from "./Icon";
+import HeroOrbit from "./HeroOrbit";
 
 // Headline split so each word rises on its own beat (CSS mask reveal).
 const HEAD_LEAD = "I build AI systems — agents, RAG, end-to-end AI apps — engineered for".split(
@@ -58,7 +59,7 @@ export default function Hero() {
         </div>
 
         {/* Headline */}
-        <p className="max-w-[16ch] font-display text-[clamp(2.6rem,7vw,5.5rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink lg:max-w-[18ch]">
+        <p className="hero-head max-w-[16ch] text-[clamp(2.6rem,6vw,5rem)] leading-[1.04] text-ink lg:max-w-[15ch]">
           {HEAD_LEAD.map((word, i) => (
             <span
               key={`${word}-${i}`}
@@ -71,7 +72,7 @@ export default function Hero() {
           ))}
           <span className="word-mask">
             <span
-              className="word-rise accent-shimmer"
+              className="word-rise hero-serif"
               style={d(wordDelay(HEAD_LEAD.length))}
             >
               production.
@@ -116,6 +117,8 @@ export default function Hero() {
         </div>
       </div>
 
+      <HeroOrbit />
+
       {/* Scroll cue */}
       <button
         onClick={() => goTo("work")}
@@ -123,7 +126,7 @@ export default function Hero() {
         className="anim-rise relative z-10 mx-auto mt-14 flex flex-col items-center gap-1.5 text-dim transition-colors hover:text-accent-ink"
         style={d(0.9)}
       >
-        <span className="font-mono text-[0.625rem] font-medium uppercase tracking-[0.24em]">
+        <span className="text-[0.8125rem] font-medium">
           Scroll
         </span>
         <span className="anim-nudge" aria-hidden>

@@ -67,7 +67,7 @@ export default function Nav() {
         <Link
           to="/"
           onClick={() => pathname === "/" && goTo("top")}
-          className="group flex shrink-0 items-center gap-2 font-mono text-[15px] font-semibold tracking-tight text-ink"
+          className="group flex shrink-0 items-center gap-2 text-[15px] font-semibold tracking-tight text-ink"
           aria-label="Harshith, home"
         >
           <span

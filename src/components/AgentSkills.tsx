@@ -25,7 +25,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
     >
       <article className="glass-card spotlight group flex h-full flex-col rounded-[var(--radius-lg)] p-6 md:p-7">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h3 className="font-mono text-base font-semibold tracking-tight text-ink transition-colors duration-500 group-hover:text-accent-ink">
+          <h3 className="font-sans text-base font-semibold tracking-tight text-ink transition-colors duration-500 group-hover:text-accent-ink">
             {skill.name}
           </h3>
           {skill.repo ? (
@@ -33,7 +33,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
               href={skill.repo}
               target="_blank"
               rel="noreferrer noopener"
-              className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-faint underline-offset-4 transition-colors hover:text-accent-ink hover:underline"
+              className="text-[0.8125rem] text-faint underline-offset-4 transition-colors hover:text-accent-ink hover:underline"
             >
               <span className="sr-only">{skill.name} on </span>GitHub
               <span aria-hidden> ↗</span>
@@ -45,7 +45,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
 
         <dl className="mt-5 flex flex-1 flex-col gap-4">
           <div>
-            <dt className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-faint">
+            <dt className="text-[0.8125rem] font-semibold text-faint">
               Why it exists
             </dt>
             <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
@@ -53,7 +53,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
             </dd>
           </div>
           <div>
-            <dt className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-faint">
+            <dt className="text-[0.8125rem] font-semibold text-faint">
               What's in it
             </dt>
             <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
@@ -61,7 +61,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
             </dd>
           </div>
           <div>
-            <dt className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-faint">
+            <dt className="text-[0.8125rem] font-semibold text-faint">
               The rule it keeps
             </dt>
             <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">

@@ -8,24 +8,35 @@ import { useInView } from "../lib/useInView";
  * Items are tactile capsules that spring on hover; the whole strip fades and
  * lifts in on scroll so the section reads as alive, not a static logo wall.
  */
-type Tool = { name: string; slug?: string };
+// `mono` marks a single-colour black logo, inverted in dark mode so it does
+// not vanish against the dark pill. `slug` may carry its own extension for
+// the one raster logo (TypeSafe publishes no SVG).
+type Tool = { name: string; slug?: string; mono?: boolean };
 
 const rowA: Tool[] = [
-  { name: "Gemini", slug: "googlegemini" },
-  { name: "Google Cloud", slug: "googlecloud" },
-  { name: "Hugging Face", slug: "huggingface" },
-  { name: "Ollama", slug: "ollama" },
-  { name: "Llama 3.1" },
+  { name: "Claude", slug: "claude" },
+  { name: "Claude Code", slug: "claudecode" },
+  { name: "OpenAI Codex", slug: "codex" },
+  { name: "OpenAI Agents API", slug: "openai", mono: true },
+  { name: "TypeSafe Jev", slug: "typesafe.png", mono: true },
+  { name: "Model Context Protocol", slug: "mcp", mono: true },
   { name: "DeepSeek R1" },
+  { name: "Ollama", slug: "ollama" },
+  { name: "Hugging Face", slug: "huggingface" },
 ];
 
 const rowB: Tool[] = [
-  { name: "React", slug: "react" },
-  { name: "Node.js", slug: "nodedotjs" },
+  { name: "Rust", slug: "rust", mono: true },
+  { name: "Bun", slug: "bun", mono: true },
+  { name: "Astro", slug: "astro" },
   { name: "TypeScript", slug: "typescript" },
+  { name: "React", slug: "react" },
+  { name: "PostgreSQL", slug: "postgresql" },
+  { name: "Python", slug: "python" },
+  { name: "Node.js", slug: "nodedotjs" },
   { name: "MongoDB", slug: "mongodb" },
   { name: "n8n", slug: "n8n" },
-  { name: "Python", slug: "python" },
+  { name: "Google Cloud", slug: "googlecloud" },
 ];
 
 function Item({ tool }: { tool: Tool }) {
@@ -33,14 +44,14 @@ function Item({ tool }: { tool: Tool }) {
     <span className="stack-pill mx-2.5 shrink-0 text-dim">
       {tool.slug && (
         <img
-          src={`/icons/${tool.slug}.svg`}
+          src={`/icons/${tool.slug.includes(".") ? tool.slug : `${tool.slug}.svg`}`}
           alt=""
           aria-hidden
           width={18}
           height={18}
           loading="lazy"
           decoding="async"
-          className="h-[18px] w-[18px] opacity-90"
+          className={`h-[20px] w-[20px] ${tool.mono ? "icon-mono" : ""}`}
         />
       )}
       <span className="stack-name">{tool.name}</span>
@@ -129,12 +140,14 @@ export default function TechMarquee() {
     >
       <div className="shell mb-7 flex items-center gap-3">
         <span className="h-3 w-px bg-accent" aria-hidden />
-        <p className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-dim">
+        <p className="text-[0.8125rem] font-medium text-dim">
           The stack behind the work
         </p>
       </div>
       <div className="flex flex-col gap-3">
+        <p className="shell text-[0.8125rem] font-semibold text-dim">Models, agents &amp; agent tooling</p>
         <Row tools={rowA} />
+        <p className="shell mt-3 text-[0.8125rem] font-semibold text-dim">Systems, runtimes &amp; data</p>
         <Row tools={rowB} reverse />
       </div>
     </section>

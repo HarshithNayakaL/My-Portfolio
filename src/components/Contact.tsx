@@ -20,9 +20,9 @@ const fieldBase =
 // own validation message, raised by reportValidity() on submit, is what
 // assistive tech announces; this is the visual counterpart.
 const errorBase =
-  "mt-1.5 hidden font-mono text-[0.6875rem] text-accent-ink peer-user-invalid:block";
+  "mt-1.5 hidden text-[0.8125rem] text-accent-ink peer-user-invalid:block";
 const labelBase =
-  "pointer-events-none absolute left-0 top-2.5 origin-left font-mono text-[0.75rem] uppercase tracking-[0.12em] text-faint transition-all duration-200 peer-focus:-translate-y-4 peer-focus:text-[0.625rem] peer-focus:text-accent-ink peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:text-[0.625rem]";
+  "pointer-events-none absolute left-0 top-2.5 origin-left text-[0.8125rem] text-faint transition-all duration-200 peer-focus:-translate-y-4 peer-focus:text-[0.625rem] peer-focus:text-accent-ink peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:text-[0.625rem]";
 
 export default function Contact() {
   const [status, setStatus] = useState<Status>("idle");
@@ -135,7 +135,7 @@ export default function Contact() {
               <div className="mt-8 space-y-3">
                 <a
                   href={`mailto:${EMAIL}`}
-                  className="inline-flex items-center gap-2 font-mono text-sm font-medium text-dim transition-colors hover:text-accent-ink"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-dim transition-colors hover:text-accent-ink"
                 >
                   {EMAIL}
                 </a>

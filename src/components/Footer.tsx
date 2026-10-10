@@ -66,7 +66,7 @@ export default function Footer() {
 
   const col = "flex flex-col gap-3";
   const head =
-    "font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-faint";
+    "text-[0.8125rem] font-semibold text-faint";
   const link = "footer-link";
 
   return (
@@ -77,7 +77,7 @@ export default function Footer() {
           <div className="max-w-xs">
             <Link
               to="/"
-              className="inline-flex items-center gap-2.5 font-mono text-base font-semibold text-ink transition-colors hover:text-accent-ink"
+              className="inline-flex items-center gap-2.5 text-base font-semibold text-ink transition-colors hover:text-accent-ink"
             >
               <span className="h-2.5 w-2.5 rounded-[2px] bg-accent" aria-hidden />
               {NAME}
@@ -141,7 +141,7 @@ export default function Footer() {
             © {year} {NAME}. All rights reserved. · Last updated{" "}
             <time dateTime={contentDate(pathname)}>{updatedFormat.format(new Date(contentDate(pathname)))}</time>
           </p>
-          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-faint">
+          <p className="text-[0.8125rem] text-faint">
             Reliability is the feature.
           </p>
         </div>

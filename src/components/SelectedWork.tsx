@@ -1,5 +1,5 @@
 import { projects } from "../data/projects";
-import WorkRow from "./WorkRow";
+import WorkCard from "./WorkCard";
 import SectionHeading from "./SectionHeading";
 import Reveal from "./Reveal";
 import GitHubActivity from "./GitHubActivity";
@@ -18,13 +18,19 @@ export default function SelectedWork() {
       {/* The year of commits behind the projects below, ahead of them. */}
       <GitHubActivity className="mt-10 md:mt-14" />
 
-      <div className="mt-10 md:mt-12">
-        {projects.map((p, i) => (
-          <Reveal key={p.slug} delay={Math.min(i, 4) * 0.05}>
-            <WorkRow project={p} />
+      <div className="mt-10 grid gap-5 md:mt-12 md:grid-cols-2">
+        {projects.slice(0, 4).map((p, i) => (
+          <Reveal key={p.slug} delay={i * 0.05}>
+            <WorkCard project={p} />
           </Reveal>
         ))}
-        <div className="border-t border-line" aria-hidden />
+      </div>
+      <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {projects.slice(4).map((p, i) => (
+          <Reveal key={p.slug} delay={Math.min(i, 3) * 0.05}>
+            <WorkCard project={p} size="sm" />
+          </Reveal>
+        ))}
       </div>
     </section>
   );

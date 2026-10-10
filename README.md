@@ -2,8 +2,8 @@
 
 AI Engineer portfolio. One scrolling page (Hero, Selected Work, Capabilities,
 Agent Skills, About, FAQ, Contact) plus per-project case-study routes and legal
-pages. Light canvas with a dark mode, a single rust accent, Poppins display over
-Inter body with DM Mono for labels.
+pages. Light canvas with a dark mode, a single rust accent, Instrument Serif
+headings over Inter body and labels, with a Poppins hero headline.
 
 The site is also built to be read by machines: every page is prerendered to
 static HTML, has a markdown twin, and is mirrored by a read-only JSON API.
@@ -13,8 +13,8 @@ static HTML, has a markdown twin, and is mirrored by a read-only JSON API.
 - Vite + React 18 + TypeScript
 - Tailwind CSS v4 (`@tailwindcss/vite`); all theme tokens live in `src/index.css`
 - React Router for case-study and legal routes
-- Self-hosted fonts via `@fontsource`: Inter Variable (body), Poppins (display),
-  DM Mono (labels) — served from `public/fonts`, preloaded in `index.html`
+- Self-hosted fonts via `@fontsource`: Inter Variable (body and labels), Instrument
+  Serif (display headings), Poppins (hero headline) — served from `public/fonts`, preloaded in `index.html`
 - Phosphor icons
 - `@bible-strong/avatar-core` for the mascot's geometry
 - `@vercel/edge` for the content-negotiation middleware

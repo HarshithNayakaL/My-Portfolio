@@ -68,7 +68,7 @@ export const profileDocs: Record<string, Doc> = {
           `Role: ${headlineRole} at ${facts.find((f) => f.k === "Company")?.v}, title ${workingTitle} (previously ${previousTitle}). Based in ${
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
-          "The work is AI agents, retrieval pipelines and AI applications built end to end — the model, the backend, and the interface around them. At DemandNXT that means production AI systems and pipelines for marketing and creative operations.",
+          "The work is AI agents, retrieval pipelines and AI applications built end to end — the model, the backend, and the interface around them. At DemandNXT he leads AI engineering: production AI systems and pipelines for marketing and creative operations. He is also migrating the company website from legacy WordPress to a codebase built with Astro.",
         ],
       },
       {
@@ -153,7 +153,7 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
     <article className="shell py-20 md:py-28">
       <Link
         to="/"
-        className="inline-flex items-center gap-2 font-mono text-[0.8125rem] text-dim transition-colors hover:text-ink"
+        className="inline-flex items-center gap-2 text-[0.8125rem] text-dim transition-colors hover:text-ink"
       >
         <ArrowLeft weight="bold" size={15} aria-hidden />
         All work
@@ -171,7 +171,7 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
       <div className="mt-12 max-w-2xl space-y-10">
         {d.sections.map((s) => (
           <section key={s.h}>
-            <h2 className="text-2xl font-semibold tracking-tight">{s.h}</h2>
+            <h2 className="text-3xl tracking-tight md:text-4xl">{s.h}</h2>
             <div className="mt-4 space-y-4 text-base leading-relaxed text-dim">
               {s.p.map((para) => (
                 <p key={para.slice(0, 40)}>{para}</p>
@@ -181,11 +181,11 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
         ))}
         {d.qa && (
           <section>
-            <h2 className="text-2xl font-semibold tracking-tight">{d.qa.h}</h2>
+            <h2 className="text-3xl tracking-tight md:text-4xl">{d.qa.h}</h2>
             <div className="mt-6 space-y-7">
               {d.qa.items.map((item) => (
                 <div key={item.q}>
-                  <h3 className="text-lg font-semibold tracking-tight text-ink">{item.q}</h3>
+                  <h3 className="text-xl tracking-tight text-ink md:text-2xl">{item.q}</h3>
                   <p className="mt-2 text-base leading-relaxed text-dim">{item.a}</p>
                 </div>
               ))}

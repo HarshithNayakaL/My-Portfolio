@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* Self-hosted fonts (latin subsets, font-display: optional + preloaded). See
-   fonts.css — Poppins for display headings, Inter for body/UI, DM Mono for the
-   small technical labels. */
+   fonts.css — Instrument Serif for display headings, Poppins for the hero
+   headline, Inter for body, UI and every small label. */
 @import "./fonts.css";
 
 /* ----------------------------------------------------------------------
@@ -37,8 +37,8 @@
 
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Poppins", "Inter Variable", ui-sans-serif, sans-serif;
-  --font-mono: "DM Mono", ui-monospace, "SF Mono", monospace;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-hero: "Poppins", "Inter Variable", ui-sans-serif, sans-serif;
 
   /* iOS-style soft radii. One scale, applied everywhere (shape lock). */
   --radius-sm: 10px;
@@ -145,15 +145,6 @@
     transition: background-color 0.4s ease, color 0.4s ease;
   }
 
-  /* Poppins carries every display heading; body text stays Inter. */
-  h1,
-  h2,
-  h3,
-  .font-display {
-    font-family: var(--font-display);
-    letter-spacing: -0.01em;
-  }
-
   /* Faint engineering grid, fixed so it never repaints on scroll */
   body::before {
     content: "";
@@ -197,27 +188,9 @@
    just stops carrying the full string on every row. Precompiled on
    purpose rather than CSS @function, which is Chromium-only. */
 @layer components {
-  /* WorkRow: hover panel, accent marker, body, title, tags, links */
-  .work-panel {
-    @apply pointer-events-none absolute inset-x-[-0.85rem] inset-y-1 rounded-[var(--radius-lg)] border border-transparent bg-elevated/0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:border-line group-hover:bg-elevated/45 group-focus-within:border-line group-focus-within:bg-elevated/45;
-  }
-  .work-marker {
-    @apply absolute left-[-0.85rem] top-1/2 h-[calc(100%-4rem)] w-[3px] -translate-y-1/2 scale-y-0 rounded-full bg-accent transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-y-100 group-focus-within:scale-y-100;
-  }
-  .work-body {
-    @apply pointer-events-none relative grid gap-6 py-9 pl-5 transition-[padding] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:pl-7 md:grid-cols-[1fr_auto] md:items-end md:gap-12 md:py-11;
-  }
-  .work-title {
-    @apply mt-3 font-display text-[1.7rem] font-semibold leading-[1.1] tracking-tight text-ink transition-colors duration-300 group-hover:text-accent-ink md:text-4xl;
-  }
-  .work-tag {
-    @apply rounded-[6px] border border-line px-2.5 py-0.5 font-mono text-[0.6875rem] font-medium text-dim;
-  }
+  /* Work card links */
   .work-link {
     @apply inline-flex items-center gap-1.5 text-sm font-semibold text-dim transition-colors hover:text-ink;
-  }
-  .work-cta-arrow {
-    @apply transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1;
   }
 
   /* FAQ disclosure rows */
@@ -238,10 +211,10 @@
     @apply text-left text-sm font-medium text-dim transition-colors hover:text-accent-ink;
   }
   .skill-tag {
-    @apply rounded-full border border-line px-2.5 py-1 font-mono text-[0.6875rem] text-faint;
+    @apply rounded-full border border-line px-2.5 py-1 text-[0.75rem] font-medium text-dim;
   }
   .stack-name {
-    @apply font-mono text-[0.9375rem] tracking-tight;
+    @apply text-[0.9375rem] font-medium tracking-tight;
   }
 }
 
@@ -669,23 +642,6 @@
       0 34px 70px -28px rgba(0, 0, 0, 0.55);
   }
 
-  /* Accent gradient on the headline highlight — depth without a flat fill.
-     Deliberately static: this previously animated `background-position`, which
-     no browser can composite, so it ran forever on the main thread (flagged by
-     the perf audit and a needless battery cost on the largest text on the
-     page). The gradient carries the richness on its own. */
-  .accent-shimmer {
-    background: linear-gradient(
-      100deg,
-      var(--color-accent-ink) 0%,
-      color-mix(in oklab, var(--color-accent-ink) 55%, var(--color-ink)) 55%,
-      var(--color-accent-ink) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
   .text-pretty {
     text-wrap: pretty;
   }
@@ -900,3 +856,78 @@
     }
   }
 }
+
+/* ----------------------------------------------------------------------
+   Display type. Instrument Serif ships one weight, so every display heading
+   is set at 400: the utility font-semibold left on older headings would
+   otherwise make the browser synthesise a smeared faux-bold. Unlayered so it
+   outranks those utilities; .font-sans opts a heading out (small labels that
+   are headings for structure, not for display). */
+:is(h1, h2, h3, .font-display, .faq-q):not(.font-sans) {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Hero: the headline keeps Poppins; only "production." is the serif. The
+   serif's x-height is about three quarters of Poppins', so it is set larger to
+   sit on the same line at the same visual size. line-height 0 stops the bigger
+   glyphs from pushing the line box open. */
+.hero-head { font-family: var(--font-hero); font-weight: 600; letter-spacing: -0.02em; }
+.hero-serif { font-family: var(--font-display); font-weight: 400; font-size: 1.3em; line-height: 0; letter-spacing: -0.015em; color: var(--color-accent-ink); }
+
+/* Floating tool tiles in the hero's empty half (decorative, desktop only). */
+.orbit-tile {
+  position: absolute; display: grid; place-items: center; border-radius: 22px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--color-elevated) 92%, transparent), color-mix(in oklab, var(--color-elevated) 62%, transparent));
+  box-shadow: inset 0 1px 0 var(--glass-edge), 0 24px 40px -24px rgba(20, 22, 28, 0.35), 0 2px 6px -2px rgba(20, 22, 28, 0.08);
+  animation: orbit-float var(--dur, 7s) ease-in-out infinite; animation-delay: var(--del, 0s);
+}
+.orbit-tile img { width: 46%; height: 46%; }
+.orbit-tile span { position: absolute; bottom: -24px; white-space: nowrap; font-size: 0.75rem; font-weight: 500; color: var(--color-faint); }
+@keyframes orbit-float {
+  0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+  50% { transform: translateY(-12px) rotate(calc(var(--rot, 0deg) * -1)); }
+}
+@media (prefers-reduced-motion: reduce) { .orbit-tile { animation: none; } }
+
+/* Annotated system figure (SystemFigure.tsx): boxes, bus connectors, and the
+   rule each gate enforces as an upright serif note on a dashed leader. */
+.fig-diag text { font-family: var(--font-sans); }
+.fig-diag .dn { fill: var(--color-elevated); stroke: var(--color-line-strong); }
+.fig-diag .dn.acc { stroke: var(--color-accent); }
+.fig-diag .dt { font-size: 14px; font-weight: 600; fill: var(--color-ink); }
+.fig-diag .ds { font-size: 10.5px; font-weight: 500; fill: var(--color-dim); }
+.fig-diag .ln { fill: none; stroke: var(--color-line-strong); stroke-width: 1.2; }
+.fig-diag .ann { fill: none; stroke: var(--color-accent); stroke-width: 1; stroke-dasharray: 3 3; }
+.fig-diag .at { font-family: var(--font-display); font-size: 15px; fill: var(--color-accent-ink); }
+.fig-diag .sn { font-family: var(--font-display); font-size: 17px; fill: var(--color-ink); }
+.fig-cap { font-size: 0.875rem; color: var(--color-dim); }
+.fig-cap b { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; color: var(--color-ink); }
+
+/* Work cards */
+.wcard {
+  position: relative; display: flex; height: 100%; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-elevated);
+  transition: border-color 0.4s var(--ease), transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+.wcard:hover, .wcard:focus-within {
+  border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-line));
+  transform: translateY(-3px); box-shadow: 0 24px 50px -30px rgba(20, 22, 28, 0.35);
+}
+.wfig {
+  position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  border-bottom: 1px solid var(--color-line);
+  background-color: var(--color-surface);
+  --wfig-grid: color-mix(in oklab, var(--color-line) 55%, transparent);
+  background-image: linear-gradient(var(--wfig-grid) 1px, transparent 1px), linear-gradient(90deg, var(--wfig-grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.wfig img { width: 86%; margin-top: 36px; align-self: flex-start; border-radius: 10px 10px 0 0; border: 1px solid var(--color-line); box-shadow: 0 14px 30px -18px rgba(20, 22, 28, 0.4); }
+.wfig-tag { position: absolute; left: 14px; top: 12px; z-index: 1; font-size: 12px; font-weight: 500; color: var(--color-dim); background: var(--color-surface); padding: 0 6px; border-radius: 4px; }
+.wchip { font-size: 0.75rem; font-weight: 500; color: var(--color-dim); border: 1px solid var(--color-line); border-radius: 999px; padding: 2px 10px; }
+
+/* Single-colour black logos (Rust, Bun, OpenAI, MCP, TypeSafe) would vanish
+   on the dark pills and tiles; invert them there. */
+.dark .icon-mono { filter: invert(0.92); }

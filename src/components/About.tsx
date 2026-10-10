@@ -40,6 +40,7 @@ export const facts = [
   { k: "Role", v: headlineRole },
   { k: "Company", v: "DemandNXT" },
   { k: "Title at DemandNXT", v: workingTitle },
+  { k: "At DemandNXT", v: "Leads AI engineering" },
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
 ];
@@ -53,7 +54,7 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He works at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
+export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /**
  * The stack, stated once in words. AI Mode fans a question like "AI engineer
@@ -118,7 +119,7 @@ export default function About() {
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.04]"
               />
               <div
-                className="pointer-events-none absolute bottom-3 left-4 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-white"
+                className="pointer-events-none absolute bottom-3 left-4 text-[0.8125rem] font-semibold text-white"
                 style={{ textShadow: "0 1px 6px rgba(0,0,0,0.65)" }}
               >
                 Harshith Nayaka L
@@ -131,7 +132,7 @@ export default function About() {
                   key={f.k}
                   className="flex items-baseline justify-between gap-4 border-t border-line py-3 first:border-t-0"
                 >
-                  <dt className="shrink-0 font-mono text-[0.75rem] font-medium uppercase tracking-wider text-dim">
+                  <dt className="shrink-0 text-[0.8125rem] font-medium text-dim">
                     {f.k}
                   </dt>
                   <dd className="text-right text-sm font-semibold text-ink">
@@ -154,7 +155,7 @@ export default function About() {
               </span>
             </span>
 
-            <h2 className="mt-6 text-3xl font-semibold tracking-tight md:text-4xl">
+            <h2 className="mt-6 text-[2.6rem] leading-[1.02] tracking-tight md:text-6xl">
               About
             </h2>
 
@@ -164,6 +165,12 @@ export default function About() {
                   and the text the Person schema's description matches. The
                   first-person voice picks up after it. */}
               <p className="text-ink">{identitySentence}</p>
+              <p>
+                At DemandNXT I lead AI engineering: the company's AI work runs
+                through me, from the agents and pipelines to how they ship. I'm
+                also leading the migration of the company website off legacy
+                WordPress onto a codebase built with Astro.
+              </p>
               <p>
                 In practice that means the model, the backend, and the
                 interface around it. My public work includes Octo, a
@@ -188,7 +195,7 @@ export default function About() {
             {/* Published research. Real, citable proof-of-work — and the
                 academic counterpart to the AI Notes case study. */}
             <div className="mt-10 border-t border-line pt-6">
-              <h3 className="font-mono text-[0.75rem] font-medium uppercase tracking-wider text-dim">
+              <h3 className="font-sans text-[0.8125rem] font-semibold text-dim">
                 Published research
               </h3>
               <p className="mt-3 text-base leading-relaxed text-dim">
@@ -205,7 +212,7 @@ export default function About() {
                 the local-inference approach behind the AI Notes project —
                 running the model on-device so notes never leave the machine.
               </p>
-              <p className="mt-2 font-mono text-[0.75rem] text-faint">
+              <p className="mt-2 text-[0.8125rem] text-faint">
                 DOI: {paper.doi}
               </p>
             </div>

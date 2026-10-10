@@ -12,7 +12,7 @@ export default function SectionHeading({
 }) {
   return (
     <div id={id} className="max-w-2xl scroll-mt-24">
-      <h2 className="text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+      <h2 className="text-[2.6rem] leading-[1.02] tracking-tight text-ink md:text-6xl">
         {title}
       </h2>
       {intro && (
