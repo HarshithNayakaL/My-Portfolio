@@ -741,7 +741,18 @@ async function handleMcp(request: Request, url: URL, server: McpServer): Promise
     return new Response(null, { status: 204, headers: { ...MCP_CORS, "Access-Control-Max-Age": "86400" } });
   }
   if (request.method !== "POST") {
-    return new Response(null, { status: 405, headers: { Allow: "POST, OPTIONS", ...MCP_CORS } });
+    // A bare 405 read to one agent as "the MCP server is unreachable". Say
+    // what the endpoint is and show the call, as /a2a does.
+    const card = url.pathname === "/mcp/docs" ? "/.well-known/mcp/docs-server-card.json" : "/.well-known/mcp/server-card.json";
+    return new Response(
+      JSON.stringify({
+        error: "This is an MCP endpoint (Streamable HTTP): POST a JSON-RPC 2.0 request. It is stateless, so no initialize or session is needed first.",
+        example: { jsonrpc: "2.0", id: 1, method: "tools/list" },
+        serverCard: `${ORIGIN}${card}`,
+        docs: `${ORIGIN}/developers`,
+      }),
+      { status: 405, headers: { Allow: "POST, OPTIONS", "Content-Type": "application/json; charset=utf-8", ...MCP_CORS } },
+    );
   }
 
   const origin = request.headers.get("origin");
