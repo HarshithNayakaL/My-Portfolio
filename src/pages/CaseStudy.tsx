@@ -65,10 +65,10 @@ export default function CaseStudy() {
               now reads "Maestro: Multi-model LLM orchestration" to a crawler
               and a screen reader, with the layout unchanged. */}
           <h1 className="mt-10 flex max-w-4xl flex-col-reverse gap-5">
-            <span className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+            <span className="text-balance text-5xl leading-[1.02] tracking-tight md:text-7xl">
               {study.title}
             </span>
-            <span className="text-[0.8125rem] font-normal leading-normal text-accent-ink">
+            <span className="font-sans text-[0.9375rem] font-semibold leading-normal text-accent-ink">
               <span className="sr-only">: </span>
               {study.searchKicker ?? study.kicker}
             </span>
@@ -207,18 +207,21 @@ export default function CaseStudy() {
                 {study.pipelineIntro ??
                   "The pipeline, end to end. Every stage assumes the model can be wrong, so the interesting work is in the verify steps, not just generation."}
               </p>
-              <p className="mt-6 flex items-center gap-2 font-display text-lg text-accent-ink">
+              <p className="mt-6 flex items-center gap-2 font-display text-xl text-accent-ink">
                 <span className="h-[7px] w-[7px] bg-accent" aria-hidden /> The rule each gate enforces
               </p>
             </div>
           </Reveal>
           <Reveal delay={0.1}>
             <figure className="m-0">
-              <div className="md:hidden">
-                <SystemFigure stages={study.pipeline} compact="xs" details />
+              {/* The wide figure's margin notes need ~700px to stay legible;
+                  below xl the column is narrower, so it gets the stacked
+                  figure, capped so it does not balloon on a tablet. */}
+              <div className="mx-auto max-w-[480px] xl:hidden">
+                <SystemFigure stages={study.pipeline} layout="stacked" details />
               </div>
-              <div className="hidden md:block">
-                <SystemFigure stages={study.pipeline} />
+              <div className="hidden xl:block">
+                <SystemFigure stages={study.pipeline} layout="wide" />
               </div>
               <ol className="sr-only">
                 {study.pipeline.map((st) => (
@@ -400,7 +403,7 @@ function StudyNav({ slug }: { slug: string }) {
           className={`group rounded-[var(--radius)] border border-line p-4 transition-colors hover:border-line-strong ${align}`}
         >
           <span className="block text-[0.8125rem] text-faint">{label}</span>
-          <span className="mt-1 block font-display text-lg font-semibold text-ink transition-colors group-hover:text-accent-ink">
+          <span className="mt-1 block font-display text-xl text-ink md:text-2xl transition-colors group-hover:text-accent-ink">
             {p.title}
           </span>
           <span className="mt-0.5 block text-sm text-dim">{p.kicker}</span>

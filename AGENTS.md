@@ -135,10 +135,16 @@ fix the cause — do not weaken the check.
   monospace, all-caps, wide-tracked label style on this site: the owner reads
   it as the giveaway of AI-generated design, and it was removed on purpose.
   A heading that is really a small label opts out of the serif with
-  `font-sans`.
+  `font-sans`. Sizes are checked as rendered, at 390px through 1920px:
+  no text below 12px (figure text included, after the SVG is scaled), and
+  no serif below 16px; Instrument Serif is a display face and goes thin and
+  hard to read under that.
 - **Work cards and figures.** Projects render as `WorkCard`s; a card shows
   the product screenshot, or the case study's `SystemFigure` when there is
-  none. "How it's wired" on a case study is the same figure at full size. Both
+  none. Cards use the stacked figure (rules as HTML text under it) and line
+  up per row through CSS subgrid, so a frame grows to fit its figure rather
+  than shrinking it. "How it's wired" on a case study uses the wide figure
+  (serif margin notes) from xl and the stacked one below. Both
   are generated from the case study's `pipeline` data, never drawn by hand.
 - **Accessibility is enforced.** The site scores 100 on axe/Lighthouse
   accessibility. Watch list structure in particular: a `<dl>` may wrap each

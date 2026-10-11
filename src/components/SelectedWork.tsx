@@ -20,14 +20,16 @@ export default function SelectedWork() {
 
       <div className="mt-10 grid gap-5 md:mt-12 md:grid-cols-2">
         {projects.slice(0, 4).map((p, i) => (
-          <Reveal key={p.slug} delay={i * 0.05}>
+          <Reveal key={p.slug} delay={i * 0.05} className="wcard-cell">
             <WorkCard project={p} />
           </Reveal>
         ))}
       </div>
-      <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {/* Three across only from xl: at lg a third of the row is ~300px, too
+          narrow for a system figure to stay legible. */}
+      <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {projects.slice(4).map((p, i) => (
-          <Reveal key={p.slug} delay={Math.min(i, 3) * 0.05}>
+          <Reveal key={p.slug} delay={Math.min(i, 3) * 0.05} className="wcard-cell">
             <WorkCard project={p} size="sm" />
           </Reveal>
         ))}

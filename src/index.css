@@ -198,7 +198,7 @@
     @apply flex cursor-pointer list-none items-start justify-between gap-6 py-6 text-left;
   }
   .faq-q {
-    @apply font-display text-lg font-semibold tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-xl;
+    @apply font-display text-xl tracking-tight text-ink transition-colors group-hover:text-accent-ink md:text-2xl;
   }
   .faq-toggle {
     @apply mt-1.5 shrink-0 text-dim transition-transform duration-300 group-open:rotate-45;
@@ -911,11 +911,14 @@
 .fig-diag .at { font-family: var(--font-display); font-size: 15px; fill: var(--color-accent-ink); }
 .fig-diag .sn { font-family: var(--font-display); font-size: 17px; fill: var(--color-ink); }
 .fig-cap { font-size: 0.875rem; color: var(--color-dim); }
-.fig-cap b { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; color: var(--color-ink); }
+.fig-cap b { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; color: var(--color-ink); }
 
-/* Work cards */
+/* Work cards. Each card spans two rows of its grid (frame, body) and takes
+   them from the grid through subgrid, so every frame in a row is as tall as
+   the tallest one and every title in the row starts on the same line. */
+.wcard-cell { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
 .wcard {
-  position: relative; display: flex; height: 100%; flex-direction: column; overflow: hidden;
+  position: relative; display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; overflow: hidden;
   border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-elevated);
   transition: border-color 0.4s var(--ease), transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
 }
@@ -931,7 +934,7 @@
   background-image: linear-gradient(var(--wfig-grid) 1px, transparent 1px), linear-gradient(90deg, var(--wfig-grid) 1px, transparent 1px);
   background-size: 22px 22px;
 }
-.wfig img { width: 86%; margin-top: 36px; align-self: flex-start; border-radius: 10px 10px 0 0; border: 1px solid var(--color-line); box-shadow: 0 14px 30px -18px rgba(20, 22, 28, 0.4); }
+.wfig img { position: absolute; top: 36px; left: 7%; width: 86%; height: auto; border-radius: 10px 10px 0 0; border: 1px solid var(--color-line); box-shadow: 0 14px 30px -18px rgba(20, 22, 28, 0.4); }
 .wfig-tag { position: absolute; left: 14px; top: 12px; z-index: 1; font-size: 12px; font-weight: 500; color: var(--color-dim); background: var(--color-surface); padding: 0 6px; border-radius: 4px; }
 .wchip { font-size: 0.75rem; font-weight: 500; color: var(--color-dim); border: 1px solid var(--color-line); border-radius: 999px; padding: 2px 10px; }
 
@@ -941,8 +944,8 @@
 
 /* Phone layout of the system figure: numbered gate markers in the SVG, the
    rules themselves as real text underneath. */
-.fig-diag .fig-num { font-size: 10px; font-weight: 700; fill: var(--color-on-btn); }
-.fig-notes { display: grid; gap: 0.5rem; font-size: 0.875rem; line-height: 1.45; color: var(--color-dim); }
+.fig-diag .fig-num { font-size: 13.5px; font-weight: 700; fill: var(--color-on-btn); }
+.fig-notes { display: grid; gap: 0.6rem; font-size: 0.9375rem; line-height: 1.45; color: var(--color-dim); }
 .fig-notes li { display: flex; gap: 0.6rem; align-items: baseline; }
 .fig-notes b { font-weight: 600; color: var(--color-ink); }
-.fig-notes-n { flex: none; display: inline-grid; place-items: center; width: 1.15rem; height: 1.15rem; border-radius: 4px; background: var(--color-btn); color: var(--color-on-btn); font-size: 0.6875rem; font-weight: 700; }
+.fig-notes-n { flex: none; display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 5px; background: var(--color-btn); color: var(--color-on-btn); font-size: 0.8125rem; font-weight: 700; }
