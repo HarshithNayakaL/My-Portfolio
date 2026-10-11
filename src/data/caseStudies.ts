@@ -779,11 +779,11 @@ const aiNotes: CaseStudy = {
     "Browser storage",
   ],
   shot: {
-    src: "/shots/ai-notes.f7ec4d0e.webp",
-    small: "/shots/ai-notes-640.8bfda5bf.webp",
+    src: "/shots/ai-notes.ce897f1d.webp",
+    small: "/shots/ai-notes-640.adec3ca7.webp",
     width: 1440,
     height: 900,
-    alt: "AI Notes with one entry open: a catalog sidebar headed 'local archive · DeepSeek R1', the note in a ruled editor with Save, Delete and Ask Archive actions above it, an 'AI Offline' badge in the top corner, and 'stored on this device' in the sidebar footer.",
+    alt: "AI Notes home screen: 'My Notes' with Create New Note and Ask AI Last Note tiles, a Local AI panel reading 'DeepSeek R1 via Ollama' with an Offline status, and a Recent Notes list of four notes, each tagged with its date and word count.",
   },
   questions: [
     {
