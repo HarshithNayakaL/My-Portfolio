@@ -876,6 +876,12 @@
    last line nor push it off the shared baseline. */
 .hero-head { font-family: var(--font-hero); font-weight: 600; letter-spacing: -0.02em; }
 .hero-serif { display: inline-block; font-family: var(--font-display); font-weight: 400; font-size: 1.3em; line-height: 0.6; letter-spacing: -0.015em; color: var(--color-accent-ink); }
+/* Below md the serif word wraps onto its own line, right under the
+   descenders of "engineered", and its taller ascenders (d, t, the i dot)
+   ran 3-4px into the g. Room above it on phones, a touch on tablets and
+   small laptops; from 1180px it clears by 7-8px and the spacing is even. */
+@media (max-width: 767px) { .hero-serif { padding-top: 0.22em; } }
+@media (min-width: 768px) and (max-width: 1179px) { .hero-serif { padding-top: 0.05em; } }
 
 /* Floating tool tiles in the hero's empty half (decorative, desktop only). */
 .orbit-tile {
