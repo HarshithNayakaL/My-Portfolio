@@ -41,7 +41,6 @@ export const facts = [
   { k: "Company", v: "DemandNXT" },
   { k: "Title at DemandNXT", v: workingTitle },
   { k: "At DemandNXT", v: "Leads AI engineering" },
-  { k: "Reports to", v: "The CEO" },
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
 ];
@@ -55,7 +54,7 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}. As the company's only AI engineer, he reports directly to the CEO and owns AI work across DemandNXT's six B2B brands. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
+export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}. He owns AI work across DemandNXT's six B2B brands. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /**
  * The stack, stated once in words. AI Mode fans a question like "AI engineer
@@ -167,11 +166,11 @@ export default function About() {
                   first-person voice picks up after it. */}
               <p className="text-ink">{identitySentence}</p>
               <p>
-                At DemandNXT I'm the only AI engineer, and I report directly to
-                the CEO. AI work across the company's six B2B brands runs
-                through me, from the agents and pipelines to how they ship, and
-                I'm leading the migration of the company website off legacy
-                WordPress onto a codebase built with Astro.
+                At DemandNXT I lead AI engineering: AI work across the
+                company's six B2B brands runs through me, from the agents and
+                pipelines to how they ship. I'm also leading the migration of
+                the company website off legacy WordPress onto a codebase built
+                with Astro.
               </p>
               <p>
                 In practice that means the model, the backend, and the

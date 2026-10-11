@@ -68,7 +68,7 @@ export const profileDocs: Record<string, Doc> = {
           `Role: ${headlineRole} at ${facts.find((f) => f.k === "Company")?.v}, title ${workingTitle} (previously ${previousTitle}). Based in ${
             facts.find((f) => f.k === "Based in")?.v
           }. Building since ${facts.find((f) => f.k === "Building since")?.v}. ${availability}.`,
-          "The work is AI agents, retrieval pipelines and AI applications built end to end — the model, the backend, and the interface around them. At DemandNXT he leads AI engineering as the company's only AI engineer, reporting directly to the CEO: production AI systems and pipelines for marketing and creative operations across its six B2B brands. He is also migrating the company website from legacy WordPress to a codebase built with Astro.",
+          "The work is AI agents, retrieval pipelines and AI applications built end to end — the model, the backend, and the interface around them. At DemandNXT he leads AI engineering: production AI systems and pipelines for marketing and creative operations across its six B2B brands. He is also migrating the company website from legacy WordPress to a codebase built with Astro.",
         ],
       },
       {
