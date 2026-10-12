@@ -119,7 +119,7 @@ export default function About() {
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.04]"
               />
               <div
-                className="pointer-events-none absolute bottom-3 left-4 text-[0.8125rem] font-semibold text-white"
+                className="pointer-events-none absolute bottom-3 left-4 text-[max(12px,0.8125rem)] font-semibold text-white"
                 style={{ textShadow: "0 1px 6px rgba(0,0,0,0.65)" }}
               >
                 Harshith Nayaka L
@@ -132,7 +132,7 @@ export default function About() {
                   key={f.k}
                   className="flex items-baseline justify-between gap-4 border-t border-line py-3 first:border-t-0"
                 >
-                  <dt className="shrink-0 text-[0.8125rem] font-medium text-dim">
+                  <dt className="shrink-0 text-[max(12px,0.8125rem)] font-medium text-dim">
                     {f.k}
                   </dt>
                   <dd className="text-right text-sm font-semibold text-ink">
@@ -196,7 +196,7 @@ export default function About() {
             {/* Published research. Real, citable proof-of-work — and the
                 academic counterpart to the AI Notes case study. */}
             <div className="mt-10 border-t border-line pt-6">
-              <h3 className="font-sans text-[0.8125rem] font-semibold text-dim">
+              <h3 className="font-sans text-[max(12px,0.8125rem)] font-semibold text-dim">
                 Published research
               </h3>
               <p className="mt-3 text-base leading-relaxed text-dim">
@@ -213,7 +213,7 @@ export default function About() {
                 the local-inference approach behind the AI Notes project —
                 running the model on-device so notes never leave the machine.
               </p>
-              <p className="mt-2 text-[0.8125rem] text-faint">
+              <p className="mt-2 text-[max(12px,0.8125rem)] text-faint">
                 DOI: {paper.doi}
               </p>
             </div>

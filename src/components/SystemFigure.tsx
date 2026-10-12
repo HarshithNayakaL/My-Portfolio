@@ -9,7 +9,7 @@ import type { PipelineStage, PipelineNode } from "../data/caseStudies";
  * - "wide" (case-study page from xl): stage gutter on the left, the rule as a
  *   serif margin note on a dashed accent leader to the right.
  * - "stacked" (every work card, and the case-study page below xl): one
- *   column, step numbers only, numbered gate markers, and the rules as real
+ *   column, no gutter, numbered gate markers, and the rules as real
  *   text beside or under the figure. A notes column inside the SVG scaled the
  *   whole figure down until labels were 9-11px on a card; as HTML they stay
  *   at body size however narrow the figure gets.
@@ -153,12 +153,12 @@ function WideFigure({ stages }: { stages: PipelineStage[] }) {
 function StackedFigure({
   stages, details, notes: notesAt, fit,
 }: { stages: PipelineStage[]; details: boolean; notes: "below" | "side"; fit: boolean }) {
-  // Sized for the ~0.9x the figure is drawn at on a 390px phone: box labels
-  // land near 13px, details and markers near 12px, step numbers near 20px.
-  const X0 = 30, span = 312, G = 10, LH = 18.5, SFS = 12.5, GAP = 28;
+  // No step numbers: the boxes and connectors already read top to bottom.
+  // Sized for the ~0.9x the figure is drawn at on a phone: box labels land
+  // near 13px, details and markers near 12px.
+  const X0 = 0, span = 312, G = 10, LH = 18.5, SFS = 12.5, GAP = 28;
   let y = 4;
   const rows: Box[][] = [];
-  const nums: number[] = [];
   const notes: { box: Box; label: string; text: string }[] = [];
 
   stages.forEach((st, si) => {
@@ -176,7 +176,6 @@ function StackedFigure({
     const rh = Math.max(...boxes.map((b) => b.h));
     boxes.forEach((b) => (b.h = rh));
     rows.push(boxes);
-    nums.push(y);
     if (gate) notes.push({ box: boxes.find((b) => b.node === gate)!, label: gate.label, text: gate.detail! });
     y += rh + (si < stages.length - 1 ? GAP : 4);
   });
@@ -188,9 +187,6 @@ function StackedFigure({
       className={fit ? "fig-diag h-full w-full" : "fig-diag h-auto w-full"}
       aria-hidden
     >
-      {nums.map((ny, i) => (
-        <text key={i} x={0} y={ny + 19} className="sn" style={{ fontSize: 23 }}>{String(i + 1).padStart(2, "0")}</text>
-      ))}
       <Buses rows={rows} />
       {rows.flat().map((b) => {
         const k = noteNo(b);

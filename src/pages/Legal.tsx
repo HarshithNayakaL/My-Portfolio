@@ -123,18 +123,18 @@ export default function Legal() {
     <article className="shell max-w-3xl pt-32 pb-24 md:pt-40">
       <Link
         to="/"
-        className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-dim transition-colors hover:text-accent-ink"
+        className="inline-flex items-center gap-1.5 text-[max(12px,0.8125rem)] font-medium text-dim transition-colors hover:text-accent-ink"
       >
         <ArrowLeft size={15} weight="bold" /> Back home
       </Link>
 
-      <p className="mt-10 text-[0.8125rem] font-medium text-accent-ink">
+      <p className="mt-10 text-[max(12px,0.8125rem)] font-medium text-accent-ink">
         Legal
       </p>
       <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
         {data.title}
       </h1>
-      <p className="mt-3 text-[0.8125rem] text-faint">Last updated · {data.updated}</p>
+      <p className="mt-3 text-[max(12px,0.8125rem)] text-faint">Last updated · {data.updated}</p>
       <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-dim md:text-lg">
         {data.intro}
       </p>

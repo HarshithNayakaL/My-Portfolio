@@ -38,7 +38,7 @@ export default function WorkCard({ project, size = "lg" }: { project: Project; s
             decoding="async"
           />
         ) : cs ? (
-          <div className="mx-auto w-full max-w-[420px] px-4 pb-6 pt-12">
+          <div className="mx-auto w-full max-w-[280px] px-1 pb-6 pt-11 md:max-w-[320px]">
             <SystemFigure stages={cs.pipeline} layout="stacked" />
           </div>
         ) : null}
@@ -47,9 +47,9 @@ export default function WorkCard({ project, size = "lg" }: { project: Project; s
 
       <div className={`flex flex-1 flex-col ${big ? "p-7" : "p-6"}`}>
         <div className="flex flex-wrap items-center gap-3">
-          <p className="text-[0.8125rem] font-medium text-dim">{kicker}</p>
+          <p className="text-[max(12px,0.8125rem)] font-medium text-dim">{kicker}</p>
           {inProgress && (
-            <span className="inline-flex items-center gap-2 text-[0.75rem] font-semibold text-accent-ink">
+            <span className="inline-flex items-center gap-2 text-[max(12px,0.75rem)] font-semibold text-accent-ink">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
               In progress
             </span>

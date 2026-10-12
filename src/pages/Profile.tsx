@@ -153,7 +153,7 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
     <article className="shell py-20 md:py-28">
       <Link
         to="/"
-        className="inline-flex items-center gap-2 text-[0.8125rem] text-dim transition-colors hover:text-ink"
+        className="inline-flex items-center gap-2 text-[max(12px,0.8125rem)] text-dim transition-colors hover:text-ink"
       >
         <ArrowLeft weight="bold" size={15} aria-hidden />
         All work

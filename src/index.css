@@ -36,9 +36,9 @@
 }
 
 @theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --font-hero: "Poppins", "Inter Variable", ui-sans-serif, sans-serif;
+  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", "Instrument Serif Fallback", Georgia, serif;
+  --font-hero: "Poppins", "Poppins Fallback", "Inter Variable", ui-sans-serif, sans-serif;
 
   /* iOS-style soft radii. One scale, applied everywhere (shape lock). */
   --radius-sm: 10px;
@@ -131,6 +131,14 @@
     scroll-behavior: smooth;
     background-color: var(--color-canvas);
   }
+  /* Desktop runs at 90% of the base size. At 100% the layout read as zoomed
+     in on a laptop (the owner was browsing it at 90% zoom to make it look
+     right). Type and spacing are rem-based, so this scales the whole page
+     the way browser zoom does; phones and tablets keep the full size. A
+     percentage, not px, so a reader's own browser font setting still wins. */
+  @media (min-width: 1024px) {
+    html { font-size: 90%; }
+  }
 
   body {
     margin: 0;
@@ -211,7 +219,7 @@
     @apply text-left text-sm font-medium text-dim transition-colors hover:text-accent-ink;
   }
   .skill-tag {
-    @apply rounded-full border border-line px-2.5 py-1 text-[0.75rem] font-medium text-dim;
+    @apply rounded-full border border-line px-2.5 py-1 text-[max(12px,0.75rem)] font-medium text-dim;
   }
   .stack-name {
     @apply text-[0.9375rem] font-medium tracking-tight;
@@ -892,7 +900,7 @@
   animation: orbit-float var(--dur, 7s) ease-in-out infinite; animation-delay: var(--del, 0s);
 }
 .orbit-tile img { width: 46%; height: 46%; }
-.orbit-tile span { position: absolute; bottom: -24px; white-space: nowrap; font-size: 0.75rem; font-weight: 500; color: var(--color-faint); }
+.orbit-tile span { position: absolute; bottom: -24px; white-space: nowrap; font-size: max(12px, 0.75rem); font-weight: 500; color: var(--color-faint); }
 @keyframes orbit-float {
   0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
   50% { transform: translateY(-12px) rotate(calc(var(--rot, 0deg) * -1)); }
@@ -936,7 +944,7 @@
 }
 .wfig img { position: absolute; top: 36px; left: 7%; width: 86%; height: auto; border-radius: 10px 10px 0 0; border: 1px solid var(--color-line); box-shadow: 0 14px 30px -18px rgba(20, 22, 28, 0.4); }
 .wfig-tag { position: absolute; left: 14px; top: 12px; z-index: 1; font-size: 12px; font-weight: 500; color: var(--color-dim); background: var(--color-surface); padding: 0 6px; border-radius: 4px; }
-.wchip { font-size: 0.75rem; font-weight: 500; color: var(--color-dim); border: 1px solid var(--color-line); border-radius: 999px; padding: 2px 10px; }
+.wchip { font-size: max(12px, 0.75rem); font-weight: 500; color: var(--color-dim); border: 1px solid var(--color-line); border-radius: 999px; padding: 2px 10px; }
 
 /* Single-colour black logos (Rust, Bun, OpenAI, MCP, TypeSafe) would vanish
    on the dark pills and tiles; invert them there. */
@@ -944,8 +952,8 @@
 
 /* Phone layout of the system figure: numbered gate markers in the SVG, the
    rules themselves as real text underneath. */
-.fig-diag .fig-num { font-size: 13.5px; font-weight: 700; fill: var(--color-on-btn); }
-.fig-notes { display: grid; gap: 0.6rem; font-size: 0.9375rem; line-height: 1.45; color: var(--color-dim); }
+.fig-diag .fig-num { font-size: 14.5px; font-weight: 700; fill: var(--color-on-btn); }
+.fig-notes { display: grid; gap: 0.5rem; font-size: max(13px, 0.875rem); line-height: 1.45; color: var(--color-dim); }
 .fig-notes li { display: flex; gap: 0.6rem; align-items: baseline; }
 .fig-notes b { font-weight: 600; color: var(--color-ink); }
-.fig-notes-n { flex: none; display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 5px; background: var(--color-btn); color: var(--color-on-btn); font-size: 0.8125rem; font-weight: 700; }
+.fig-notes-n { flex: none; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 5px; background: var(--color-btn); color: var(--color-on-btn); font-size: max(12px, 0.8125rem); font-weight: 700; }

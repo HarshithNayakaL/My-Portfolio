@@ -64,7 +64,7 @@ export default function GitHubActivity({ className }: { className?: string }) {
               graph is wider than the screen, max-w-full applies, and it scrolls. */}
           <div className="mx-auto w-fit max-w-full">
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-              <h3 className="font-sans text-[0.8125rem] font-semibold text-dim">
+              <h3 className="font-sans text-[max(12px,0.8125rem)] font-semibold text-dim">
                 GitHub activity
               </h3>
               <a

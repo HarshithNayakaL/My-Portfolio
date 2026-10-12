@@ -2,18 +2,46 @@
    (unhashed) paths so the critical faces can be <link rel="preload">ed in
    index.html.
 
-   font-display: optional is deliberate: the browser gives the font a tiny block
-   window and, if it isn't ready, keeps the fallback for the WHOLE page load
-   instead of swapping mid-view. Combined with the preloads, the real font is
-   almost always ready before first paint — so we get the real type AND zero
-   font-swap layout shift (the desktop CLS culprit was the headline reflowing
-   when Poppins arrived late). */
+   font-display: swap, with a metric-matched local fallback for each face.
+   This used to be `optional`, which keeps the fallback for the whole page
+   load whenever the font misses a ~100ms window. Chrome usually made it;
+   Firefox applies the rule more strictly and often did not, so the site
+   rendered in Arial and Times there. `swap` always ends on the real font,
+   and the fallbacks below are sized (size-adjust, ascent/descent overrides
+   measured against each real face) so the swap barely moves the text: the
+   layout shift `optional` was protecting against stays near zero. */
+
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 106.29%;
+  ascent-override: 91.26%;
+  descent-override: 22.58%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Poppins Fallback";
+  font-weight: 600;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Helvetica Bold");
+  size-adjust: 104.99%;
+  ascent-override: 100.01%;
+  descent-override: 33.34%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Instrument Serif Fallback";
+  src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"), local("Times");
+  size-adjust: 81.97%;
+  ascent-override: 120.78%;
+  descent-override: 37.82%;
+  line-gap-override: 0%;
+}
 
 /* Poppins — the hero headline only, in its one weight */
 @font-face {
   font-family: "Poppins";
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
   font-weight: 600;
   src: url(/fonts/poppins-latin-600-normal.woff2) format("woff2");
 }
@@ -22,7 +50,7 @@
 @font-face {
   font-family: "Inter Variable";
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
   font-weight: 100 900;
   src: url(/fonts/inter-latin-wght-normal.woff2) format("woff2-variations");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
@@ -32,7 +60,7 @@
 @font-face {
   font-family: "Inter Variable";
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
   font-weight: 100 900;
   src: url(/fonts/inter-latin-ext-wght-normal.woff2) format("woff2-variations");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
@@ -45,7 +73,7 @@
 @font-face {
   font-family: "Instrument Serif";
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
   font-weight: 400;
   src: url(/fonts/instrument-serif-latin-400-normal.woff2) format("woff2");
 }

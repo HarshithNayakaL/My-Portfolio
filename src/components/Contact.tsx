@@ -20,9 +20,9 @@ const fieldBase =
 // own validation message, raised by reportValidity() on submit, is what
 // assistive tech announces; this is the visual counterpart.
 const errorBase =
-  "mt-1.5 hidden text-[0.8125rem] text-accent-ink peer-user-invalid:block";
+  "mt-1.5 hidden text-[max(12px,0.8125rem)] text-accent-ink peer-user-invalid:block";
 const labelBase =
-  "pointer-events-none absolute left-0 top-2.5 origin-left text-[0.8125rem] text-faint transition-all duration-200 peer-focus:-translate-y-4 peer-focus:text-[0.625rem] peer-focus:text-accent-ink peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:text-[0.625rem]";
+  "pointer-events-none absolute left-0 top-2.5 origin-left text-[max(12px,0.8125rem)] text-faint transition-all duration-200 peer-focus:-translate-y-4 peer-focus:text-[0.625rem] peer-focus:text-accent-ink peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:text-[0.625rem]";
 
 export default function Contact() {
   const [status, setStatus] = useState<Status>("idle");
@@ -292,7 +292,7 @@ export default function Contact() {
 
                   <p
                     aria-live="polite"
-                    className={`text-center text-[0.8125rem] ${
+                    className={`text-center text-[max(12px,0.8125rem)] ${
                       status === "error" ? "text-ink" : "text-faint"
                     }`}
                   >

@@ -61,7 +61,11 @@ export default function Hero() {
         </div>
 
         {/* Headline */}
-        <p className="hero-head max-w-[16ch] text-[clamp(2.6rem,6vw,5rem)] leading-[1.04] text-ink lg:max-w-[15ch]">
+        {/* Widths in em, not ch: ch is the width of the font's "0", so the box
+            shrank under the fallback font (and in Firefox before Poppins
+            loaded) and the headline wrapped onto two extra lines. 10.35em and
+            9.7em are the old 16ch and 15ch measured in Poppins. */}
+        <p className="hero-head max-w-[10.35em] text-[clamp(2.6rem,6vw,5rem)] leading-[1.04] text-ink lg:max-w-[9.7em]">
           {HEAD_LEAD.map((word, i) => (
             <span
               key={`${word}-${i}`}
@@ -126,7 +130,7 @@ export default function Hero() {
         className="anim-rise relative z-10 mx-auto mt-14 flex flex-col items-center gap-1.5 text-dim transition-colors hover:text-accent-ink"
         style={d(0.9)}
       >
-        <span className="text-[0.8125rem] font-medium">
+        <span className="text-[max(12px,0.8125rem)] font-medium">
           Scroll
         </span>
         <span className="anim-nudge" aria-hidden>

@@ -140,14 +140,14 @@ export default function TechMarquee() {
     >
       <div className="shell mb-7 flex items-center gap-3">
         <span className="h-3 w-px bg-accent" aria-hidden />
-        <p className="text-[0.8125rem] font-medium text-dim">
+        <p className="text-[max(12px,0.8125rem)] font-medium text-dim">
           The stack behind the work
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        <p className="shell text-[0.8125rem] font-semibold text-dim">Models, agents &amp; agent tooling</p>
+        <p className="shell text-[max(12px,0.8125rem)] font-semibold text-dim">Models, agents &amp; agent tooling</p>
         <Row tools={rowA} />
-        <p className="shell mt-3 text-[0.8125rem] font-semibold text-dim">Systems, runtimes &amp; data</p>
+        <p className="shell mt-3 text-[max(12px,0.8125rem)] font-semibold text-dim">Systems, runtimes &amp; data</p>
         <Row tools={rowB} reverse />
       </div>
     </section>

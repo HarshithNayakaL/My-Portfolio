@@ -53,7 +53,7 @@ export default function CaseStudy() {
         <div>
           <Link
             to="/#work"
-            className="inline-flex items-center gap-1.5 text-[0.8125rem] text-dim transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 text-[max(12px,0.8125rem)] text-dim transition-colors hover:text-ink"
           >
             <ArrowLeft size={15} weight="bold" /> All work
           </Link>
@@ -82,7 +82,7 @@ export default function CaseStudy() {
               corroborated it. Google's guidance is to carry a byline wherever
               a reader would reasonably ask "who wrote this?", which a case
               study plainly is. */}
-          <p className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] text-dim">
+          <p className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-1 text-[max(12px,0.8125rem)] text-dim">
             <span>Written by</span>
             <Link
               to="/#about"
@@ -108,7 +108,7 @@ export default function CaseStudy() {
           <dl className="mt-10 grid gap-px border-t border-line sm:grid-cols-2 lg:grid-cols-4">
             {study.meta.map((m) => (
               <div key={m.label} className="border-b border-line py-4 pr-4 sm:border-b-0">
-                <dt className="text-[0.8125rem] font-medium text-dim">
+                <dt className="text-[max(12px,0.8125rem)] font-medium text-dim">
                   {m.label}
                 </dt>
                 <dd className="mt-1.5 text-sm leading-snug text-ink">{m.value}</dd>
@@ -173,7 +173,7 @@ export default function CaseStudy() {
                   className="block h-auto w-full"
                 />
               </div>
-              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-faint">
+              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 text-[max(12px,0.8125rem)] text-faint">
                 <span>{study.title}, running.</span>
                 <a
                   href={study.shot.src}
@@ -217,7 +217,7 @@ export default function CaseStudy() {
               {/* The wide figure's margin notes need ~700px to stay legible;
                   below xl the column is narrower, so it gets the stacked
                   figure, capped so it does not balloon on a tablet. */}
-              <div className="mx-auto max-w-[480px] xl:hidden">
+              <div className="mx-auto max-w-[400px] xl:hidden">
                 <SystemFigure stages={study.pipeline} layout="stacked" details />
               </div>
               <div className="hidden xl:block">
@@ -273,7 +273,7 @@ export default function CaseStudy() {
           {study.results.map((r, i) => (
             <Reveal key={r.label} delay={i * 0.05}>
               <div className="elev grid gap-2 rounded-[var(--radius-lg)] border border-line bg-surface/50 p-6 md:grid-cols-[180px_1fr] md:gap-8">
-                <p className="text-[0.8125rem] text-accent-ink">
+                <p className="text-[max(12px,0.8125rem)] text-accent-ink">
                   {r.label}
                 </p>
                 <p className="text-[0.9375rem] leading-relaxed text-dim">{r.body}</p>
@@ -286,14 +286,14 @@ export default function CaseStudy() {
       {/* Tech */}
       <section className="shell py-12 md:py-16">
         <Reveal>
-          <h2 className="mb-6 font-sans text-[0.8125rem] font-semibold text-dim">
+          <h2 className="mb-6 font-sans text-[max(12px,0.8125rem)] font-semibold text-dim">
             Built with
           </h2>
           <ul className="flex flex-wrap gap-2">
             {study.tech.map((t) => (
               <li
                 key={t}
-                className="rounded-[6px] border border-line px-3.5 py-1.5 text-[0.8125rem] text-dim"
+                className="rounded-[6px] border border-line px-3.5 py-1.5 text-[max(12px,0.8125rem)] text-dim"
               >
                 {t}
               </li>
@@ -345,7 +345,7 @@ export default function CaseStudy() {
 function StudyQuestions({ items }: { items: { q: string; a: string }[] }) {
   return (
     <div className="mt-16 max-w-3xl border-t border-line pt-8">
-      <h2 className="font-sans text-[0.8125rem] font-semibold text-dim">
+      <h2 className="font-sans text-[max(12px,0.8125rem)] font-semibold text-dim">
         Questions this answers
       </h2>
       <div className="mt-4">
@@ -370,7 +370,7 @@ function StudyQuestions({ items }: { items: { q: string; a: string }[] }) {
 function StudySources({ items }: { items: { label: string; href: string }[] }) {
   return (
     <section className="shell pb-12 md:pb-16">
-      <h2 className="mb-4 font-sans text-[0.8125rem] font-semibold text-dim">
+      <h2 className="mb-4 font-sans text-[max(12px,0.8125rem)] font-semibold text-dim">
         Sources
       </h2>
       <ol className="flex max-w-3xl list-decimal flex-col gap-2 pl-5 text-[0.875rem] leading-relaxed text-dim marker:text-faint">
@@ -402,7 +402,7 @@ function StudyNav({ slug }: { slug: string }) {
           to={`/work/${p.slug}`}
           className={`group rounded-[var(--radius)] border border-line p-4 transition-colors hover:border-line-strong ${align}`}
         >
-          <span className="block text-[0.8125rem] text-faint">{label}</span>
+          <span className="block text-[max(12px,0.8125rem)] text-faint">{label}</span>
           <span className="mt-1 block font-display text-xl text-ink md:text-2xl transition-colors group-hover:text-accent-ink">
             {p.title}
           </span>

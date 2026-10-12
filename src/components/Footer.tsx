@@ -69,7 +69,7 @@ export default function Footer() {
 
   const col = "flex flex-col gap-3";
   const head =
-    "text-[0.8125rem] font-semibold text-faint";
+    "text-[max(12px,0.8125rem)] font-semibold text-faint";
   const link = "footer-link";
 
   return (
@@ -140,11 +140,11 @@ export default function Footer() {
           {/* The page's last real content change: the same value as its
               dateModified, sitemap lastmod and markdown twin, shown because an
               undated page reads as stale to a person and to an answer engine. */}
-          <p className="text-[0.8125rem] font-medium text-faint">
+          <p className="text-[max(12px,0.8125rem)] font-medium text-faint">
             © {year} {NAME}. All rights reserved. · Last updated{" "}
             <time dateTime={contentDate(pathname)}>{updatedFormat.format(new Date(contentDate(pathname)))}</time>
           </p>
-          <p className="text-[0.8125rem] text-faint">
+          <p className="text-[max(12px,0.8125rem)] text-faint">
             Reliability is the feature.
           </p>
         </div>

@@ -67,7 +67,7 @@ export default function GitHubGraph({ data }: { data: Contributions }) {
             />
           )}
         </ContributionGraphCalendar>
-        <ContributionGraphFooter className="items-center text-[0.75rem]">
+        <ContributionGraphFooter className="items-center text-[max(12px,0.75rem)]">
           {/* The hovered day replaces the total while the pointer is on a
               block; pointer-only by design, the total is what matters. */}
           <div aria-hidden={hovered ? true : undefined}>

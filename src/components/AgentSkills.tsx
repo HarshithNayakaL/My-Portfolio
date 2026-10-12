@@ -33,7 +33,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
               href={skill.repo}
               target="_blank"
               rel="noreferrer noopener"
-              className="text-[0.8125rem] text-faint underline-offset-4 transition-colors hover:text-accent-ink hover:underline"
+              className="text-[max(12px,0.8125rem)] text-faint underline-offset-4 transition-colors hover:text-accent-ink hover:underline"
             >
               <span className="sr-only">{skill.name} on </span>GitHub
               <span aria-hidden> ↗</span>
@@ -45,7 +45,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
 
         <dl className="mt-5 flex flex-1 flex-col gap-4">
           <div>
-            <dt className="text-[0.8125rem] font-semibold text-faint">
+            <dt className="text-[max(12px,0.8125rem)] font-semibold text-faint">
               Why it exists
             </dt>
             <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
@@ -53,7 +53,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
             </dd>
           </div>
           <div>
-            <dt className="text-[0.8125rem] font-semibold text-faint">
+            <dt className="text-[max(12px,0.8125rem)] font-semibold text-faint">
               What's in it
             </dt>
             <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">
@@ -61,7 +61,7 @@ function SkillCard({ skill, index }: { skill: AgentSkill; index: number }) {
             </dd>
           </div>
           <div>
-            <dt className="text-[0.8125rem] font-semibold text-faint">
+            <dt className="text-[max(12px,0.8125rem)] font-semibold text-faint">
               The rule it keeps
             </dt>
             <dd className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">

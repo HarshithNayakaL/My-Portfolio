@@ -141,11 +141,19 @@ fix the cause — do not weaken the check.
   hard to read under that.
 - **Work cards and figures.** Projects render as `WorkCard`s; a card shows
   the product screenshot, or the case study's `SystemFigure` when there is
-  none. Cards use the stacked figure (rules as HTML text under it) and line
+  none. Cards use the stacked figure (no step numbers, rules as HTML text
+  under it, kept small: max 280px wide on phones, 320px above) and line
   up per row through CSS subgrid, so a frame grows to fit its figure rather
   than shrinking it. "How it's wired" on a case study uses the wide figure
   (serif margin notes) from xl and the stacked one below. Both
   are generated from the case study's `pipeline` data, never drawn by hand.
+- **Desktop renders at 90%.** From 1024px the root font size is 90%, so the
+  rem-based layout reads like browser zoom at 90%. The smallest labels use
+  `max(12px, …)` so they keep the 12px floor at that scale.
+- **Fonts swap, never `optional`.** `optional` left Firefox on Arial and Times
+  for the whole visit. Faces use `font-display: swap` with metric-matched
+  local fallbacks (`src/fonts.css`), and widths that must hold through the
+  swap are in `em`, not `ch` (`ch` follows the current font's "0").
 - **Accessibility is enforced.** The site scores 100 on axe/Lighthouse
   accessibility. Watch list structure in particular: a `<dl>` may wrap each
   `<dt>`/`<dd>` pair in one `<div>`, never two nested ones.
