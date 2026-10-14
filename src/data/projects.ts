@@ -190,7 +190,7 @@ export const projects: Project[] = [
     title: "ReplyDesk",
     kicker: "WhatsApp lead agent",
     outcome:
-      "A WhatsApp lead agent that captures every inbound message and auto-replies in ~8 seconds, with a live dashboard for the lead feed, pipeline, and response-time KPIs.",
+      "An interactive prototype of a WhatsApp lead agent: simulate an inbound lead and watch it get a first reply in ~8 seconds, with a live dashboard for the lead feed, pipeline, and response-time KPIs.",
     tags: ["WhatsApp", "Lead automation", "Real-time dashboard", "Agent"],
     links: [
       {

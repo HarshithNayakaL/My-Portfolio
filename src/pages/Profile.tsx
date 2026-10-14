@@ -58,7 +58,7 @@ export const profileDocs: Record<string, Doc> = {
         p: [
           `${headlineRole} at ${facts.find((f) => f.k === "Company")?.v} (title: ${workingTitle}) · Bengaluru (Bangalore), India · ${availability}.`,
           "Specialties: AI agents and multi-agent systems, RAG pipelines, AI workflow automation with n8n, and LLM apps built end to end.",
-          "Shipped: Octo, a live multi-agent research workspace on the OpenAI Agents API; Personal MCP OS, an 85-tool local MCP server where risky actions wait for one-time human approval; Maestro, a live open-source multi-model LLM orchestration engine; and a roughly 90-node n8n content pipeline with QA gates.",
+          "Shipped: Octo, a live multi-agent research workspace on the OpenAI Agents API; SPECTRA, a live AI search visibility audit; Personal MCP OS, an 85-tool local MCP server where risky actions wait for one-time human approval; Maestro, a live open-source multi-model LLM orchestration engine; and a roughly 90-node n8n content pipeline with QA gates.",
           stackSentence,
         ],
       },
@@ -97,7 +97,7 @@ export const profileDocs: Record<string, Doc> = {
         h: "Everything here is checkable",
         p: [
           "Building with code since 2022: a few years of shipping things, breaking them and learning what reliable looks like up close.",
-          "Everything stated here is checkable. The projects are public repositories, the research is a published paper with a DOI, and where a number appears it traces to something that can be read rather than taken on trust.",
+          "Everything stated here is checkable. Most projects are public repositories (the two internal ones, the Multi-Brand Audit Platform and the Creative-Ops Pipeline, say so on their pages), the research is a published paper with a DOI, and where a number appears it traces to something that can be read rather than taken on trust.",
         ],
       },
       {
@@ -140,7 +140,7 @@ export const profileDocs: Record<string, Doc> = {
         h: "What helps in a first message",
         p: [
           "The rough steps of the process as it works today, and what a good outcome looks like. Not a specification — a specification written before anyone understands the failure modes usually describes the wrong system.",
-          "If there is an existing stack, naming it saves a round trip. Provider choice is a wiring decision rather than an architectural one: shipped work here runs on Gemini, Groq, Llama, DeepSeek and fully local inference.",
+          "If there is an existing stack, naming it saves a round trip. Provider choice is a wiring decision rather than an architectural one: shipped work here runs on OpenAI, Gemini, Groq, Llama, DeepSeek and fully local inference.",
         ],
       },
     ],

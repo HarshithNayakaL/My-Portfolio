@@ -958,7 +958,7 @@ const cannon: CaseStudy = {
   build: [
     "Cannon runs independent domain agents, each with its own persona, its own system prompt, its own tools, and its own retrieval scope. A fitness agent and a work agent share infrastructure but never share context. Cannon's own README draws the contrast directly: its sibling project Maestro splits a single task across collaborating roles; Cannon runs independent experts that don't collaborate at all. Different architecture, different problem.",
     "Isolation is enforced at the query, not by convention. The fitness agent can't read work documents even by accident: retrieval takes the agent id as an argument and the Postgres function filters on it internally, so there's no post-filter step a caller could forget to add. The memory store enforces the same boundary as a WHERE clause on the scan. Both paths are unit-tested with mirror-image queries.",
-    "Provider fallback is modeled as a real interface, not a try/catch. A fallback model implements the AI SDK's provider interface and wraps Groq behind Gemini, so streaming, tool execution, and the UI stream protocol are all unaware a swap ever happened. It distinguishes two real failure modes — a call that never connects, versus one that connects and then errors mid-stream — and once real content is flowing, a failure is surfaced rather than silently restarted, because re-running a partially executed tool chain is worse than a visible error.",
+    "Provider fallback is modeled as a real interface, not a try/catch. A fallback model implements the AI SDK's provider interface and wraps Groq with Gemini behind it, so streaming, tool execution, and the UI stream protocol are all unaware a swap ever happened. It distinguishes two real failure modes — a call that never connects, versus one that connects and then errors mid-stream — and once real content is flowing, a failure is surfaced rather than silently restarted, because re-running a partially executed tool chain is worse than a visible error.",
     "Every external dependency has a working fallback, all the way down: no provider key and no database, and the app still boots, builds, passes its full test suite, and serves a working demo. Inference falls back to a scripted model implementing the real provider interface; embeddings fall back to a deterministic lexical embedder; storage falls back to a process-local store. That's what lets CI run true end-to-end tests with zero secrets, exercising the production code path instead of a mocked-out shortcut.",
   ],
   pipeline: [
@@ -1002,7 +1002,7 @@ const cannon: CaseStudy = {
     },
     {
       title: "A fallback chain that's a typed model, not a caught exception",
-      body: "The fallback wraps Groq behind Gemini by implementing the AI SDK's actual provider interface, so every layer above it — streaming, tool execution, the UI stream protocol — stays unaware a swap happened. It separates a call that never connects from one that connects and fails mid-stream, and treats a mid-stream failure as something to surface, not silently retry, since re-running a half-executed tool chain is its own hazard.",
+      body: "The fallback wraps Groq with Gemini behind it by implementing the AI SDK's actual provider interface, so every layer above it — streaming, tool execution, the UI stream protocol — stays unaware a swap happened. It separates a call that never connects from one that connects and fails mid-stream, and treats a mid-stream failure as something to surface, not silently retry, since re-running a half-executed tool chain is its own hazard.",
     },
     {
       title: "Fallbacks all the way down, so CI tests the real path",
@@ -1054,7 +1054,7 @@ const cannon: CaseStudy = {
     },
     {
       q: "How do you add an LLM provider fallback without breaking streaming?",
-      a: "Model the fallback as a provider, not a try/catch. In Cannon, built by Harshith Nayaka L, the fallback implements the AI SDK’s provider interface and wraps Groq behind Gemini, so streaming, tool execution and the UI stream protocol never see the swap. It distinguishes a call that never connects from one that fails mid-stream, and surfaces a mid-stream failure rather than silently retrying, because re-running a half-executed tool chain is worse than a visible error.",
+      a: "Model the fallback as a provider, not a try/catch. In Cannon, built by Harshith Nayaka L, the fallback implements the AI SDK’s provider interface and wraps Groq with Gemini behind it, so streaming, tool execution and the UI stream protocol never see the swap. It distinguishes a call that never connects from one that fails mid-stream, and surfaces a mid-stream failure rather than silently retrying, because re-running a half-executed tool chain is worse than a visible error.",
     },
   ],
   metaDescription:
@@ -1074,7 +1074,7 @@ const replydesk: CaseStudy = {
   title: "ReplyDesk",
   kicker: "WhatsApp lead agent",
   outcome:
-    "Answer every inbound WhatsApp lead in seconds, automatically, with a live operations dashboard for the lead feed, pipeline, and response times.",
+    "An interactive prototype of a WhatsApp lead agent that answers every inbound lead in seconds, with a live operations dashboard for the lead feed, pipeline, and response times.",
   meta: [
     { label: "Type", value: "Lead-response agent + dashboard" },
     { label: "Focus", value: "Speed-to-lead" },
@@ -1171,7 +1171,7 @@ const replydesk: CaseStudy = {
     },
   ],
   metaDescription:
-    "WhatsApp lead agent answering every inbound message in about eight seconds, with a live dashboard for the lead feed, pipeline and response-time KPIs.",
+    "Interactive prototype of a WhatsApp lead agent: a first reply in about eight seconds, with a live dashboard for the lead feed, pipeline and response-time KPIs.",
   links: [
     {
       label: "View on GitHub",
