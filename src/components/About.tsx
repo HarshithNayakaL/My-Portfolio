@@ -22,7 +22,8 @@ export const paper = {
  * The job title at DemandNXT, exactly as the company writes it ("AI Engineer -
  * Full Stack"; not "Full-Stack AI Engineer", which reads as a different
  * title). Every surface that states the role uses this constant. The earlier
- * title stays on record because it is true and people still search for it.
+ * title (AI Workflow Engineer) is no longer stated anywhere: even framed as
+ * "previously", Google's AI Mode kept quoting it as the current role.
  */
 export const workingTitle = "AI Engineer - Full Stack";
 
@@ -34,7 +35,6 @@ export const workingTitle = "AI Engineer - Full Stack";
  * filed him with full-stack developers, which is not the work.
  */
 export const headlineRole = "AI Engineer";
-export const previousTitle = "AI Workflow Engineer";
 
 export const facts = [
   { k: "Role", v: headlineRole },
@@ -54,7 +54,7 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}. He owns AI work across DemandNXT's six B2B brands. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
+export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where his title is ${workingTitle}. He owns AI work across DemandNXT's six B2B brands. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /**
  * The stack, stated once in words. AI Mode fans a question like "AI engineer

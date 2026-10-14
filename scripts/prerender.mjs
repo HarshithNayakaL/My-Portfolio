@@ -41,7 +41,6 @@ const {
   availability,
   workingTitle,
   headlineRole,
-  previousTitle,
   stackList,
   identitySentence,
   legalDocs,
@@ -536,9 +535,6 @@ function markdownFor(path, seo) {
     identitySentence,
     "",
     ...facts.map((f) => `- **${f.k}:** ${f.v}`),
-    `- **Previously:** ${previousTitle} (at ${
-      facts.find((f) => f.k === "Company")?.v ?? "work"
-    })`,
     `- **Stack:** ${stackList}`,
     `- **Availability:** ${availability}`,
     `- **Contact:** ${EMAIL}`,

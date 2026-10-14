@@ -25,7 +25,7 @@ const DIST = join(ROOT, "dist");
 
 const {
   caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO,
-  facts, availability, headlineRole, workingTitle, previousTitle, identitySentence, stack, stackSentence, profileQA,
+  facts, availability, headlineRole, workingTitle, identitySentence, stack, stackSentence, profileQA,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
@@ -163,7 +163,6 @@ await put(`${API}/profile.json`, {
   role: {
     title: workingTitle,
     employer: facts.find((f) => f.k === "Company")?.v,
-    previousTitles: [previousTitle],
     scope: facts.find((f) => f.k === "At DemandNXT")?.v,
   },
   availability,
@@ -492,7 +491,6 @@ const openapi = {
             properties: {
               title: { type: "string", description: "Current job title." },
               employer: { type: "string" },
-              previousTitles: { type: "array", items: { type: "string" } },
               scope: { type: "string", description: "What he does in the role, beyond the title." },
             },
           },

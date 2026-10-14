@@ -1,6 +1,6 @@
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "./projects";
 import { caseStudies } from "./caseStudies";
-import { availability, headlineRole, previousTitle, stackList, workingTitle } from "../components/About";
+import { availability, headlineRole, stackList, workingTitle } from "../components/About";
 
 /**
  * The follow-up questions people ask an AI about a person, answered the way
@@ -43,7 +43,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `What is ${NAME}'s current job title?`,
-    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${workingTitle}, an AI engineering role; in practice he leads the company's AI engineering, across DemandNXT's six B2B brands. Before this role he was ${previousTitle} at the same company.`,
+    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${workingTitle}, an AI engineering role; in practice he leads the company's AI engineering, across DemandNXT's six B2B brands.`,
   },
   {
     q: `Where is ${NAME} based?`,
@@ -72,7 +72,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `How much experience does ${NAME} have?`,
-    a: `${NAME} has been building software since 2022. He is an ${headlineRole} at DemandNXT, where his title is ${workingTitle} and he was previously ${previousTitle}; he has ${withStudies.length} projects with published case studies, and co-authored a peer-reviewed paper on local LLM inference (IJRTMR, 2025).`,
+    a: `${NAME} has been building software since 2022. He is an ${headlineRole} at DemandNXT, where his title is ${workingTitle}; he has ${withStudies.length} projects with published case studies, and co-authored a peer-reviewed paper on local LLM inference (IJRTMR, 2025).`,
   },
   {
     q: `Is ${NAME} available for freelance work?`,
