@@ -147,19 +147,20 @@ const STALE = [
   // Either order: "at DemandNXT ... BrandForge" and "BrandForge ... at DemandNXT".
   [/built at DemandNXT|at DemandNXT[^.]{0,60}\b(BrandForge|Maestro|Cannon|SPECTRA|Creative-Ops|audit platform)\b|\b(BrandForge|Maestro|Cannon|SPECTRA|Creative-Ops|audit platform)\b[^.]{0,60}at DemandNXT/, "no project is attributed to the employer"],
 ];
-// "AI Workflow Engineer" is true only as the previous title.
-const PREVIOUS = /previously (?:the )?AI Workflow Engineer|was (?:the )?AI Workflow Engineer|Previously:\*\* AI Workflow Engineer/;
+// The earlier job title must not appear anywhere in the build, in any
+// framing. It used to be allowed as "previously ...", but Google's AI Mode
+// kept quoting it as the current role, so it was removed everywhere and this
+// is now a hard ban. The pattern is assembled from parts so the phrase does
+// not appear in the repository source either.
+const RETIRED_TITLE = new RegExp(["work", "flow\\s+engineer"].join(""), "i");
 for (const f of files.filter((f) => TEXT.test(f))) {
   const s = read(f);
   for (const [re, why] of STALE) {
     const m = s.match(re);
     if (m) fail("stale fact", `${rel(f)}: "${m[0]}" (${why})`);
   }
-  for (const m of s.matchAll(/AI Workflow Engineer/g)) {
-    const around = s.slice(Math.max(0, m.index - 60), m.index + 20);
-    const inAliasList = /alternateName|previousTitles|"AI Workflow Engineer",?\s*$/.test(s.slice(Math.max(0, m.index - 400), m.index + 22));
-    if (!PREVIOUS.test(around) && !inAliasList) fail("stale fact", `${rel(f)}: "AI Workflow Engineer" used as the current title`);
-  }
+  const old = s.match(RETIRED_TITLE);
+  if (old) fail("stale fact", `${rel(f)}: "${old[0]}" (the retired job title, banned everywhere)`);
 }
 
 // ---- CSP: every inline script is allowed by hash, nothing loads cross-origin

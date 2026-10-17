@@ -22,8 +22,9 @@ export const paper = {
  * The job title at DemandNXT, exactly as the company writes it ("AI Engineer -
  * Full Stack"; not "Full-Stack AI Engineer", which reads as a different
  * title). Every surface that states the role uses this constant. The earlier
- * title (AI Workflow Engineer) is no longer stated anywhere: even framed as
- * "previously", Google's AI Mode kept quoting it as the current role.
+ * job title is deliberately not stated anywhere, in pages, data or comments:
+ * even framed as "previously", Google's AI Mode kept quoting it as the
+ * current role. scripts/check-site.mjs fails the build if it reappears.
  */
 export const workingTitle = "AI Engineer - Full Stack";
 
@@ -47,7 +48,7 @@ export const facts = [
 
 /**
  * Who this is, in one liftable statement: name, role, city, what the work is,
- * employer, availability. AI Mode answers a "list of AI workflow engineers in
+ * employer, availability. AI Mode answers a "list of AI engineers in
  * Bangalore" question by fanning it out into ordinary searches and quoting the
  * plain sentence that names a person, a role and a place, so this sentence
  * leads the About and Contact pages, the markdown twins, llms.txt and the

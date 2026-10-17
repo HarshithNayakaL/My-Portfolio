@@ -36,8 +36,8 @@ export default function Hero() {
               hit it first. */}
           {/* The page's <h1> is who, what and where, because Google matches a
               search against the title and main heading first, and the
-              searches that matter here are "AI workflow engineer Bengaluru"
-              and "AI engineer to hire in Bangalore". The big slogan below
+              searches that matter here are "AI engineer Bengaluru" and
+              "AI engineer to hire in Bangalore". The big slogan below
               keeps its look as a <p>. font-sans: headings default to the
               display face, and this line is set in the body face. */}
           {/* The {" "} between the parts is load-bearing: flex gaps are

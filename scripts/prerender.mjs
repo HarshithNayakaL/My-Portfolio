@@ -519,7 +519,7 @@ function markdownFor(path, seo) {
     // Identity first, and stated plainly.
     //
     // This block exists because of a measured failure. An audit of the site
-    // asked a model "find an AI workflow engineer in Bengaluru to hire" and it
+    // asked a model "find an AI engineer in Bengaluru to hire" and it
     // answered, correctly, that the evidence held no contact details and no
     // availability: the twin opened straight into a project list, and the
     // About section — which carries the location, the working title and the
