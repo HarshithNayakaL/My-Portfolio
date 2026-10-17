@@ -21,10 +21,7 @@ export const paper = {
 /**
  * The job title at DemandNXT, exactly as the company writes it ("AI Engineer -
  * Full Stack"; not "Full-Stack AI Engineer", which reads as a different
- * title). Every surface that states the role uses this constant. The earlier
- * job title is deliberately not stated anywhere, in pages, data or comments:
- * even framed as "previously", Google's AI Mode kept quoting it as the
- * current role. scripts/check-site.mjs fails the build if it reappears.
+ * title). Every surface that states the role uses this constant.
  */
 export const workingTitle = "AI Engineer - Full Stack";
 
@@ -36,6 +33,18 @@ export const workingTitle = "AI Engineer - Full Stack";
  * filed him with full-stack developers, which is not the work.
  */
 export const headlineRole = "AI Engineer";
+
+/**
+ * Career at DemandNXT, newest first. The earlier title appears only here, in
+ * an explicit current/previous list: stated loosely as "previously ..." in
+ * the summary sentence, Google's AI Mode quoted it as the current role.
+ * scripts/check-site.mjs fails the build if it appears outside a
+ * clearly-past framing.
+ */
+export const experience = [
+  { title: workingTitle, org: "DemandNXT", when: "Current role", note: "Leads AI engineering across DemandNXT's six B2B brands." },
+  { title: "AI Workflow Engineer", org: "DemandNXT", when: "Previous role", note: "Moved from this role to AI Engineer." },
+];
 
 export const facts = [
   { k: "Role", v: headlineRole },
@@ -192,6 +201,24 @@ export default function About() {
                 between a demo and something a business can lean on, is most of
                 the job, and it's the part I'm good at.
               </p>
+            </div>
+
+            {/* Experience: current role first, the earlier one labelled as
+                past. See `experience` above for why it lives only here. */}
+            <div className="mt-10 border-t border-line pt-6">
+              <h3 className="font-sans text-[max(12px,0.8125rem)] font-semibold text-dim">
+                Experience
+              </h3>
+              <ol className="mt-3 space-y-3">
+                {experience.map((e) => (
+                  <li key={e.title} className="text-base leading-relaxed text-dim">
+                    <span className="font-semibold text-ink">{e.title}</span>, {e.org}{" "}
+                    <span className="text-[max(12px,0.8125rem)] font-semibold text-accent-ink">· {e.when}</span>
+                    <br />
+                    {e.note}
+                  </li>
+                ))}
+              </ol>
             </div>
 
             {/* Published research. Real, citable proof-of-work — and the

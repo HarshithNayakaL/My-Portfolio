@@ -147,20 +147,23 @@ const STALE = [
   // Either order: "at DemandNXT ... BrandForge" and "BrandForge ... at DemandNXT".
   [/built at DemandNXT|at DemandNXT[^.]{0,60}\b(BrandForge|Maestro|Cannon|SPECTRA|Creative-Ops|audit platform)\b|\b(BrandForge|Maestro|Cannon|SPECTRA|Creative-Ops|audit platform)\b[^.]{0,60}at DemandNXT/, "no project is attributed to the employer"],
 ];
-// The earlier job title must not appear anywhere in the build, in any
-// framing. It used to be allowed as "previously ...", but Google's AI Mode
-// kept quoting it as the current role, so it was removed everywhere and this
-// is now a hard ban. The pattern is assembled from parts so the phrase does
-// not appear in the repository source either.
-const RETIRED_TITLE = new RegExp(["work", "flow\\s+engineer"].join(""), "i");
+// The earlier job title may appear only where it is unmistakably past: the
+// Experience entries ("Previous role") and the line saying he moved from it.
+// Loosely framed as "previously ..." in the summary, Google's AI Mode quoted
+// it as the current role, so anything else fails the build.
+const RETIRED_TITLE = /AI Workflow Engineer/gi;
+const PAST_FRAMING = /Previous role|moved (?:into this role )?from|Moved from this role/i;
 for (const f of files.filter((f) => TEXT.test(f))) {
   const s = read(f);
   for (const [re, why] of STALE) {
     const m = s.match(re);
     if (m) fail("stale fact", `${rel(f)}: "${m[0]}" (${why})`);
   }
-  const old = s.match(RETIRED_TITLE);
-  if (old) fail("stale fact", `${rel(f)}: "${old[0]}" (the retired job title, banned everywhere)`);
+  for (const m of s.matchAll(RETIRED_TITLE)) {
+    // Wide enough to span the HTML markup between a title and its label.
+    const around = s.slice(Math.max(0, m.index - 140), m.index + 360);
+    if (!PAST_FRAMING.test(around)) fail("stale fact", `${rel(f)}: "${m[0]}" outside an explicit previous-role framing`);
+  }
 }
 
 // ---- CSP: every inline script is allowed by hash, nothing loads cross-origin

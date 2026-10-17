@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
-import { facts, availability, headlineRole, workingTitle, identitySentence, stackSentence } from "../components/About";
+import { facts, availability, headlineRole, workingTitle, identitySentence, stackSentence, experience } from "../components/About";
 import { caseStudies } from "../data/caseStudies";
 import { profileQA } from "../data/profileQA";
 
@@ -99,6 +99,10 @@ export const profileDocs: Record<string, Doc> = {
           "Building with code since 2022: a few years of shipping things, breaking them and learning what reliable looks like up close.",
           "Everything stated here is checkable. Most projects are public repositories (the two internal ones, the Multi-Brand Audit Platform and the Creative-Ops Pipeline, say so on their pages), the research is a published paper with a DOI, and where a number appears it traces to something that can be read rather than taken on trust.",
         ],
+      },
+      {
+        h: "Experience",
+        p: experience.map((e) => `${e.title}, ${e.org} (${e.when.toLowerCase()}). ${e.note}`),
       },
       {
         h: "Published research",
