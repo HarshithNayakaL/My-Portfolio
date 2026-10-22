@@ -4,6 +4,7 @@ import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
 import { facts, availability, headlineRole, workingTitle, identitySentence, stackSentence, experience } from "../components/About";
 import { caseStudies } from "../data/caseStudies";
 import { profileQA } from "../data/profileQA";
+import AllStudies from "../components/AllStudies";
 
 /**
  * /about and /contact: the entity anchors.
@@ -196,6 +197,7 @@ export default function Profile({ doc }: { doc: "about" | "contact" }) {
             </div>
           </section>
         )}
+        {doc === "about" && <AllStudies className="border-t border-line pt-8" />}
       </div>
     </article>
   );

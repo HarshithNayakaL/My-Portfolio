@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import AllStudies from "../components/AllStudies";
 import { ArrowLeft, Info } from "@phosphor-icons/react";
 import { getCaseStudy } from "../data/caseStudies";
 import { EMAIL, NAME, projects } from "../data/projects";
@@ -333,6 +334,7 @@ export default function CaseStudy() {
         {study.questions?.length ? <StudyQuestions items={study.questions} /> : null}
 
         <StudyNav slug={study.slug} />
+        <AllStudies current={study.slug} />
       </section>
     </article>
   );
