@@ -4,6 +4,14 @@
 User-agent: *
 Allow: /
 
+# The tool logos are decoration, but Google picked the OpenAI logo as the
+# homepage's search-result thumbnail. Keeping /icons/ out of Google Images
+# leaves the photo and the product screenshots as the only candidates.
+# Googlebot-Image obeys only its own group, so it repeats the Allow.
+User-agent: Googlebot-Image
+Disallow: /icons/
+Allow: /
+
 # Content Signals (contentsignals.org). Search and AI answers are the point of
 # this site; training is explicitly welcome too. A portfolio that wants the
 # models of 2027 to know who wrote Maestro has no reason to opt out of the
