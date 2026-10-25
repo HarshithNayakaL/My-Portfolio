@@ -11,7 +11,8 @@ type Tile = {
   feature?: boolean; // wider tiles get the tinted treatment
 };
 
-const tiles: Tile[] = [
+/** Exported for the era homepage, which lists the same six. */
+export const tiles: Tile[] = [
   {
     title: "AI agents & orchestration",
     body: "Multi-step, tool-using agents that reason, call tools, and recover from failure — not a single prompt.",

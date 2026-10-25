@@ -4,7 +4,9 @@ import "./era.css";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
 import { agentSkills } from "../data/skills";
 import { faqs } from "../components/Faq";
-import { experience, headlineRole, identitySentence, paper, stack } from "../components/About";
+import { experience, headlineRole, identitySentence, paper, stack, stackSentence } from "../components/About";
+import { tiles as capabilities } from "../components/Capabilities";
+import { statement as reliability } from "../components/Approach";
 import GitHubActivity from "../components/GitHubActivity";
 import HelmetGrid from "./HelmetGrid";
 import Turntable from "./Turntable";
@@ -127,10 +129,22 @@ export default function EraHome() {
         <Section id="about" title="About">
           <div className="space-y-4 text-[1.0625rem] leading-relaxed text-dim">
             <p className="text-ink">{identitySentence}</p>
+            {/* The live About copy, kept word for word: these are the
+                passages answer engines already quote. */}
             <p>
-              At DemandNXT, AI work across the company's six B2B brands runs through me, from the agents and
-              pipelines to how they ship. What I care about is the unglamorous part: an AI system that behaves the
-              same on the hundredth run as on the first.
+              At DemandNXT I lead AI engineering: AI work across the company's six B2B brands runs through me,
+              from the agents and pipelines to how they ship. I'm also leading the migration of the company
+              website off legacy WordPress onto a codebase built with Astro.
+            </p>
+            <p>
+              In practice that means the model, the backend, and the interface around it. My public work
+              includes Octo, a multi-agent research workspace on the OpenAI Agents API, and Maestro, a
+              multi-model LLM orchestration engine — both live and open-source.
+            </p>
+            <p>
+              What I care about is the unglamorous part: making AI systems behave the same way on the hundredth
+              run as the first. That gap, between a demo and something a business can lean on, is most of the
+              job, and it's the part I'm good at.
             </p>
           </div>
           <Turntable />
@@ -145,6 +159,20 @@ export default function EraHome() {
               </button>
             </div>
           )}
+        </Section>
+
+        {/* What the live homepage's Capabilities and reliability sections said,
+            in this page's style. The id is the nav's "Capabilities" target. */}
+        <Section id="capabilities" title="What I build">
+          <p className="text-[1.0625rem] leading-relaxed text-ink">{reliability}</p>
+          <ul className="era-caps">
+            {capabilities.map((c) => (
+              <li key={c.title}>
+                <h3 className="font-sans text-base font-semibold text-ink">{c.title}</h3>
+                <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">{c.body}</p>
+              </li>
+            ))}
+          </ul>
         </Section>
 
         <Section id="experience" title="Experience">
@@ -176,8 +204,8 @@ export default function EraHome() {
           </ol>
         </Section>
 
-        {/* The id is the nav's "Capabilities" target. */}
-        <Section id="capabilities" title="Stack">
+        <Section id="stack" title="Stack">
+          <p className="mb-4 text-[0.9375rem] leading-relaxed text-dim">{stackSentence}</p>
           <ul className="era-chips">
             {tools.map((t) => (
               <li key={t.label}>

@@ -1,6 +1,7 @@
 import { useInView } from "../lib/useInView";
 
-const statement =
+/** Exported for the era homepage, which leads its capabilities with it. */
+export const statement =
   "Most AI demos work once. The hard part is the hundredth run: the malformed response, the model that drifts, the edge case nobody tested. I build for that run. Validation at every boundary, gates that catch drift, and failures that save their work instead of losing it.";
 
 /**

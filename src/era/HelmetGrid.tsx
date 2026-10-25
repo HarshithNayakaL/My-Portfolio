@@ -3,15 +3,15 @@
  * own lit bay: a back wall with a spotlight falling on it, a glossy shelf it
  * stands on, a contact shadow and a faint reflection. Hovering one selects
  * it the way a drawing tool does (a bounding box with corner handles) and
- * names the driver and team; the names are also in each image's alt text.
+ * names the driver and team.
  */
 const helmets = [
-  { id: "schumacher", name: "Schumacher", team: "Ferrari", full: "Michael Schumacher" },
-  { id: "alonso", name: "Alonso", team: "Renault", full: "Fernando Alonso" },
-  { id: "raikkonen", name: "Räikkönen", team: "McLaren", full: "Kimi Räikkönen" },
-  { id: "vettel", name: "Vettel", team: "Red Bull", full: "Sebastian Vettel" },
-  { id: "verstappen", name: "Verstappen", team: "Red Bull", full: "Max Verstappen" },
-  { id: "hamilton", name: "Hamilton", team: "Ferrari", full: "Lewis Hamilton" },
+  { id: "schumacher", name: "Schumacher", team: "Ferrari" },
+  { id: "alonso", name: "Alonso", team: "Renault" },
+  { id: "raikkonen", name: "Räikkönen", team: "McLaren" },
+  { id: "vettel", name: "Vettel", team: "Red Bull" },
+  { id: "verstappen", name: "Verstappen", team: "Red Bull" },
+  { id: "hamilton", name: "Hamilton", team: "Ferrari" },
 ];
 // The cut-outs are all 320px tall and about 266 wide.
 const W = 64;
@@ -19,7 +19,10 @@ const H = Math.round((W * 320) / 266);
 
 export default function HelmetGrid() {
   return (
-    <ul className="hg" aria-label="Pixel-art F1 helmets">
+    // Decorative, and kept out of the page's text and images on purpose: the
+    // helmets come before the profile photo, and a helmet must never become
+    // the photo search results show for this page.
+    <ul className="hg" aria-hidden>
       {helmets.map((h) => (
         <li key={h.id} className="hg-cell">
           <span aria-hidden className="hg-wall">
@@ -30,7 +33,7 @@ export default function HelmetGrid() {
           <img src={`/era/helmet-${h.id}.png`} alt="" aria-hidden width={W} height={H} decoding="async" className="hg-reflect" />
           <img
             src={`/era/helmet-${h.id}.png`}
-            alt={`${h.full}'s ${h.team} helmet, in pixel art`}
+            alt=""
             width={W}
             height={H}
             decoding="async"

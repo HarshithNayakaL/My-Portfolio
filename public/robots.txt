@@ -7,9 +7,12 @@ Allow: /
 # The tool logos are decoration, but Google picked the OpenAI logo as the
 # homepage's search-result thumbnail. Keeping /icons/ out of Google Images
 # leaves the photo and the product screenshots as the only candidates.
+# /era/ is the same: helmets, cars, cameras and the tyre are decoration, and
+# the helmets sit above the photo on the homepage.
 # Googlebot-Image obeys only its own group, so it repeats the Allow.
 User-agent: Googlebot-Image
 Disallow: /icons/
+Disallow: /era/
 Allow: /
 
 # Content Signals (contentsignals.org). Search and AI answers are the point of

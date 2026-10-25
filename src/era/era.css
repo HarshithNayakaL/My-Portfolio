@@ -639,6 +639,28 @@
 }
 .wk-tip.is-on { opacity: 1; }
 
+/* What I build: six capabilities, two to a row, in one dashed box. */
+.era-caps {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1.5px dashed var(--dash);
+  border-radius: 18px;
+  background: var(--elevated);
+  overflow: hidden;
+}
+.era-caps li { padding: 1.1rem 1.35rem; border-top: 1px solid var(--line); }
+.era-caps li:nth-child(-n + 2) { border-top: 0; }
+.era-caps li:nth-child(even) { border-left: 1px solid var(--line); }
+@media (max-width: 640px) {
+  .era-caps { grid-template-columns: 1fr; }
+  .era-caps li { padding: 1rem; }
+  .era-caps li:nth-child(2) { border-top: 1px solid var(--line); }
+  .era-caps li:nth-child(even) { border-left: 0; }
+}
+
 /* ── rows, chips, graph ─────────────────────────────────────────────── */
 .era-rows li { padding: 1.1rem 1.35rem; }
 .era-rows li + li { border-top: 1px solid var(--line); }
