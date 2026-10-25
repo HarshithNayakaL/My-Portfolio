@@ -26,7 +26,7 @@ import { Arrow, GitHubMark, LinkedInMark, MailMark } from "./icons";
 // data order: the order the site, the API and the agents all use.
 const studies = projects.filter((p) => p.hasCaseStudy);
 const FIRST = 6;
-const FIRST_FAQ = 6;
+const FIRST_FAQ = 3;
 
 function useBengaluruTime() {
   const [now, setNow] = useState<Date | null>(null);
@@ -68,17 +68,18 @@ const stackIcon: Record<string, { src: string; mono?: boolean }> = {
   "Google Gemini": { src: "/icons/googlegemini.svg" },
   OpenAI: { src: "/icons/openai.svg", mono: true },
   "PostgreSQL with pgvector": { src: "/icons/postgresql.svg" },
-  "the Model Context Protocol": { src: "/icons/mcp.svg", mono: true },
 };
-const stackName = (l: string) => (l === "the Model Context Protocol" ? "Model Context Protocol" : l);
 
-// The agent tooling the work is built with, floating over the stack.
-const tools: { slug: string; name: string; rot: number; dur: number; del: number; mono?: boolean }[] = [
-  { slug: "claudecode", name: "Claude Code", rot: -4, dur: 7.5, del: 0 },
-  { slug: "codex", name: "Codex", rot: 5, dur: 8.2, del: -2 },
-  { slug: "openai", name: "Agents API", rot: -3, dur: 7.9, del: -1, mono: true },
-  { slug: "mcp", name: "MCP", rot: 4, dur: 6.9, del: -4, mono: true },
+// The agent tooling the work is built with, leading the stack as chips.
+// The Model Context Protocol is moved up from the stack list rather than
+// listed twice.
+const tools: { label: string; src: string; mono?: boolean }[] = [
+  { label: "Claude Code", src: "/icons/claudecode.svg" },
+  { label: "Codex", src: "/icons/codex.svg" },
+  { label: "OpenAI Agents API", src: "/icons/openai.svg", mono: true },
+  { label: "Model Context Protocol", src: "/icons/mcp.svg", mono: true },
 ];
+const restOfStack = stack.filter((s) => s.label !== "the Model Context Protocol");
 
 export default function EraHome() {
   const time = useBengaluruTime();
@@ -177,25 +178,19 @@ export default function EraHome() {
 
         {/* The id is the nav's "Capabilities" target. */}
         <Section id="capabilities" title="Stack">
-          <div aria-hidden className="era-tools">
-            {tools.map((t) => (
-              <div
-                key={t.slug}
-                className="orbit-tile"
-                style={{ ["--rot" as string]: `${t.rot}deg`, ["--dur" as string]: `${t.dur}s`, ["--del" as string]: `${t.del}s` }}
-              >
-                <img src={`/icons/${t.slug}.svg`} alt="" width={36} height={36} decoding="async" className={t.mono ? "icon-mono" : undefined} />
-                <span>{t.name}</span>
-              </div>
-            ))}
-          </div>
           <ul className="era-chips">
-            {stack.map((s) => {
+            {tools.map((t) => (
+              <li key={t.label}>
+                <img src={t.src} alt="" width={16} height={16} className={t.mono ? "icon-mono" : undefined} />
+                {t.label}
+              </li>
+            ))}
+            {restOfStack.map((s) => {
               const icon = stackIcon[s.label];
               return (
                 <li key={s.label}>
                   {icon && <img src={icon.src} alt="" width={16} height={16} className={icon.mono ? "icon-mono" : undefined} />}
-                  {stackName(s.label)}
+                  {s.label}
                 </li>
               );
             })}

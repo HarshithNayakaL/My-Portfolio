@@ -639,14 +639,6 @@
 }
 .wk-tip.is-on { opacity: 1; }
 
-/* ── agent tools, floating ──────────────────────────────────────────── */
-.era-tools { display: flex; justify-content: center; gap: 2.25rem; padding: 0.5rem 0 2.75rem; }
-.era-tools .orbit-tile { position: relative; flex: 0 0 auto; width: 76px; height: 76px; border-radius: 20px; }
-@media (max-width: 640px) {
-  .era-tools { gap: 1.1rem; }
-  .era-tools .orbit-tile { width: 62px; height: 62px; border-radius: 16px; }
-}
-
 /* ── rows, chips, graph ─────────────────────────────────────────────── */
 .era-rows li { padding: 1.1rem 1.35rem; }
 .era-rows li + li { border-top: 1px solid var(--line); }
@@ -669,7 +661,7 @@
 .era-gh .contrib-graph { margin-top: 0; }
 
 /* ── questions ──────────────────────────────────────────────────────── */
-.era-faq.is-collapsed details:nth-child(n + 7) { display: none; }
+.era-faq.is-collapsed details:nth-child(n + 4) { display: none; }
 .era-faq details + details { border-top: 1px solid var(--line); }
 .era-faq summary {
   display: flex;
