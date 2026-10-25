@@ -5,7 +5,9 @@ import GlassFilter from "./components/GlassFilter";
 import Footer from "./components/Footer";
 import ScrollProgress from "./components/ScrollProgress";
 import OneeCompanion from "./components/OneeCompanion";
-import Home from "./pages/Home";
+// The era redesign replaces the homepage on this branch only; pages/Home
+// is untouched so main keeps the live design.
+import Home from "./era/EraHome";
 import { useWebMcpTools } from "./lib/useWebMcpTools";
 
 // Case study + legal live behind routes the landing page never needs up front,
