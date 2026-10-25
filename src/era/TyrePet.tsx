@@ -14,7 +14,10 @@ export default function TyrePet() {
   const wheel = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Not tied to prefers-reduced-motion, for the reason Onee isn't (see
+    // OneeCompanion): Windows sets it when animation effects are turned off
+    // for speed, and the owner's machine is set that way. A display setting is
+    // not a request to take the tyre away.
     let x = 24;
     let y = window.innerHeight - D - 24;
     let tx = x;

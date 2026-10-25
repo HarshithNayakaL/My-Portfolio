@@ -20,7 +20,11 @@ export default function RoamingCars() {
 
   useEffect(() => {
     const box = layer.current;
-    if (!box || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Not tied to prefers-reduced-motion, for the reason Onee isn't (see
+    // OneeCompanion): Windows sets it when animation effects are turned off
+    // for speed, and the owner's machine is set that way. A display setting is
+    // not a request to take the cars away.
+    if (!box) return;
     let timer = 0;
 
     const launch = (car: EraCar, y: number, dir: 1 | -1, speed: number, gap: number, front: boolean) => {

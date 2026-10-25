@@ -24,10 +24,10 @@ export default function RossiRide() {
   useEffect(() => {
     const box = strip.current;
     if (!box) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      if (bike.current) bike.current.style.transform = `translateX(${box.clientWidth / 2 - RIDE_W / 2}px)`;
-      return;
-    }
+    // Not tied to prefers-reduced-motion, for the reason Onee isn't (see
+    // OneeCompanion): Windows sets it when animation effects are turned off
+    // for speed, and the owner's machine is set that way. A display setting is
+    // not a request to take Rossi away.
     let raf = 0;
     let last = 0;
     let x = -RIDE_W - 40;
