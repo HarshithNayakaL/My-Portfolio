@@ -8,7 +8,7 @@ import { byId } from "./cars";
  * to put them in.
  *
  * One camera, chosen by theme so it always stands out from the page: the
- * black Canon on the light page, the silver Cyber-shot on the dark one.
+ * purple Cyber-shot on the light page, the silver one on the dark page.
  * Hover it and it says something, press it and the flash goes.
  */
 type Spot = { side: "l" | "r"; top: number; x: number; rot: number };
@@ -70,7 +70,7 @@ export default function MarginObjects() {
         <span aria-hidden className="era-bubble" style={{ transform: `translateX(-50%) rotate(${-CAMERA.rot}deg)` }}>
           {said}
         </span>
-        <img className="era-cam-light" src="/era/camera-canon.png" alt="" width={CAMERA.w} height={Math.round((CAMERA.w * 297) / 480)} />
+        <img className="era-cam-light" src="/era/camera-sony-purple.png" alt="" width={CAMERA.w} height={Math.round((CAMERA.w * 291) / 480)} />
         <img className="era-cam-dark" src="/era/camera-sony-silver.png" alt="" width={CAMERA.w} height={Math.round((CAMERA.w * 293) / 480)} />
       </button>
 

@@ -793,7 +793,8 @@
 }
 .era-object-btn:hover .era-bubble,
 .era-object-btn:focus-visible .era-bubble { opacity: 1; margin-bottom: 0; }
-/* One camera per theme: black on the light page, silver on the dark one. */
+/* One camera per theme: the purple Cyber-shot on the light page, the silver
+   one on the dark page. */
 .era-cam-dark { display: none !important; }
 .dark .era-cam-light { display: none !important; }
 .dark .era-cam-dark { display: block !important; }
