@@ -11,6 +11,7 @@ import { cars, type EraCar } from "./cars";
  */
 const F1 = cars.filter((c) => c.kind === "f1" && c.id !== "f2004");
 const RALLY = cars.filter((c) => c.kind === "rally");
+const LEAD = 700;
 const pick = (pool: EraCar[], not?: EraCar) => {
   const left = pool.filter((c) => c !== not);
   return left[Math.floor(Math.random() * left.length)];
@@ -33,13 +34,18 @@ export default function RoamingCars() {
       img.width = w;
       img.height = Math.round(h);
       img.className = "era-roamer";
+      // The mascot steps out of this car's lane (src/lib/onee.ts).
+      img.dataset.oneeAvoid = "lane";
       img.style.top = `${y - h}px`;
       img.style.zIndex = front ? "2" : "1";
       box.appendChild(img);
       const vw = window.innerWidth;
       // Start further back by the gap, and run on past the far edge by the
       // same, so the car behind gets all the way across too.
-      const from = dir > 0 ? -w - gap : vw + gap;
+      // Each run starts LEAD px offscreen: the car is already in its lane,
+      // out of sight, for about a second before it appears, which is the
+      // warning the mascot needs to step out of the road (src/lib/onee.ts).
+      const from = dir > 0 ? -w - gap - LEAD : vw + gap + LEAD;
       const to = dir > 0 ? vw + w + 160 : -w - 160;
       const flip = dir > 0 ? -1 : 1; // drawn facing left
       const anim = img.animate(

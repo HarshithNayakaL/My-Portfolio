@@ -73,7 +73,8 @@ export default function CarPet() {
   }, [car.ratio]);
 
   return (
-    <div ref={el} aria-hidden className="era-pet" style={{ width: W }}>
+    // data-onee-avoid: the mascot keeps clear of this car (src/lib/onee.ts).
+    <div ref={el} aria-hidden className="era-pet" data-onee-avoid="body" style={{ width: W }}>
       <span ref={body} className="era-pet-body">
         <img src={car.src} alt="" width={W} height={Math.round(W / car.ratio)} />
       </span>

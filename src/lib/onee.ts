@@ -22,11 +22,22 @@ import {
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 // Layout. The nav is the one place Onee may never go; everywhere else in the
-// window is fair game, subject to the hit test in `isFree` below.
+// window is fair game, subject to the hit test in `spotCost` below.
 const TOP_LIMIT = 104;
 const EDGE = 18;
-const BUBBLE = 96; // personal space it backs out of
-const TRAIL = 232; // how far behind the pointer it prefers to sit
+
+// Things that move on their own and that Onee must keep clear of: anything
+// marked `data-onee-avoid`. "body" is the thing itself; "lane" is something
+// crossing the screen sideways at speed, so its whole horizontal run ahead
+// and behind counts, not just where it is this frame.
+const AVOID = "[data-onee-avoid]";
+const AVOID_PAD = 18;
+// Around something parked: wider, because the cursor car arrives at speed
+// and gets a frame or two in before Onee has moved.
+const BODY_PAD = 36;
+// About a second of warning at the speed the cars cross.
+const LANE_REACH = 720;
+const AVOID_REFRESH_MS = 90;
 
 // Spring. Slack enough to read as an animal ambling after you rather than a
 // cursor attachment.
@@ -36,6 +47,9 @@ const DRAG = 0.86;
 // deliberate scurry with a little overshoot at the end, not a slow slide.
 const PULL_TRAVEL = 0.1;
 const DRAG_TRAVEL = 0.84;
+const PULL_DODGE = 0.17;
+const DRAG_DODGE = 0.78;
+const DODGE_MS = 700;
 const ARRIVED_WITHIN = 26; // px from the perch before it counts as landed
 
 // How long Onee stays somewhere before finding a new spot, and how often the
@@ -233,14 +247,13 @@ export function mountOnee(host: HTMLElement): () => void {
   let size = 72;
   let perch = { x: 0, y: 0 };
   let perchUntil = 0;
-  let checkedAt = 0;
+  let dodgeUntil = 0;
   let interests: DOMRect[] = [];
   let interestsAt = 0;
   let focus: { x: number; y: number } | null = null;
   let focusUntil = 0;
   let hovered: Element | null = null;
   let hoveredAt: { x: number; y: number } | null = null;
-  let spotIsFree = true;
   const gaze: Gaze = { x: 0, y: 0 };
 
   const measure = () => {
@@ -411,7 +424,31 @@ export function mountOnee(host: HTMLElement): () => void {
     return cost;
   };
 
-  const isFree = (x: number, y: number) => spotCost(x, y) === 0;
+  // The cars. They take no pointer events, so the hit test above never sees
+  // them; their boxes are read directly, a handful of rects on a throttle.
+  type Zone = { left: number; right: number; top: number; bottom: number; lane: boolean };
+  let zones: Zone[] = [];
+  let zonesAt = -Infinity;
+  const refreshZones = (now: number) => {
+    if (now - zonesAt < AVOID_REFRESH_MS) return;
+    zonesAt = now;
+    zones = [];
+    for (const el of document.querySelectorAll<HTMLElement>(AVOID)) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) continue;
+      const lane = el.dataset.oneeAvoid === "lane";
+      const reach = lane ? LANE_REACH : BODY_PAD;
+      const pad = lane ? AVOID_PAD : BODY_PAD;
+      zones.push({ left: r.left - reach, right: r.right + reach, top: r.top - pad, bottom: r.bottom + pad, lane });
+    }
+  };
+  // Measured against Onee as drawn, which tilts and breathes past its
+  // layout box, not the box itself.
+  const reachOf = () => size * 0.7;
+  const zoneAt = (x: number, y: number) => {
+    const h = reachOf();
+    return zones.find((z) => x + h > z.left && x - h < z.right && y + h > z.top && y - h < z.bottom) ?? null;
+  };
 
   // Choosing a spot is spread over frames rather than done in one go. The
   // search is ~40 candidates at five hit tests each, and every hit test
@@ -468,7 +505,7 @@ export function mountOnee(host: HTMLElement): () => void {
       // perched next to things, the way a cat picks the arm of the sofa over
       // the middle of the floor. One point of penalty, so it only breaks a tie
       // between otherwise equally clear spots and never pushes it onto text.
-      const cost = spotCost(x, y) + (nearestInterest(x, y) < BESIDE ? 0 : 1);
+      const cost = spotCost(x, y) + (nearestInterest(x, y) < BESIDE ? 0 : 1) + (zoneAt(x, y) ? 10 : 0);
       // Somewhere far enough away that the trip is worth watching.
       if (Math.hypot(x - pos.x, y - pos.y) > PERCH_TRAVEL_MIN) {
         if (cost < search.bestCost) {
@@ -625,79 +662,59 @@ export function mountOnee(host: HTMLElement): () => void {
     const vh = window.innerHeight;
     const floor = vh - EDGE - size / 2;
 
-    // Is anyone actually steering? A cursor that hasn't moved in a couple of
-    // seconds means somebody is reading, not playing, and Onee should go back
-    // to its own business instead of hovering at their elbow for the rest of
-    // the page. This one condition is most of what makes it feel alive rather
-    // than tethered.
-    const engaged = roams && senses.pointer.inside && t - lastMove.t < 2_400;
-
+    // Onee doesn't follow the cursor. On this site a car does, and the two
+    // chasing the same pointer sat on top of each other; Onee keeps its own
+    // business instead and still watches you with its eyes.
     let tx: number;
     let ty: number;
 
-    if (engaged) {
-      // Following. Onee keeps to a distance it likes, backing off when
-      // crowded and ambling over when left behind — but it shadows the cursor
-      // sideways rather than climbing after it, because trailing a cursor
-      // freely in two dimensions parked it on the middle of the H1 and ate a
-      // word. A character that wanders is charming; one that covers the
-      // headline is a bug wearing a costume.
-      const dx = pos.x - senses.pointer.x;
-      const dy = pos.y - senses.pointer.y;
-      const d = Math.hypot(dx, dy) || 1;
-      const nx = dx / d;
-      const ny = dy / d;
-
-      if (d < BUBBLE) {
-        tx = senses.pointer.x + nx * BUBBLE * 1.9;
-        ty = senses.pointer.y + ny * BUBBLE * 1.9;
-      } else if (d > TRAIL) {
-        tx = senses.pointer.x + nx * TRAIL * 0.82;
-        ty = senses.pointer.y + ny * TRAIL * 0.82;
+    // Left to itself, Onee goes places: it picks an empty spot anywhere in
+    // the window, crosses to it, hangs about for a few seconds and moves on.
+    if (t > perchUntil && !search) beginSearch();
+    const found = stepSearch();
+    if (found !== undefined) {
+      if (found) {
+        perch = found;
+        perchUntil = t + PERCH_MIN_MS + Math.random() * (PERCH_MAX_MS - PERCH_MIN_MS);
       } else {
-        tx = pos.x + Math.sin(t / 2_100) * 16;
-        ty = pos.y + Math.sin(t / 1_700 + 1.7) * 12;
+        perchUntil = t + PERCH_RETRY_MS;
       }
-      // It may only settle beside the cursor where the page is empty; if the
-      // spot it wants is on top of something, it holds its current perch and
-      // watches from there instead. Throttled hard: `isFree` is five hit tests,
-      // each of which resolves layout, and running that every frame while the
-      // cursor moves is three hundred forced layouts a second for a decoration.
-      if (t - checkedAt > 200) {
-        checkedAt = t;
-        // Same reason as in beginSearch: the rectangles are viewport-relative and
-        // the page scrolls under them. Clearing also stops the cache holding
-        // references to elements a route change has already thrown away.
-        textCache.clear();
-        spotIsFree = isFree(clamp(tx, 0, vw), clamp(ty, 0, vh));
-      }
-      if (!spotIsFree) {
+    }
+    // Fidgets around the spot rather than standing on it. Being perfectly
+    // still between trips is what made it read as a sticker between moves.
+    tx = perch.x + Math.sin(t / 2_300) * 15;
+    // Scrolling drags it behind — down the page pulls it up the screen — and
+    // it glides back once the scrolling stops. That lag is what makes it read
+    // as being carried along rather than pinned to the glass, and on a touch
+    // device it is the only movement cue there is.
+    ty = perch.y + Math.sin(t / 1_900 + 0.8) * 11 - clamp(lag, -LAG_LIMIT, LAG_LIMIT);
+
+    // Out of the way of the cars. If one is on Onee, or bearing down its
+    // lane, it steps clear: above or below a lane (a car crossing sideways
+    // can't be outrun along it), or to whichever side is nearest of
+    // something parked. The new spot becomes its perch, so it waits there
+    // rather than drifting straight back into the road.
+    refreshZones(t);
+    const hit = zoneAt(pos.x, pos.y) ?? zoneAt(tx, ty);
+    if (hit) {
+      const h = reachOf() + 12;
+      const options = [
+        { x: pos.x, y: hit.top - h },
+        { x: pos.x, y: hit.bottom + h },
+        ...(hit.lane ? [] : [{ x: hit.left - h, y: pos.y }, { x: hit.right + h, y: pos.y }]),
+      ]
+        .filter((o) => o.x >= EDGE + size / 2 && o.x <= vw - EDGE - size / 2)
+        .filter((o) => o.y >= TOP_LIMIT + size / 2 && o.y <= floor)
+        .filter((o) => !zoneAt(o.x, o.y))
+        .sort((p, q) => Math.hypot(p.x - pos.x, p.y - pos.y) - Math.hypot(q.x - pos.x, q.y - pos.y));
+      if (options[0]) {
+        perch = options[0];
+        perchUntil = t + PERCH_MIN_MS;
+        dodgeUntil = t + DODGE_MS;
+        search = null;
         tx = perch.x;
         ty = perch.y;
       }
-      perch = { x: pos.x, y: pos.y };
-      perchUntil = t + PERCH_MIN_MS;
-    } else {
-      // Left to itself, Onee goes places: it picks an empty spot anywhere in
-      // the window, crosses to it, hangs about for a few seconds and moves on.
-      if (t > perchUntil && !search) beginSearch();
-      const found = stepSearch();
-      if (found !== undefined) {
-        if (found) {
-          perch = found;
-          perchUntil = t + PERCH_MIN_MS + Math.random() * (PERCH_MAX_MS - PERCH_MIN_MS);
-        } else {
-          perchUntil = t + PERCH_RETRY_MS;
-        }
-      }
-      // Fidgets around the spot rather than standing on it. Being perfectly
-      // still between trips is what made it read as a sticker between moves.
-      tx = perch.x + Math.sin(t / 2_300) * 15;
-      // Scrolling drags it behind — down the page pulls it up the screen — and
-      // it glides back once the scrolling stops. That lag is what makes it read
-      // as being carried along rather than pinned to the glass, and on a touch
-      // device it is the only movement cue there is.
-      ty = perch.y + Math.sin(t / 1_900 + 0.8) * 11 - clamp(lag, -LAG_LIMIT, LAG_LIMIT);
     }
 
     const minX = EDGE + size / 2;
@@ -713,8 +730,10 @@ export function mountOnee(host: HTMLElement): () => void {
     if (wasTravelling && !senses.travelling) senses.arrivedAt = t;
     senses.beat = Math.floor(t / BEAT_MS);
 
-    const pull = senses.travelling ? PULL_TRAVEL : PULL;
-    const drag = senses.travelling ? DRAG_TRAVEL : DRAG;
+    // Getting out of a car's way is a hop, not an amble.
+    const dodging = t < dodgeUntil;
+    const pull = dodging ? PULL_DODGE : senses.travelling ? PULL_TRAVEL : PULL;
+    const drag = dodging ? DRAG_DODGE : senses.travelling ? DRAG_TRAVEL : DRAG;
     vel.x = (vel.x + (tx - pos.x) * pull) * drag;
     vel.y = (vel.y + (ty - pos.y) * pull) * drag;
     pos.x += vel.x;
