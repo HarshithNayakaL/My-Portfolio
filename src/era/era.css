@@ -108,94 +108,148 @@
 .era-inline-link { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 .era-inline-link:hover { text-decoration-color: currentColor; }
 
-/* ── banner: helmets mapped on a square grid ─────────────────────────
-   Square throughout: sharp corners, graph paper, solid grid lines between
-   cells. Each helmet sits in a dashed bounding box with its diagonals,
-   crosshairs out to the cell edges and an anchor point on every corner, the
-   way a selected object looks in a drawing tool. */
+/* ── banner: the helmets on display ─────────────────────────────────
+   Each cell is a bay: a back wall with a spotlight from above, a shelf with
+   a lit top surface and a darker front edge, and the helmet standing on it
+   with a contact shadow and a reflection in the gloss. Square throughout.
+   Measurements: wall 120px, shelf 30px (top surface 16, front 14), helmet
+   64 x 77 standing 9px into the top surface. */
 .hg {
-  --guide: color-mix(in srgb, var(--ink) 14%, transparent);
-  --grid: color-mix(in srgb, var(--ink) 22%, transparent);
-  --anchor: color-mix(in srgb, var(--ink) 55%, transparent);
+  --wall: color-mix(in srgb, var(--ink) 9%, var(--elevated));
+  --spot: rgba(255, 255, 255, 0.95);
+  --shelf-top: color-mix(in srgb, var(--ink) 9%, var(--elevated));
+  --shelf-front: color-mix(in srgb, var(--ink) 16%, var(--elevated));
+  --edge: rgba(255, 255, 255, 0.9);
+  --grid: color-mix(in srgb, var(--ink) 16%, transparent);
+  --anchor: var(--accent);
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   margin: 0;
   padding: 0;
   list-style: none;
   border: 1px solid var(--grid);
-  background: var(--surface);
+  background: var(--wall);
+  overflow: hidden;
 }
-.hg-cell { position: relative; display: grid; height: 104px; }
-.hg-cell + .hg-cell { border-left: 1px solid var(--grid); }
-.hg-guides { position: absolute; inset: 0 0 auto 0; height: 104px; pointer-events: none; }
-/* Crosshair through the centre, edge to edge. */
-.hg-guides::before,
-.hg-guides::after { content: ""; position: absolute; }
-.hg-guides::before { left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--guide); }
-.hg-guides::after { top: 50%; left: 0; right: 0; border-top: 1px dashed var(--guide); }
-/* The bounding box, its diagonals and four anchor points. */
-.hg-box {
+.dark .hg {
+  --wall: #0f1114;
+  --spot: rgba(255, 255, 255, 0.12);
+  --shelf-top: #1d2026;
+  --shelf-front: #0d0f12;
+  --edge: rgba(255, 255, 255, 0.12);
+}
+.hg-cell { position: relative; height: 150px; overflow: hidden; }
+.hg-wall {
+  position: absolute;
+  inset: 0 0 30px 0;
+  /* The spotlight: a cone of light from the top edge, brightest where the
+     helmet stands. */
+  background:
+    radial-gradient(ellipse 46% 95% at 50% 0%, var(--spot), transparent 72%),
+    linear-gradient(to bottom, transparent 55%, color-mix(in srgb, var(--ink) 4%, transparent));
+}
+.hg-cell + .hg-cell .hg-wall { border-left: 1px solid var(--grid); }
+.hg-shelf {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30px;
+  background: linear-gradient(to bottom, var(--shelf-top) 0 16px, var(--shelf-front) 16px);
+  box-shadow: inset 0 1px 0 var(--edge), inset 0 -1px 0 color-mix(in srgb, var(--ink) 10%, transparent);
+}
+/* A soft lit patch on the shelf under each spotlight. */
+.hg-shelf::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 14px 0;
+  background: radial-gradient(ellipse 40% 100% at 50% 30%, var(--spot), transparent 75%);
+  opacity: 0.7;
+}
+.hg-helmet,
+.hg-reflect {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 78px;
-  height: 78px;
-  margin: -39px 0 0 -39px;
-  border: 1px dashed var(--guide);
-  background:
-    linear-gradient(to top right, transparent calc(50% - 0.5px), var(--guide) 50%, transparent calc(50% + 0.5px)),
-    linear-gradient(to bottom right, transparent calc(50% - 0.5px), var(--guide) 50%, transparent calc(50% + 0.5px));
-  transition: border-color 0.3s;
+  margin-left: -32px;
+}
+.hg-helmet {
+  z-index: 2;
+  top: 52px; /* 150 - 30 + 9 - 77 */
+  transition: transform 0.45s var(--ease);
+}
+.hg-reflect {
+  z-index: 1;
+  top: 129px; /* the helmet's foot, mirrored downward */
+  transform: scaleY(-1);
+  opacity: 0.28;
+  -webkit-mask-image: linear-gradient(to top, #000, transparent 26%);
+  mask-image: linear-gradient(to top, #000, transparent 26%);
+  transition: transform 0.45s var(--ease), opacity 0.45s;
+}
+.hg-shadow {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 124px;
+  width: 58px;
+  height: 9px;
+  margin-left: -29px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.38), transparent);
+  transition: transform 0.45s var(--ease), opacity 0.45s;
+}
+/* Selected on hover: a bounding box with corner handles. */
+.hg-box {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 46px;
+  width: 80px;
+  height: 88px;
+  margin-left: -40px;
+  border: 1px solid var(--anchor);
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 .hg-box i {
   position: absolute;
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border: 1px solid var(--anchor);
   background: var(--elevated);
-  transition: border-color 0.3s;
 }
-.hg-box i:nth-child(1) { left: -3px; top: -3px; }
-.hg-box i:nth-child(2) { right: -3px; top: -3px; }
-.hg-box i:nth-child(3) { left: -3px; bottom: -3px; }
-.hg-box i:nth-child(4) { right: -3px; bottom: -3px; }
-.hg-helmet {
-  position: relative;
-  z-index: 1;
-  place-self: center;
-  filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.16));
-  transition: transform 0.4s var(--ease);
-}
-/* Who it belongs to, on hover: a label under the cell. */
+.hg-box i:nth-child(1) { left: -3.5px; top: -3.5px; }
+.hg-box i:nth-child(2) { right: -3.5px; top: -3.5px; }
+.hg-box i:nth-child(3) { left: -3.5px; bottom: -3.5px; }
+.hg-box i:nth-child(4) { right: -3.5px; bottom: -3.5px; }
 .hg-cap {
   position: absolute;
-  z-index: 3;
-  top: calc(100% + 8px);
+  z-index: 4;
+  top: 10px;
   left: 50%;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
+  padding: 0.25rem 0.55rem;
+  border-radius: 5px;
   background: var(--ink);
   color: var(--canvas);
   font-size: max(12px, 0.8125rem);
   line-height: 1.3;
   white-space: nowrap;
-  text-align: center;
   opacity: 0;
   transform: translate(-50%, -4px);
   transition: opacity 0.2s, transform 0.2s var(--ease);
   pointer-events: none;
 }
-.hg-cell:hover .hg-cap { opacity: 1; transform: translate(-50%, 0); }
-.hg-cell:hover .hg-helmet { transform: translateY(-3px); }
+.hg-cell:hover .hg-helmet { transform: translateY(-5px); }
+.hg-cell:hover .hg-reflect { transform: translateY(5px) scaleY(-1); opacity: 0.18; }
+.hg-cell:hover .hg-shadow { transform: scale(0.8); opacity: 0.6; }
 .hg-cell:hover .hg-box,
-.hg-cell:hover .hg-box i { border-color: var(--accent); }
+.hg-cell:hover .hg-cap { opacity: 1; }
+.hg-cell:hover .hg-cap { transform: translate(-50%, 0); }
 @media (max-width: 640px) {
   .hg { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .hg-cell:nth-child(3n + 1) { border-left: 0; }
+  .hg-cell:nth-child(3n + 1) .hg-wall { border-left: 0; }
   .hg-cell:nth-child(n + 4) { border-top: 1px solid var(--grid); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hg-helmet { transition: none; }
+  .hg-helmet, .hg-reflect, .hg-shadow { transition: none; }
 }
 
 /* Images in the margin objects, prints and parked row fill their box. */

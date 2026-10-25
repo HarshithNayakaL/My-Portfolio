@@ -1,8 +1,9 @@
 /**
- * The banner: six helmets mapped on a square grid, each in its own cell
- * inside a bounding box with crosshairs and anchor points, like objects laid
- * out in a drawing tool. Hovering one names the driver and team; the name is
- * already in each image's alt text. In order of era, Ferrari to Ferrari.
+ * The banner: six helmets on display, Ferrari to Ferrari. Each stands in its
+ * own lit bay: a back wall with a spotlight falling on it, a glossy shelf it
+ * stands on, a contact shadow and a faint reflection. Hovering one selects
+ * it the way a drawing tool does (a bounding box with corner handles) and
+ * names the driver and team; the names are also in each image's alt text.
  */
 const helmets = [
   { id: "schumacher", name: "Schumacher", team: "Ferrari", full: "Michael Schumacher" },
@@ -13,7 +14,7 @@ const helmets = [
   { id: "hamilton", name: "Hamilton", team: "Ferrari", full: "Lewis Hamilton" },
 ];
 // The cut-outs are all 320px tall and about 266 wide.
-const W = 60;
+const W = 64;
 const H = Math.round((W * 320) / 266);
 
 export default function HelmetGrid() {
@@ -21,9 +22,12 @@ export default function HelmetGrid() {
     <ul className="hg" aria-label="Pixel-art F1 helmets">
       {helmets.map((h) => (
         <li key={h.id} className="hg-cell">
-          <span aria-hidden className="hg-guides">
+          <span aria-hidden className="hg-wall">
             <span className="hg-box"><i /><i /><i /><i /></span>
           </span>
+          <span aria-hidden className="hg-shelf" />
+          <span aria-hidden className="hg-shadow" />
+          <img src={`/era/helmet-${h.id}.png`} alt="" aria-hidden width={W} height={H} decoding="async" className="hg-reflect" />
           <img
             src={`/era/helmet-${h.id}.png`}
             alt={`${h.full}'s ${h.team} helmet, in pixel art`}
