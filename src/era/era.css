@@ -335,104 +335,154 @@
   .era-tape { width: 60px; margin-left: -30px; height: 20px; top: -10px; }
 }
 
-/* ── the CD player ──────────────────────────────────────────────────
-   Brushed aluminium, a disc with the rainbow sheen CDs had, a backlit LCD
-   and a chrome button: a portable player of the early 2000s. It is an
-   object, so it stays silver in dark mode too. */
-.era-cd {
+/* ── the head unit ──────────────────────────────────────────────────
+   A car stereo of the early 2000s in mild dark silver: a gunmetal frame, a
+   brushed faceplate, the CD slot, a knob ringed in red, red-lit keys and a
+   blue backlit LCD. An object, so it keeps its finish in dark mode. */
+.hu {
   margin-top: 1.75rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.8rem 0.95rem 0.8rem 0.8rem;
-  border: 1px solid #a7abb2;
-  border-radius: 20px;
-  color: #1c2024;
-  background:
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0 1px, rgba(0, 0, 0, 0.025) 1px 2px),
-    linear-gradient(180deg, #f6f7f9 0%, #d9dce1 45%, #c3c7cd 55%, #e4e6ea 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.12),
-    0 14px 26px -18px rgba(0, 0, 0, 0.5);
+  padding: 7px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #5d6268, #464a50);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.2), 0 16px 28px -18px rgba(0, 0, 0, 0.55);
 }
-.era-cd-well {
+.hu-face {
   position: relative;
-  flex: 0 0 auto;
-  width: 78px;
-  height: 78px;
-  padding: 4px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #aeb2b9, #eef0f2);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-.era-cd-disc {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, transparent 0 30%, rgba(255, 255, 255, 0.55) 31% 33%, transparent 34%),
-    conic-gradient(from 20deg, #dfe3e8, #f9f9fb, #bfe0f6, #f6d5ee, #fff2bf, #dfe3e8, #f9f9fb, #c8ead6, #e6d3f6, #dfe3e8);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
-}
-.era-cd-disc.is-spinning { animation: era-spin 1.6s linear infinite; }
-@keyframes era-spin { to { transform: rotate(360deg); } }
-.era-cd-hub {
-  position: absolute;
-  inset: 37%;
-  border-radius: 50%;
-  background: radial-gradient(circle, #c3c7cd 0 34%, #f4f5f7 36% 60%, #9da2a9 62% 100%);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
-}
-.era-cd-lcd {
-  min-width: 0;
-  flex: 1;
-  padding: 0.5rem 0.75rem 0.55rem;
+  padding: 10px 14px 10px;
   border-radius: 8px;
-  color: #17251f;
-  background: linear-gradient(180deg, #b8c8be, #a6b9ad);
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(0, 0, 0, 0.18), 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #c9332c;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0.03) 1px 3px),
+    linear-gradient(180deg, #c3c7cc 0%, #a9aeb4 46%, #9a9fa6 54%, #b0b5bb 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
-.era-cd-lcd-top {
-  display: flex;
-  justify-content: space-between;
-  font-size: max(12px, 0.75rem);
-  font-variant-numeric: tabular-nums;
-  opacity: 0.8;
+.hu-slot {
+  display: block;
+  height: 7px;
+  margin: 0 12% 10px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1b1d20, #3a3e43);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.6);
 }
-.era-cd-btn {
+.hu-main { display: flex; align-items: center; gap: 12px; }
+
+/* The knob: black, ringed in red, the red lit while it plays. */
+.hu-knob {
+  position: relative;
   flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
+  width: 66px;
+  height: 66px;
+  padding: 0;
   border: 0;
   border-radius: 50%;
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 40%, #50555b, #25282c 70%);
+  box-shadow:
+    0 0 0 3px #7c2420,
+    0 0 0 4px #4a4e54,
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 3px 6px -2px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s, transform 0.12s;
+}
+.hu.is-playing .hu-knob {
+  box-shadow:
+    0 0 0 3px #e2382f,
+    0 0 0 4px #4a4e54,
+    0 0 12px 1px rgba(226, 56, 47, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 3px 6px -2px rgba(0, 0, 0, 0.5);
+}
+.hu-knob:active { transform: scale(0.97); }
+.hu-knob:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
+.hu-knob-cap {
+  position: absolute;
+  inset: 13px;
   display: grid;
   place-items: center;
-  color: #2a2e33;
-  cursor: pointer;
-  background: radial-gradient(circle at 50% 35%, #ffffff 0%, #e2e5e9 45%, #b7bbc2 100%);
-  box-shadow:
-    0 0 0 2px #c9ccd2,
-    0 0 0 3px #9ea3aa,
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 3px rgba(0, 0, 0, 0.18),
-    0 3px 6px -2px rgba(0, 0, 0, 0.35);
-  transition: transform 0.12s, box-shadow 0.12s;
+  border-radius: 50%;
+  color: #d9dce0;
+  background: radial-gradient(circle at 50% 35%, #2c2f33, #111214);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.12);
 }
-.era-cd-btn svg { filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8)); }
-.era-cd-btn:active,
-.era-cd-btn[aria-pressed="true"] {
-  transform: translateY(1px);
-  box-shadow:
-    0 0 0 2px #c9ccd2,
-    0 0 0 3px #9ea3aa,
-    inset 0 2px 4px rgba(0, 0, 0, 0.22),
-    0 1px 2px -1px rgba(0, 0, 0, 0.3);
+
+/* Keys: dark grey, rounded, their symbols in red. */
+.hu-keys { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+.hu-key {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: #e0463d;
+  background: linear-gradient(180deg, #5a5f66, #3c4046);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, 0.35);
 }
-.era-cd-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+.hu-key-round { width: 24px; min-width: 0; height: 24px; padding: 0; border-radius: 50%; margin-inline: auto; }
+.hu-key-wide { min-width: 42px; }
+
+/* The LCD: deep blue, backlit, the text glowing pale blue. */
+.hu-lcd {
+  min-width: 0;
+  flex: 1;
+  padding: 0.45rem 0.8rem 0.55rem;
+  border-radius: 10px;
+  color: #bfe2ff;
+  background: radial-gradient(ellipse at 50% 0%, #3557e0, #1b31a6 55%, #142482);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 0 3px #8d9299, 0 1px 0 4px rgba(255, 255, 255, 0.35);
+  text-shadow: 0 0 6px rgba(150, 205, 255, 0.85);
+}
+.hu-lcd-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.9;
+}
+.hu-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+.hu-eq i { width: 3px; height: 30%; background: currentColor; box-shadow: 0 0 4px rgba(150, 205, 255, 0.8); }
+.hu.is-playing .hu-eq i { animation: hu-eq 0.9s ease-in-out infinite alternate; }
+.hu-eq i:nth-child(2) { animation-delay: -0.3s; }
+.hu-eq i:nth-child(3) { animation-delay: -0.6s; }
+.hu-eq i:nth-child(4) { animation-delay: -0.15s; }
+.hu-eq i:nth-child(5) { animation-delay: -0.45s; }
+@keyframes hu-eq { from { height: 25%; } to { height: 100%; } }
+.hu-lcd-line { margin-top: 0.2rem; overflow: hidden; white-space: nowrap; font-size: 1.0625rem; font-weight: 600; }
+.hu-lcd-text { display: inline-block; }
+/* While it plays the title scrolls, as head units did with long names. */
+.hu.is-playing .hu-lcd-text { padding-left: 100%; animation: hu-scroll 9s linear infinite; }
+@keyframes hu-scroll { to { transform: translateX(-100%); } }
+
+/* Bottom row: source, presets 1 to 6, the aux jack. */
+.hu-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.hu-key-source { min-width: 56px; height: 20px; color: #fff; background: linear-gradient(180deg, #e04a40, #b12a23); }
+.hu-presets { display: flex; flex: 1; gap: 6px; }
+.hu-preset { flex: 1; min-width: 0; height: 18px; border-radius: 5px; }
+.hu-aux {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0c0d0f 0 35%, #3a3e43 40% 60%, #8c9198 64%);
+}
+@media (max-width: 640px) {
+  .hu-face { padding: 8px 10px; }
+  .hu-main { gap: 9px; }
+  .hu-knob { width: 54px; height: 54px; }
+  .hu-knob-cap { inset: 11px; }
+  .hu-keys-r { display: none; }
+  .hu-key { min-width: 28px; }
+  .hu-presets { gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hu.is-playing .hu-lcd-text { animation: none; padding-left: 0; }
+  .hu.is-playing .hu-eq i { animation: none; height: 70%; }
+}
 
 /* ── work: the grid of cards ─────────────────────────────────────────
    After harshitr.me: a framed preview with the product peeking in from the
@@ -794,6 +844,3 @@
 /* A black tyre on a dark page needs a rim of light to be seen at all. */
 .dark .era-pet { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.4)); }
 
-@media (prefers-reduced-motion: reduce) {
-  .era-cd-disc.is-spinning { animation: none !important; }
-}
