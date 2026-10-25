@@ -336,152 +336,153 @@
 }
 
 /* ── the head unit ──────────────────────────────────────────────────
-   A car stereo of the early 2000s in mild dark silver: a gunmetal frame, a
-   brushed faceplate, the CD slot, a knob ringed in red, red-lit keys and a
-   blue backlit LCD. An object, so it keeps its finish in dark mode. */
-.hu {
+   After the silver Pioneer head units of the early 2000s: a light brushed
+   face with rounded upper corners, a big volume knob, a round four-way pad,
+   and a wide blue LCD in a dark bezel with dark pixel text and boxed soft
+   keys. An object, so it keeps its finish in dark mode. */
+.pv {
+  --lcd-ink: #0e2266;
   margin-top: 1.75rem;
-  padding: 7px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #5d6268, #464a50);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.2), 0 16px 28px -18px rgba(0, 0, 0, 0.55);
-}
-.hu-face {
-  position: relative;
-  padding: 10px 14px 10px;
-  border-radius: 8px;
-  color: #c9332c;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 96px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px 12px;
+  border-radius: 22px 22px 10px 10px;
+  color: #4e535a;
   background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0.03) 1px 3px),
-    linear-gradient(180deg, #c3c7cc 0%, #a9aeb4 46%, #9a9fa6 54%, #b0b5bb 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, rgba(0, 0, 0, 0.025) 1px 2px),
+    linear-gradient(180deg, #eef0f2 0%, #d6d9dd 45%, #c5c9ce 55%, #dcdfe2 100%);
+  box-shadow:
+    0 0 0 1px #9ba0a7,
+    inset 0 1px 0 #fff,
+    inset 0 -2px 3px rgba(0, 0, 0, 0.12),
+    0 16px 28px -18px rgba(0, 0, 0, 0.5);
 }
-.hu-slot {
-  display: block;
-  height: 7px;
-  margin: 0 12% 10px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #1b1d20, #3a3e43);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.6);
+.pv-side { display: grid; justify-items: center; gap: 10px; }
+/* Volume knob: a satin aluminium dome in a dark ring. */
+.pv-knob {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.9), transparent 45%),
+    conic-gradient(from 200deg, #f4f5f7, #b9bdc3, #eceef0, #a4a9b0, #f4f5f7, #b9bdc3, #eceef0, #a4a9b0, #f4f5f7);
+  box-shadow: 0 0 0 3px #5b6067, 0 0 0 4px #e9ebee, 0 4px 8px -2px rgba(0, 0, 0, 0.35);
 }
-.hu-main { display: flex; align-items: center; gap: 12px; }
-
-/* The knob: black, ringed in red, the red lit while it plays. */
-.hu-knob {
+.pv-btns { display: flex; gap: 10px; }
+.pv-btn { display: grid; justify-items: center; gap: 3px; font-size: 12px; line-height: 1; color: #5a5f66; }
+.pv-btn i {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #ffffff, #c4c8cd);
+  box-shadow: 0 0 0 1px #8d929a, 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+/* The four-way pad, its centre the play key. */
+.pv-pad {
   position: relative;
-  flex: 0 0 auto;
-  width: 66px;
-  height: 66px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #fbfbfc, #c9cdd2 70%, #b3b8be);
+  box-shadow: 0 0 0 1px #8d929a, 0 0 0 4px #e3e6e9, 0 0 0 5px #a3a8af, 0 4px 8px -2px rgba(0, 0, 0, 0.3);
+}
+.pv-pad-arrows i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  margin: -5px;
+}
+.pv-pad-arrows i:nth-child(1) { border-bottom-color: #6b7077; transform: translateY(-26px); }
+.pv-pad-arrows i:nth-child(2) { border-top-color: #6b7077; transform: translateY(26px); }
+.pv-pad-arrows i:nth-child(3) { border-right-color: #6b7077; transform: translateX(-26px); }
+.pv-pad-arrows i:nth-child(4) { border-left-color: #6b7077; transform: translateX(26px); }
+.pv-pad-centre {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px;
   padding: 0;
   border: 0;
   border-radius: 50%;
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  background: radial-gradient(circle at 50% 40%, #50555b, #25282c 70%);
-  box-shadow:
-    0 0 0 3px #7c2420,
-    0 0 0 4px #4a4e54,
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 3px 6px -2px rgba(0, 0, 0, 0.5);
-  transition: box-shadow 0.3s, transform 0.12s;
+  color: #3f444a;
+  background: radial-gradient(circle at 50% 30%, #ffffff, #d2d6da);
+  box-shadow: 0 0 0 1px #8d929a, 0 2px 3px rgba(0, 0, 0, 0.2);
 }
-.hu.is-playing .hu-knob {
-  box-shadow:
-    0 0 0 3px #e2382f,
-    0 0 0 4px #4a4e54,
-    0 0 12px 1px rgba(226, 56, 47, 0.55),
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 3px 6px -2px rgba(0, 0, 0, 0.5);
-}
-.hu-knob:active { transform: scale(0.97); }
-.hu-knob:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
-.hu-knob-cap {
-  position: absolute;
-  inset: 13px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: #d9dce0;
-  background: radial-gradient(circle at 50% 35%, #2c2f33, #111214);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.12);
-}
+.pv-pad-centre:active,
+.pv-pad-centre[aria-pressed="true"] { box-shadow: 0 0 0 1px #8d929a, inset 0 2px 3px rgba(0, 0, 0, 0.25); }
+.pv-pad-centre:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 
-/* Keys: dark grey, rounded, their symbols in red. */
-.hu-keys { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
-.hu-key {
-  display: grid;
-  place-items: center;
-  min-width: 34px;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  color: #e0463d;
-  background: linear-gradient(180deg, #5a5f66, #3c4046);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, 0.35);
+/* The LCD in its dark bezel. */
+.pv-bezel {
+  padding: 6px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #2c3036, #15171a);
+  box-shadow: 0 0 0 1px #7f848b, 0 1px 0 2px rgba(255, 255, 255, 0.6);
 }
-.hu-key-round { width: 24px; min-width: 0; height: 24px; padding: 0; border-radius: 50%; margin-inline: auto; }
-.hu-key-wide { min-width: 42px; }
-
-/* The LCD: deep blue, backlit, the text glowing pale blue. */
-.hu-lcd {
-  min-width: 0;
-  flex: 1;
-  padding: 0.45rem 0.8rem 0.55rem;
-  border-radius: 10px;
-  color: #bfe2ff;
-  background: radial-gradient(ellipse at 50% 0%, #3557e0, #1b31a6 55%, #142482);
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 0 3px #8d9299, 0 1px 0 4px rgba(255, 255, 255, 0.35);
-  text-shadow: 0 0 6px rgba(150, 205, 255, 0.85);
-}
-.hu-lcd-top {
+.pv-lcd {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.9;
+  align-items: stretch;
+  gap: 10px;
+  min-height: 96px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: radial-gradient(ellipse 80% 120% at 40% 20%, #d7ecff, #a9d2f7 55%, #86bdee);
+  box-shadow: inset 0 2px 6px rgba(0, 20, 60, 0.35);
 }
-.hu-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
-.hu-eq i { width: 3px; height: 30%; background: currentColor; box-shadow: 0 0 4px rgba(150, 205, 255, 0.8); }
-.hu.is-playing .hu-eq i { animation: hu-eq 0.9s ease-in-out infinite alternate; }
-.hu-eq i:nth-child(2) { animation-delay: -0.3s; }
-.hu-eq i:nth-child(3) { animation-delay: -0.6s; }
-.hu-eq i:nth-child(4) { animation-delay: -0.15s; }
-.hu-eq i:nth-child(5) { animation-delay: -0.45s; }
-@keyframes hu-eq { from { height: 25%; } to { height: 100%; } }
-.hu-lcd-line { margin-top: 0.2rem; overflow: hidden; white-space: nowrap; font-size: 1.0625rem; font-weight: 600; }
-.hu-lcd-text { display: inline-block; }
-/* While it plays the title scrolls, as head units did with long names. */
-.hu.is-playing .hu-lcd-text { padding-left: 100%; animation: hu-scroll 9s linear infinite; }
-@keyframes hu-scroll { to { transform: translateX(-100%); } }
-
-/* Bottom row: source, presets 1 to 6, the aux jack. */
-.hu-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.hu-key-source { min-width: 56px; height: 20px; color: #fff; background: linear-gradient(180deg, #e04a40, #b12a23); }
-.hu-presets { display: flex; flex: 1; gap: 6px; }
-.hu-preset { flex: 1; min-width: 0; height: 18px; border-radius: 5px; }
-.hu-aux {
+.pv-lcd .dm { display: block; max-width: 100%; height: auto; }
+.pv-lcd .dm-on { fill: var(--lcd-ink); }
+.pv-lcd .dm-off { fill: rgba(14, 34, 102, 0.045); }
+.pv-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
+.pv-time { display: flex; align-items: center; gap: 8px; }
+.pv-cd { flex: none; fill: none; stroke: var(--lcd-ink); stroke-width: 2.2; }
+.pv-cd circle { fill: var(--lcd-ink); stroke: none; }
+.pv.is-playing .pv-cd { animation: pv-spin 1.4s linear infinite; }
+@keyframes pv-spin { to { transform: rotate(360deg); } }
+.pv-keys {
   flex: 0 0 auto;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #0c0d0f 0 35%, #3a3e43 40% 60%, #8c9198 64%);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 3px;
+  align-content: center;
+}
+.pv-keys > span {
+  display: grid;
+  place-items: center;
+  padding: 4px 5px;
+  border: 1.5px solid var(--lcd-ink);
+  border-radius: 2px;
+}
+.pv-keys > span.is-on { background: var(--lcd-ink); }
+.pv-keys > span.is-on .dm-on { fill: #cfe7ff; }
+.pv-keys > span.is-on .dm-off { fill: rgba(207, 231, 255, 0.08); }
+.pv-key-wide { grid-column: 1 / -1; }
+@media (max-width: 760px) {
+  .pv-keys { display: none; }
 }
 @media (max-width: 640px) {
-  .hu-face { padding: 8px 10px; }
-  .hu-main { gap: 9px; }
-  .hu-knob { width: 54px; height: 54px; }
-  .hu-knob-cap { inset: 11px; }
-  .hu-keys-r { display: none; }
-  .hu-key { min-width: 28px; }
-  .hu-presets { gap: 4px; }
+  .pv { grid-template-columns: 64px minmax(0, 1fr) 64px; gap: 8px; padding: 10px; }
+  .pv-knob { width: 52px; height: 52px; }
+  .pv-pad { width: 56px; height: 56px; }
+  .pv-pad-arrows i:nth-child(1) { transform: translateY(-19px); }
+  .pv-pad-arrows i:nth-child(2) { transform: translateY(19px); }
+  .pv-pad-arrows i:nth-child(3) { transform: translateX(-19px); }
+  .pv-pad-arrows i:nth-child(4) { transform: translateX(19px); }
+  .pv-pad-centre { width: 26px; height: 26px; margin: -13px; }
+  .pv-btns { display: none; }
+  .pv-lcd { min-height: 80px; padding: 7px 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hu.is-playing .hu-lcd-text { animation: none; padding-left: 0; }
-  .hu.is-playing .hu-eq i { animation: none; height: 70%; }
+  .pv.is-playing .pv-cd { animation: none; }
 }
 
 /* ── work: the grid of cards ─────────────────────────────────────────
