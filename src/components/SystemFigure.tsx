@@ -21,7 +21,21 @@ import type { PipelineStage, PipelineNode } from "../data/caseStudies";
 function wrap(t: string, n: number, max: number): string[] {
   const out: string[] = [];
   let cur = "";
-  const words = t.split(" ").flatMap((w) => (w.length > n && w.includes("-") ? w.split(/(?<=-)/) : [w]));
+  const words = t
+    .split(" ")
+    .flatMap((w) => (w.length > n && w.includes("-") ? w.split(/(?<=-)/) : [w]))
+    // A single word wider than the line can't wrap and would run out of its
+    // box, so it is broken with a hyphen. Rare: only the narrowest boxes.
+    .flatMap((w) => {
+      if (w.length <= n || n < 4) return [w];
+      const parts: string[] = [];
+      let rest = w;
+      while (rest.length > n) {
+        parts.push(rest.slice(0, n - 1) + "-");
+        rest = rest.slice(n - 1);
+      }
+      return [...parts, rest];
+    });
   for (const w of words) {
     const sep = cur.endsWith("-") ? "" : " ";
     if (!cur) cur = w;
@@ -61,7 +75,7 @@ function Buses({ rows }: { rows: Box[][] }) {
 }
 
 export default function SystemFigure({
-  stages, layout, details = false, notes = "below", fit = false,
+  stages, layout, details = false, notes = "below", fit = false, canvas = 312,
 }: {
   stages: PipelineStage[];
   layout: "wide" | "stacked";
@@ -71,8 +85,12 @@ export default function SystemFigure({
   notes?: "below" | "side";
   /** stacked: scale the SVG to fill a fixed-height frame instead of its width. */
   fit?: boolean;
+  /** stacked: drawing width in units. 312 suits a card or a phone; give it
+   *  more only where it is drawn about that many px wide, so text stays at
+   *  its own size instead of being scaled up. */
+  canvas?: number;
 }) {
-  return layout === "wide" ? <WideFigure stages={stages} /> : <StackedFigure stages={stages} details={details} notes={notes} fit={fit} />;
+  return layout === "wide" ? <WideFigure stages={stages} /> : <StackedFigure stages={stages} details={details} notes={notes} fit={fit} span={canvas} />;
 }
 
 function WideFigure({ stages }: { stages: PipelineStage[] }) {
@@ -150,28 +168,132 @@ function WideFigure({ stages }: { stages: PipelineStage[] }) {
   );
 }
 
+// Stacked-figure type, and text measured the way Inter sets it. A per-letter
+// average wrapped "Classification" (narrow letters) early and let "Markdown,
+// JSON, CSV" (wide ones) run into the border; approximate advances per glyph
+// (em, regular weight) get both right. Checked against the rendered boxes on
+// every case study at 1440 and 390px.
+const LABEL_FS = 14;
+const SUB_FS = 12.5;
+const GAP_X = 10;
+const ADV: Record<string, number> = {
+  a: 0.56, b: 0.6, c: 0.53, d: 0.6, e: 0.56, f: 0.34, g: 0.6, h: 0.58, i: 0.25, j: 0.26, k: 0.53, l: 0.25, m: 0.87,
+  n: 0.58, o: 0.58, p: 0.6, q: 0.6, r: 0.37, s: 0.51, t: 0.35, u: 0.58, v: 0.52, w: 0.78, x: 0.51, y: 0.52, z: 0.5,
+  A: 0.66, B: 0.64, C: 0.7, D: 0.71, E: 0.58, F: 0.56, G: 0.72, H: 0.73, I: 0.27, J: 0.5, K: 0.64, L: 0.53, M: 0.87,
+  N: 0.74, O: 0.75, P: 0.62, Q: 0.75, R: 0.64, S: 0.62, T: 0.61, U: 0.72, V: 0.66, W: 0.95, X: 0.64, Y: 0.62, Z: 0.6,
+  " ": 0.26, ",": 0.27, ".": 0.27, ";": 0.27, ":": 0.27, "-": 0.4, "/": 0.37, "+": 0.6, "(": 0.33, ")": 0.33,
+  "&": 0.65, "'": 0.22, "·": 0.3, "→": 0.7,
+};
+/** Width in px of `t` set in Inter at `fs`, 4% slack included; 600 weight runs ~5% wider. */
+const textWidth = (t: string, fs: number, bold: boolean) =>
+  [...t].reduce((w, ch) => w + (ADV[ch] ?? (/[0-9]/.test(ch) ? 0.6 : 0.6)), 0) * fs * (bold ? 1.05 : 1) * 1.04;
+const boxWidth = (span: number, n: number) => (span - GAP_X * (n - 1)) / n;
+// The numbered badge sits on a gate's first line only, so only that line is
+// narrowed for it; the lines under it get the full width back.
+const labelRoom = (bw: number) => bw - 22;
+const BADGE_ROOM = 23;
+const subRoom = (bw: number) => bw - 22;
+
+/** Wrap by measured width. A word wider than the line is broken with a hyphen.
+ *  `first` narrows the first line (for a badge beside it). */
+function wrapW(t: string, room: number, fs: number, bold: boolean, max: number, first = room): string[] {
+  const lines: string[] = [];
+  const fits = (s: string) => textWidth(s, fs, bold) <= (lines.length === 0 ? first : room);
+  const words = t.split(" ").flatMap((w) => {
+    if (fits(w)) return [w];
+    const parts = w.split(/(?<=-)/);
+    const out: string[] = [];
+    for (let p of parts) {
+      while (!fits(p)) {
+        let k = p.length - 1;
+        while (k > 1 && !fits(p.slice(0, k) + "-")) k -= 1;
+        out.push(p.slice(0, k) + "-");
+        p = p.slice(k);
+      }
+      out.push(p);
+    }
+    return out;
+  });
+  let cur = "";
+  for (const w of words) {
+    const sep = cur.endsWith("-") ? "" : " ";
+    if (!cur) cur = w;
+    else if (fits(cur + sep + w)) cur += sep + w;
+    else {
+      lines.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) lines.push(cur);
+  if (lines.length > max) {
+    const kept = lines.slice(0, max);
+    let last = kept[max - 1];
+    while (last.length > 1 && !fits(last + "…")) last = last.slice(0, -1).trimEnd();
+    kept[max - 1] = last + "…";
+    return kept;
+  }
+  return lines;
+}
+
+/**
+ * Whether every word of a pipeline fits its box at this canvas width. When
+ * one doesn't, a page can draw the figure wider and let it scroll, rather
+ * than break the word or shrink the type under the 12px floor.
+ */
+export function fitsCanvas(stages: PipelineStage[], canvas: number, details: boolean) {
+  return stages.every((st) => {
+    const bw = boxWidth(canvas, st.nodes.length);
+    const gate = [...st.nodes].reverse().find((nd) => nd.kind === "gate" && nd.detail);
+    return st.nodes.every((nd) => {
+      const widest = (t: string, fs: number, bold: boolean) =>
+        Math.max(...t.split(/\s+/).flatMap((w) => w.split(/(?<=-)/)).map((w) => textWidth(w, fs, bold)));
+      const labelOk = widest(nd.label, LABEL_FS, true) <= labelRoom(bw);
+      const subOk = !details || nd === gate || !nd.detail || widest(nd.detail, SUB_FS, false) <= subRoom(bw);
+      return labelOk && subOk;
+    });
+  });
+}
+
+// Stacked-figure box metrics. Text is placed on baselines, and a box's height
+// is read off the same baselines, so the two can never disagree.
+const PAD_X = 11;
+const PAD_Y = 10;
+const labelBase = (b: Box, i: number) => b.y + PAD_Y + b.fs * 0.76 + i * b.fs * 1.28;
+const subBase = (b: Box, i: number, sfs: number) => labelBase(b, b.label.length - 1) + sfs * 1.55 + i * sfs * 1.42;
+const boxBottom = (b: Box, sfs: number) =>
+  b.sub.length ? subBase(b, b.sub.length - 1, sfs) + sfs * 0.3 : labelBase(b, b.label.length - 1) + b.fs * 0.28;
+
 function StackedFigure({
-  stages, details, notes: notesAt, fit,
-}: { stages: PipelineStage[]; details: boolean; notes: "below" | "side"; fit: boolean }) {
+  stages, details, notes: notesAt, fit, span,
+}: { stages: PipelineStage[]; details: boolean; notes: "below" | "side"; fit: boolean; span: number }) {
   // No step numbers: the boxes and connectors already read top to bottom.
   // Sized for the ~0.9x the figure is drawn at on a phone: box labels land
-  // near 13px, details and markers near 12px.
-  const X0 = 0, span = 312, G = 10, LH = 18.5, SFS = 12.5, GAP = 28;
+  // near 12.5px, details and markers near 12px.
+  //
+  // Every row spans the same width, a lone step included, so box edges line
+  // up from row to row; a narrower centred single box made each row start
+  // somewhere new. Heights come from the same baselines the text is drawn
+  // on, so the last line always clears the border (descenders were being cut
+  // when height and text positions were worked out separately).
+  const X0 = 0, G = GAP_X, SFS = SUB_FS, GAP = 24;
   let y = 4;
   const rows: Box[][] = [];
   const notes: { box: Box; label: string; text: string }[] = [];
 
   stages.forEach((st, si) => {
     const n = st.nodes.length;
-    const bw = n === 1 ? 220 : (span - G * (n - 1)) / n;
-    const sx = X0 + span / 2 - (n * bw + (n - 1) * G) / 2;
-    const FS = n === 3 ? 14 : 15;
+    const bw = boxWidth(span, n);
+    const FS = LABEL_FS;
     const gate = [...st.nodes].reverse().find((nd) => nd.kind === "gate" && nd.detail);
     const boxes = st.nodes.map((nd, i) => {
-      const label = wrap(nd.label, Math.floor((bw - (nd === gate ? 36 : 18)) / (FS * 0.56)), 3);
-      const sub = details && nd !== gate && nd.detail ? wrap(nd.detail, Math.floor((bw - 18) / 6.6), 4) : [];
-      const h = 18 + label.length * LH + (sub.length ? 4 + sub.length * (SFS + 4) : 0);
-      return { x: sx + i * (bw + G), y, w: bw, h, node: nd, label, sub, fs: FS } as Box;
+      const room = labelRoom(bw);
+      const label = wrapW(nd.label, room, FS, true, 3, nd === gate ? room - BADGE_ROOM : room);
+      // Six lines is more than any detail needs in the narrowest box; a
+      // detail cut off with an ellipsis would hide part of the claim.
+      const sub = details && nd !== gate && nd.detail ? wrapW(nd.detail, subRoom(bw), SFS, false, 6) : [];
+      const box = { x: X0 + i * (bw + G), y, w: bw, h: 0, node: nd, label, sub, fs: FS } as Box;
+      box.h = boxBottom(box, SFS) - y + PAD_Y;
+      return box;
     });
     const rh = Math.max(...boxes.map((b) => b.h));
     boxes.forEach((b) => (b.h = rh));
@@ -192,17 +314,18 @@ function StackedFigure({
         const k = noteNo(b);
         return (
           <g key={b.node.id}>
-            <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={9} className={isAccent(b.node) ? "dn acc" : "dn"} />
+            <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={8} className={isAccent(b.node) ? "dn acc" : "dn"} />
             {b.label.map((l, i) => (
-              <text key={i} x={b.x + 10} y={b.y + 9 + b.fs * 0.85 + i * LH} className="dt" style={{ fontSize: b.fs }}>{l}</text>
+              <text key={i} x={b.x + PAD_X} y={labelBase(b, i)} className="dt" style={{ fontSize: b.fs }}>{l}</text>
             ))}
             {b.sub.map((l, i) => (
-              <text key={i} x={b.x + 10} y={b.y + 9 + b.fs * 0.85 + b.label.length * LH + 2 + SFS + i * (SFS + 4)} className="ds" style={{ fontSize: SFS }}>{l}</text>
+              <text key={i} x={b.x + PAD_X} y={subBase(b, i, SFS)} className="ds" style={{ fontSize: SFS }}>{l}</text>
             ))}
             {k > 0 && (
+              // Centred on the first line of the label, inset like the text.
               <g>
-                <rect x={b.x + b.w - 23} y={b.y + 6} width={17} height={17} rx={4} fill="var(--color-btn)" />
-                <text x={b.x + b.w - 14.5} y={b.y + 19} textAnchor="middle" className="fig-num">{k}</text>
+                <rect x={b.x + b.w - PAD_X - 17} y={labelBase(b, 0) - b.fs * 0.36 - 8.5} width={17} height={17} rx={4} fill="var(--color-btn)" />
+                <text x={b.x + b.w - PAD_X - 8.5} y={labelBase(b, 0) - b.fs * 0.36 + 5.2} textAnchor="middle" className="fig-num">{k}</text>
               </g>
             )}
           </g>

@@ -4,7 +4,7 @@ import "./case.css";
 import { getCaseStudy } from "../data/caseStudies";
 import { EMAIL, NAME, projects } from "../data/projects";
 import { headlineRole } from "../components/About";
-import SystemFigure from "../components/SystemFigure";
+import SystemFigure, { fitsCanvas } from "../components/SystemFigure";
 import AllStudies from "../components/AllStudies";
 import TyrePet from "./TyrePet";
 import RoamingCars from "./RoamingCars";
@@ -82,6 +82,7 @@ export default function EraCaseStudy() {
   const prev = studyOrder[(i - 1 + studyOrder.length) % studyOrder.length];
   const next = studyOrder[(i + 1) % studyOrder.length];
 
+  const phoneFits = fitsCanvas(study.pipeline, 312, true);
   const intro =
     study.pipelineIntro ??
     "The pipeline, end to end. Every stage assumes the model can be wrong, so the interesting work is in the verify steps, not just generation.";
@@ -89,9 +90,25 @@ export default function EraCaseStudy() {
   const figure = (
     <figure className="m-0">
       <div className="cs-figure">
-        <div className="mx-auto max-w-[400px]">
-          <SystemFigure stages={study.pipeline} layout="stacked" details />
+        {/* Drawn at its own size, never blown up to fill the column (at 400px
+            a 312-unit figure put every label near 19px): a 400-unit canvas
+            where there is 400px for it, the 312 one on a phone. */}
+        <div className="mx-auto hidden max-w-[400px] sm:block">
+          <SystemFigure stages={study.pipeline} layout="stacked" details canvas={400} />
         </div>
+        {phoneFits ? (
+          <div className="mx-auto max-w-[340px] sm:hidden">
+            <SystemFigure stages={study.pipeline} layout="stacked" details />
+          </div>
+        ) : (
+          // Words too long for a phone-width box: the full-size figure,
+          // scrolling sideways, like the GitHub graph does on a phone.
+          <div className="cs-figure-scroll sm:hidden">
+            <div className="w-[400px]">
+              <SystemFigure stages={study.pipeline} layout="stacked" details canvas={400} />
+            </div>
+          </div>
+        )}
       </div>
       {/* The SVG is decorative to assistive tech; the same stages and steps
           are here as text, which is also what a crawler reads. */}
