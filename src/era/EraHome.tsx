@@ -10,7 +10,7 @@ import SystemFigure from "../components/SystemFigure";
 import GitHubActivity from "../components/GitHubActivity";
 import StartBanner from "./StartBanner";
 import Turntable from "./Turntable";
-import CarPet from "./CarPet";
+import TyrePet from "./TyrePet";
 import RoamingCars from "./RoamingCars";
 import MarginObjects from "./MarginObjects";
 import Garage from "./Garage";
@@ -20,7 +20,7 @@ import { Arrow, GitHubMark, GlobeMark, LinkedInMark, MailMark } from "./icons";
  * The era homepage. One dashed frame holds the page (palakonweb.in), on grid
  * paper (upriyanshu.tech), with the photo taped down as a polaroid and the
  * margins set with objects of the time (garvitsingla.in). The cars are the
- * part that is mine: the F2004 follows the cursor, the others cross the page
+ * part that is mine: a Pirelli tyre follows the cursor, the cars cross the page
  * on their own, and all of them are parked in a row at the bottom.
  */
 /**
@@ -108,7 +108,7 @@ export default function EraHome() {
   return (
     <div className="era">
       <RoamingCars />
-      <CarPet />
+      <TyrePet />
       <MarginObjects />
 
       <div className="era-frame">

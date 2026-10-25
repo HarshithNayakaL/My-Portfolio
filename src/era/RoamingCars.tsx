@@ -6,10 +6,8 @@ import { cars, type EraCar } from "./cars";
  * right or right to left, at a random height. Sometimes it is two of the same
  * kind racing nose to tail, the one behind a touch quicker so it can close up
  * or get past. No suspension bounce: an F1 car on a straight doesn't move.
- *
- * The F2004 is left out, it is the one following the cursor.
  */
-const F1 = cars.filter((c) => c.kind === "f1" && c.id !== "f2004");
+const F1 = cars.filter((c) => c.kind === "f1");
 const RALLY = cars.filter((c) => c.kind === "rally");
 const LEAD = 700;
 const pick = (pool: EraCar[], not?: EraCar) => {

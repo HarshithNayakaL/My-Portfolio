@@ -155,7 +155,6 @@
 }
 .era-banner-passer img,
 .era-grid-car img,
-.era-pet img,
 .era-object img,
 .era-print img,
 .era-bay img {
@@ -525,6 +524,41 @@
 .era-object-btn { padding: 0; border: 0; background: none; cursor: pointer; }
 .era-object-btn:active { scale: 0.97; }
 .era-object-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+/* What the Cyber-shot says while the pointer is on it. */
+.era-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--elevated);
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  margin-bottom: -6px;
+  pointer-events: none;
+  transition: opacity 0.2s, margin-bottom 0.25s var(--ease);
+}
+.era-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--elevated);
+  transform: rotate(45deg);
+}
+.era-object-btn:hover .era-bubble,
+.era-object-btn:focus-visible .era-bubble { opacity: 1; margin-bottom: 0; }
+.era-object-small { filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.2)); }
 .era-print {
   padding: 12px 12px 0;
   background: #fff;
@@ -572,7 +606,9 @@
 }
 /* A pet that follows the pointer means nothing without one. */
 @media (hover: none) { .era-pet { display: none; } }
-.era-pet-body { display: block; }
+.era-pet img { display: block; width: 100%; height: 100%; will-change: transform; }
+/* A black tyre on a dark page needs a rim of light to be seen at all. */
+.dark .era-pet { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.4)); }
 
 @media (prefers-reduced-motion: reduce) {
   .era-vinyl.is-spinning, .era-banner-passer { animation: none !important; }
