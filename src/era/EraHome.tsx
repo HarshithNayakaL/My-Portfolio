@@ -6,7 +6,7 @@ import { agentSkills } from "../data/skills";
 import { faqs } from "../components/Faq";
 import { experience, headlineRole, identitySentence, paper, stack } from "../components/About";
 import GitHubActivity from "../components/GitHubActivity";
-import StartBanner from "./StartBanner";
+import HelmetGrid from "./HelmetGrid";
 import Turntable from "./Turntable";
 import TyrePet from "./TyrePet";
 import RoamingCars from "./RoamingCars";
@@ -94,7 +94,7 @@ export default function EraHome() {
       <MarginObjects />
 
       <div className="era-frame">
-        <StartBanner />
+        <HelmetGrid />
 
         {/* Hero */}
         <section aria-labelledby="era-name" className="era-hero">

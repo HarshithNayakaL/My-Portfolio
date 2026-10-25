@@ -1,0 +1,43 @@
+/**
+ * The banner: six helmets set out on a construction grid, like a drawing
+ * sheet before it is inked. Every helmet stands in its own cell on the same
+ * baseline, with a dashed circle and crosshair through its centre and a mark
+ * wherever the grid lines cross. In order of era, Ferrari to Ferrari.
+ */
+const helmets = [
+  { id: "schumacher", name: "Schumacher", team: "Ferrari", full: "Michael Schumacher" },
+  { id: "alonso", name: "Alonso", team: "Renault", full: "Fernando Alonso" },
+  { id: "raikkonen", name: "Räikkönen", team: "McLaren", full: "Kimi Räikkönen" },
+  { id: "vettel", name: "Vettel", team: "Red Bull", full: "Sebastian Vettel" },
+  { id: "verstappen", name: "Verstappen", team: "Red Bull", full: "Max Verstappen" },
+  { id: "hamilton", name: "Hamilton", team: "Ferrari", full: "Lewis Hamilton" },
+];
+// The cut-outs are all 320px tall and about 266 wide.
+const W = 92;
+const H = Math.round((W * 320) / 266);
+
+export default function HelmetGrid() {
+  return (
+    <ul className="hg" aria-label="Pixel-art F1 helmets">
+      {helmets.map((h) => (
+        <li key={h.id} className="hg-cell">
+          <span aria-hidden className="hg-guides">
+            <span className="hg-ring" />
+          </span>
+          <img
+            src={`/era/helmet-${h.id}.png`}
+            alt={`${h.full}'s ${h.team} helmet, in pixel art`}
+            width={W}
+            height={H}
+            decoding="async"
+            className="hg-helmet"
+          />
+          <span className="hg-cap">
+            <span className="block text-[0.8125rem] font-semibold text-ink">{h.name}</span>
+            <span className="block text-[max(12px,0.75rem)] text-dim">{h.team}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}

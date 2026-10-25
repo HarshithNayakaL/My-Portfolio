@@ -80,135 +80,106 @@
 .era-inline-link { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 .era-inline-link:hover { text-decoration-color: currentColor; }
 
-/* ── banner ─────────────────────────────────────────────────────────── */
-.era-banner {
+/* ── banner: helmets on a construction grid ───────────────────────────
+   One cell per helmet, every helmet on the same baseline. The guides are
+   drawn in CSS: dashed dividers between cells, a dashed baseline and caption
+   rule, a ring and crosshair through each helmet's centre, and a small mark
+   wherever a divider meets the top or bottom edge. */
+.hg {
+  --guide: color-mix(in srgb, var(--ink) 16%, transparent);
+  --guide-strong: color-mix(in srgb, var(--ink) 34%, transparent);
   position: relative;
-  height: 200px;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line-strong);
   border-radius: 16px;
-  background: #2b2d31;
+  overflow: hidden;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--ink) 3.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 3.5%, transparent) 1px, transparent 1px);
+  background-size: 12px 12px;
+  background-position: -1px -1px;
 }
-.era-banner-grass {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 44%;
-  background: repeating-linear-gradient(90deg, #3d7b37 0 46px, #468a3f 46px 92px);
+.hg-cell {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  grid-template-rows: 150px auto;
 }
-.era-banner-kerb {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 44%;
-  height: 8px;
-  background: repeating-linear-gradient(90deg, #d40000 0 18px, #f2f2f2 18px 36px);
-}
-.era-banner-road {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: calc(44% + 8px);
-  background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 30px, transparent 30px 64px) 0 38% / 100% 2px no-repeat,
-    linear-gradient(180deg, #34363b, #26282c);
-}
-/* The grid box the car sits in. */
-.era-banner-road::after {
+.hg-cell + .hg-cell { border-left: 1px dashed var(--guide); }
+/* The marks where a divider meets the top and bottom edges. */
+.hg-cell + .hg-cell::before,
+.hg-cell + .hg-cell::after {
   content: "";
   position: absolute;
-  left: calc(50% - 128px);
-  bottom: 14px;
-  width: 24px;
-  height: 46px;
-  border: 3px solid rgba(255, 255, 255, 0.8);
-  border-right: 0;
+  left: -5.5px;
+  width: 10px;
+  height: 10px;
+  background:
+    linear-gradient(var(--guide-strong), var(--guide-strong)) center / 1px 100% no-repeat,
+    linear-gradient(var(--guide-strong), var(--guide-strong)) center / 100% 1px no-repeat;
 }
-.era-gantry {
+.hg-cell + .hg-cell::before { top: 6px; }
+.hg-cell + .hg-cell::after { bottom: 6px; }
+.hg-guides { position: absolute; left: 0; right: 0; top: 0; height: 150px; pointer-events: none; }
+/* The crosshair through the helmet's centre (the image is centred at y=78). */
+.hg-guides::before,
+.hg-guides::after { content: ""; position: absolute; transition: background-color 0.3s; }
+.hg-guides::before { left: 50%; top: 14px; bottom: 6px; border-left: 1px dashed var(--guide); }
+.hg-guides::after { top: 78px; left: 10px; right: 10px; border-top: 1px dashed var(--guide); }
+.hg-ring {
   position: absolute;
-  top: 12px;
   left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  padding: 6px 8px;
-  background: #121315;
-  border-radius: 4px;
-  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.6);
-}
-.era-gantry-pod { display: grid; gap: 4px; padding: 4px; background: #1f2023; border-radius: 3px; }
-.era-light {
-  width: 14px;
-  height: 14px;
+  top: 78px;
+  width: 112px;
+  height: 112px;
+  margin: -56px 0 0 -56px;
+  border: 1px dashed var(--guide);
   border-radius: 50%;
-  background: #3a1414;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s, transform 0.5s var(--ease);
 }
-.era-light.is-on { background: #ff2a1a; box-shadow: 0 0 10px 2px rgba(255, 42, 26, 0.75); }
-.era-banner-passer {
-  position: absolute;
-  top: calc(44% + 12px);
-  left: 0;
-  opacity: 0.9;
-  transform: translateX(-200px);
-  animation: era-pass 9s linear 2s infinite;
+.hg-helmet {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  margin-top: 6px;
+  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.18));
+  transition: transform 0.45s var(--ease);
 }
-@keyframes era-pass {
-  0% { transform: translateX(calc(var(--col) + 40px)); }
-  38%, 100% { transform: translateX(-200px); }
+.hg-cap {
+  width: 100%;
+  padding: 0.55rem 0.4rem 0.7rem;
+  border-top: 1px dashed var(--guide);
+  text-align: center;
+  line-height: 1.35;
 }
-.era-grid-car {
-  position: absolute;
-  left: calc(50% - 104px);
-  bottom: 14px;
-  width: 236px;
+/* On hover the cell's guides ink in and the helmet lifts off the sheet. */
+.hg-cell:hover .hg-helmet { transform: translateY(-5px) rotate(-3deg); }
+.hg-cell:hover .hg-ring { border-color: var(--accent); transform: scale(1.06); }
+.hg-cell:hover .hg-guides::before,
+.hg-cell:hover .hg-guides::after { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+@media (max-width: 640px) {
+  .hg { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hg-cell:nth-child(3n + 1) { border-left: 0; }
+  .hg-cell:nth-child(3n + 1)::before,
+  .hg-cell:nth-child(3n + 1)::after { display: none; }
+  .hg-cell:nth-child(n + 4) { border-top: 1px dashed var(--guide); }
 }
-.era-banner-passer img,
-.era-grid-car img,
+@media (prefers-reduced-motion: reduce) {
+  .hg-helmet, .hg-ring { transition: none; }
+}
+
+/* Images in the margin objects, prints and parked row fill their box. */
 .era-object img,
 .era-print img,
 .era-bay img {
   display: block;
   width: 100%;
   height: auto;
-}
-.era-grid-car.is-go { animation: era-launch 1.8s forwards; }
-@keyframes era-launch {
-  0% { transform: translateX(0); animation-timing-function: cubic-bezier(0.5, 0, 1, 0.6); }
-  40% { transform: translateX(-640px); }
-  40.01% { transform: translateX(560px); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
-  100% { transform: translateX(0); }
-}
-.era-speedlines {
-  position: absolute;
-  right: -60px;
-  top: 25%;
-  width: 90px;
-  height: 50%;
-  opacity: 0;
-  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0 2px, transparent 2px 9px);
-}
-.era-grid-car.is-go .era-speedlines { animation: era-lines 1.8s forwards; }
-@keyframes era-lines { 0% { opacity: 0; } 8%, 38% { opacity: 1; } 40%, 100% { opacity: 0; } }
-.era-banner-btn {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  background: #0f1012;
-  color: #fff;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-.era-banner-btn:disabled { cursor: default; opacity: 0.75; }
-.era-banner-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-@media (max-width: 640px) {
-  .era-banner { height: 168px; border-radius: 14px; }
-  .era-grid-car { width: 164px; left: calc(50% - 92px); }
-  .era-banner-road::after { left: calc(50% - 108px); height: 36px; }
-  .era-banner-passer { display: none; }
 }
 
 /* ── hero ───────────────────────────────────────────────────────────── */
@@ -803,6 +774,5 @@
 .dark .era-pet { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.4)); }
 
 @media (prefers-reduced-motion: reduce) {
-  .era-cd-disc.is-spinning, .era-banner-passer { animation: none !important; }
-  .era-grid-car.is-go { animation-duration: 0.01s; }
+  .era-cd-disc.is-spinning { animation: none !important; }
 }

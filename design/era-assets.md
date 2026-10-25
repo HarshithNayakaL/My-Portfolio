@@ -35,9 +35,11 @@ Not used: 01 (the four rally cars again, as one grid), 04, 06, 09, 10, 22,
 
 ## Still needed for the sketch
 
-- `banner.png`: the pixel-art banner across the top.
-- Helmets: Schumacher, Alonso, Raikkonen, Hamilton (and Rossi), for the row
-  under the name and the work cards.
+- Helmets: done. Six front views (Schumacher, Alonso, Raikkonen, Vettel,
+  Verstappen, Hamilton), originals in `era-source/helmets/`, cut out to
+  `public/era/helmet-*.png`. They are the banner now (`src/era/HelmetGrid.tsx`),
+  so a separate `banner.png` is no longer needed. Rossi's helmet would still
+  be welcome.
 - Top-down cars (nose up), if the cars in the margins should follow the wavy
   tracks. Without them, side views drive the straight parts.
 
