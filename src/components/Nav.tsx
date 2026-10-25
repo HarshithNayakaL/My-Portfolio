@@ -10,7 +10,7 @@ import ThemeToggle from "./ThemeToggle";
  *
  * Only Capabilities drops now, and only below the width where Agent Skills
  * already covers the same ground. Everything else is carried at every size by
- * scaling the type and padding down instead — see `.nav-pill nav button` in
+ * scaling the type and padding down instead — see `.nav-pill .nav-link` in
  * index.css for the measurements.
  */
 const sections = [
@@ -83,7 +83,7 @@ export default function Nav() {
               key={s.id}
               onClick={() => goTo(s.id)}
               aria-current={active === s.id ? "true" : undefined}
-              className={`relative rounded-full py-2 font-semibold transition-colors duration-300 ${
+              className={`nav-link relative rounded-full py-2 font-semibold transition-colors duration-300 ${
                 s.from
               } ${active === s.id ? "text-accent-ink" : "text-ink"}`}
               style={{ touchAction: "manipulation" }}
