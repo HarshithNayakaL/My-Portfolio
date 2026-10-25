@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from "react";
-import { byId, rossi } from "./cars";
+import { byId } from "./cars";
 
 /**
  * Things laid in the margins beside the page: the digicams of the time and a
@@ -16,13 +16,14 @@ const delta = byId("delta-integrale");
 const r26 = byId("r26");
 const mp422 = byId("mp4-22");
 const impreza = byId("impreza");
+const evo = byId("evo");
 
 const things: Thing[] = [
   { kind: "object", side: "l", top: 190, x: 0, rot: -11, src: "/era/camera-sony-silver.png", w: 170, ratio: 480 / 293, flash: true },
   { kind: "print", side: "r", top: 150, x: 10, rot: 5, src: delta.src, w: 190, ratio: delta.ratio, caption: "Martini Delta", tone: "sky" },
-  { kind: "print", side: "l", top: 820, x: 20, rot: 4, src: rossi.wheelie.src, w: 150, ratio: rossi.wheelie.ratio, caption: "Rossi, 46", tone: "sun" },
+  { kind: "object", side: "l", top: 860, x: 10, rot: 7, src: "/era/camera-canon.png", w: 160, ratio: 480 / 297 },
   { kind: "object", side: "r", top: 780, x: 0, rot: 9, src: "/era/camera-sony-purple.png", w: 160, ratio: 480 / 291 },
-  { kind: "object", side: "l", top: 1560, x: 10, rot: 7, src: "/era/camera-canon.png", w: 160, ratio: 480 / 297 },
+  { kind: "print", side: "l", top: 1600, x: 20, rot: 4, src: evo.src, w: 180, ratio: evo.ratio, caption: "Lancer Evo", tone: "sun" },
   { kind: "print", side: "r", top: 1500, x: 0, rot: -6, src: r26.src, w: 200, ratio: r26.ratio, caption: "Renault R26", tone: "pit" },
   { kind: "print", side: "r", top: 2620, x: 10, rot: 4, src: mp422.src, w: 196, ratio: mp422.ratio, caption: "McLaren MP4-22", tone: "pit" },
   { kind: "print", side: "l", top: 3020, x: 0, rot: -5, src: impreza.src, w: 180, ratio: impreza.ratio, caption: "Impreza", tone: "sky" },

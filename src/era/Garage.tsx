@@ -1,8 +1,9 @@
-import { cars, rossi } from "./cars";
+import { cars } from "./cars";
 
 /**
- * Every car on the site parked in one row at the foot of the page, with
- * Rossi's bike on the end. Hovering one rolls it forward and names it.
+ * Every car on the site parked in one row at the foot of the page. Hovering
+ * one rolls it forward and names it. Rossi isn't parked: he rides the strip
+ * below.
  */
 export default function Garage() {
   return (
@@ -15,9 +16,6 @@ export default function Garage() {
           </span>
         );
       })}
-      <span className="era-bay era-bay-bike" data-label="Yamaha, Rossi" style={{ width: 60 }}>
-        <img src={rossi.ride.src} alt="" width={60} height={Math.round(60 / rossi.ride.ratio)} loading="lazy" decoding="async" />
-      </span>
     </div>
   );
 }
