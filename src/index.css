@@ -553,17 +553,17 @@
      backdrop-filter — Chromium does, WebKit and Gecko do not. They keep the
      plain blur above, which is the same frost without the bend at the edge.
      The blur lives inside the filter because Chromium drops a blur() that
-     shares a chain with a url(); see GlassFilter.tsx. */
-  @supports (backdrop-filter: url("#nav-glass")) {
-    .nav-pill {
-      backdrop-filter: url("#nav-glass");
-    }
-    /* Matching the theme selector's specificity deliberately — a bare
-       `.nav-pill` here loses to `.dark .nav-pill` above and dark mode keeps
-       the unrefracted blur. */
-    .dark .nav-pill {
-      backdrop-filter: url("#nav-glass-dark");
-    }
+     shares a chain with a url(); see GlassFilter.tsx.
+     Gated on a class GlassFilter sets in Chromium, not on @supports: Firefox
+     parses url() here, so @supports passed, then it drew nothing and the
+     page read straight through the bar with no blur at all. */
+  .glass-refract .nav-pill {
+    backdrop-filter: url("#nav-glass");
+  }
+  /* The extra class out-specifies `.dark .nav-pill` above; without it dark
+     mode keeps the unrefracted blur. */
+  .glass-refract.dark .nav-pill {
+    backdrop-filter: url("#nav-glass-dark");
   }
   /* Never ship the effect without the frost: a filter reference that fails to
      resolve leaves a bare translucent fill and the page reads straight

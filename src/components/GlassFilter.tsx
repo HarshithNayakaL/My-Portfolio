@@ -136,6 +136,11 @@ function Glass({ id, tint }: { id: string; tint: number }) {
 export default function GlassFilter() {
   // Paint the map at the bar's real size, and again whenever that changes.
   useEffect(() => {
+    // Only Chromium draws a url() inside backdrop-filter, and no CSS test can
+    // tell: Firefox parses the rule and then renders no blur at all. User-Agent
+    // Client Hints exist only in Chromium, so they mark the engine that can.
+    if (!("userAgentData" in navigator)) return;
+    document.documentElement.classList.add("glass-refract");
     const pill = document.querySelector<HTMLElement>(".nav-pill");
     if (!pill) return;
     let last = "";
