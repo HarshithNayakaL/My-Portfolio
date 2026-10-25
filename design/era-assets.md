@@ -43,8 +43,10 @@ Not used: 01 (the four rally cars again, as one grid), 04, 06, 09, 10, 22,
 - Top-down cars (nose up), if the cars in the margins should follow the wavy
   tracks. Without them, side views drive the straight parts.
 
-## Before this goes public
+## Sponsor marks
 
-Most liveries carry real sponsor marks, including tobacco brands (Marlboro,
-Mild Seven, Rothmans). They are fine for a preview; for the live site,
-versions with the text removed are the safer choice.
+The liveries and helmets keep their real sponsor marks, tobacco brands
+included (Marlboro, Mild Seven, West, Rothmans), as they ran in period.
+Decided: they stay. Nothing on the site sells or promotes those products;
+if a rights holder ever asks for a mark to come off, that one image is
+swapped.
