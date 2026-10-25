@@ -2,11 +2,9 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import "./era.css";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
-import { getCaseStudy } from "../data/caseStudies";
 import { agentSkills } from "../data/skills";
 import { faqs } from "../components/Faq";
 import { experience, headlineRole, identitySentence, paper, stack } from "../components/About";
-import SystemFigure from "../components/SystemFigure";
 import GitHubActivity from "../components/GitHubActivity";
 import StartBanner from "./StartBanner";
 import Turntable from "./Turntable";
@@ -14,7 +12,10 @@ import TyrePet from "./TyrePet";
 import RoamingCars from "./RoamingCars";
 import MarginObjects from "./MarginObjects";
 import Garage from "./Garage";
-import { Arrow, GitHubMark, GlobeMark, LinkedInMark, MailMark } from "./icons";
+import WorkGrid from "./WorkGrid";
+import SectionRail from "./SectionRail";
+import Intro from "./Intro";
+import { Arrow, GitHubMark, LinkedInMark, MailMark } from "./icons";
 
 /**
  * The era homepage. One dashed frame holds the page (palakonweb.in), on grid
@@ -23,28 +24,9 @@ import { Arrow, GitHubMark, GlobeMark, LinkedInMark, MailMark } from "./icons";
  * part that is mine: a Pirelli tyre follows the cursor, the cars cross the page
  * on their own, and all of them are parked in a row at the bottom.
  */
-/**
- * The case studies in data order, nudged so each row of two is a matched
- * pair: two screenshots, or two system figures. A figure is several times
- * taller than a screenshot, and a row that mixed them left the screenshot
- * card mostly empty space. A card waits for the next one of its kind, so
- * nothing moves more than a row or two from its place.
- */
-const studies = (() => {
-  const all = projects.filter((p) => p.hasCaseStudy);
-  const out: typeof all = [];
-  const waiting: Record<"shot" | "figure", (typeof all)[number] | null> = { shot: null, figure: null };
-  for (const p of all) {
-    const k = getCaseStudy(p.slug)?.shot ? "shot" : "figure";
-    const held = waiting[k];
-    if (held) {
-      out.push(held, p);
-      waiting[k] = null;
-    } else waiting[k] = p;
-  }
-  for (const p of [waiting.shot, waiting.figure]) if (p) out.push(p);
-  return out;
-})();
+// Every frame in the grid is the same height now, so the studies keep their
+// data order: the order the site, the API and the agents all use.
+const studies = projects.filter((p) => p.hasCaseStudy);
 const FIRST = 6;
 const FIRST_FAQ = 6;
 
@@ -92,13 +74,13 @@ const stackIcon: Record<string, { src: string; mono?: boolean }> = {
 };
 const stackName = (l: string) => (l === "the Model Context Protocol" ? "Model Context Protocol" : l);
 
-/** What the little browser bar over a screenshot says: the live host, or the repo path. */
-const addressOf = (links: { href: string }[]) => {
-  const live = links.find((l) => !l.href.includes("github.com")) ?? links[0];
-  if (!live) return "";
-  const u = new URL(live.href);
-  return (u.host + u.pathname).replace(/\/$/, "");
-};
+// The agent tooling the work is built with, floating over the stack.
+const tools: { slug: string; name: string; rot: number; dur: number; del: number; mono?: boolean }[] = [
+  { slug: "claudecode", name: "Claude Code", rot: -4, dur: 7.5, del: 0 },
+  { slug: "codex", name: "Codex", rot: 5, dur: 8.2, del: -2 },
+  { slug: "openai", name: "Agents API", rot: -3, dur: 7.9, del: -1, mono: true },
+  { slug: "mcp", name: "MCP", rot: 4, dur: 6.9, del: -4, mono: true },
+];
 
 export default function EraHome() {
   const time = useBengaluruTime();
@@ -107,6 +89,8 @@ export default function EraHome() {
 
   return (
     <div className="era">
+      <Intro />
+      <SectionRail />
       <RoamingCars />
       <TyrePet />
       <MarginObjects />
@@ -127,7 +111,7 @@ export default function EraHome() {
             </h1>
             <p className="mt-2 text-lg text-ink">{headlineRole}</p>
             <p className="mt-1 flex items-center gap-2 text-sm text-dim">
-              <span aria-hidden className="era-live" />
+              <span aria-hidden className="era-mark" />
               Bengaluru, India{time ? ` · ${time}` : ""}
             </p>
           </div>
@@ -161,49 +145,7 @@ export default function EraHome() {
         </Section>
 
         <Section id="work" title="Work" aside={<p className="text-sm text-dim">{studies.length} case studies</p>}>
-          <div className={`era-work ${allWork ? "" : "is-collapsed"}`}>
-            {studies.map((p) => {
-              const cs = getCaseStudy(p.slug);
-              const shot = cs?.shot;
-              return (
-                <article key={p.slug} className="era-card">
-                  {shot ? (
-                    <div className="era-browser">
-                      <div aria-hidden className="era-browser-bar">
-                        <span className="era-browser-dots"><i /><i /><i /></span>
-                        <span className="truncate">{addressOf(p.links)}</span>
-                      </div>
-                      <img src={shot.small ?? shot.src} alt={shot.alt} width={640} height={400} loading="lazy" decoding="async" />
-                    </div>
-                  ) : cs ? (
-                    <div className="era-card-figure">
-                      <SystemFigure stages={cs.pipeline} layout="stacked" />
-                    </div>
-                  ) : null}
-                  <div className="era-card-body">
-                    <p className="text-[max(12px,0.8125rem)] text-dim">{p.kicker}</p>
-                    <h3 className="mt-1 font-sans text-lg font-semibold text-ink">
-                      <Link to={`/work/${p.slug}`} className="era-card-link">{p.title}</Link>
-                    </h3>
-                    <p className="era-card-outcome">{p.outcome}</p>
-                    <ul className="era-tags">
-                      {p.tags.map((t) => <li key={t}>{t}</li>)}
-                    </ul>
-                    <div className="era-card-foot">
-                      <span className="flex items-center gap-1.5 text-sm font-medium text-ink">Case study <Arrow /></span>
-                      <span className="era-card-links">
-                        {p.links.map((l) => (
-                          <a key={l.href} href={l.href} target="_blank" rel="noreferrer noopener" aria-label={`${p.title}: ${l.label}`}>
-                            {l.href.includes("github.com") ? <GitHubMark /> : <GlobeMark />}
-                          </a>
-                        ))}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <WorkGrid items={studies} collapsed={!allWork} />
           {studies.length > FIRST && (
             <div className="mt-6 flex justify-center">
               <button type="button" className="era-pill" aria-expanded={allWork} onClick={() => setAllWork((v) => !v)}>
@@ -244,6 +186,18 @@ export default function EraHome() {
 
         {/* The id is the nav's "Capabilities" target. */}
         <Section id="capabilities" title="Stack">
+          <div aria-hidden className="era-tools">
+            {tools.map((t) => (
+              <div
+                key={t.slug}
+                className="orbit-tile"
+                style={{ ["--rot" as string]: `${t.rot}deg`, ["--dur" as string]: `${t.dur}s`, ["--del" as string]: `${t.del}s` }}
+              >
+                <img src={`/icons/${t.slug}.svg`} alt="" width={36} height={36} decoding="async" className={t.mono ? "icon-mono" : undefined} />
+                <span>{t.name}</span>
+              </div>
+            ))}
+          </div>
           <ul className="era-chips">
             {stack.map((s) => {
               const icon = stackIcon[s.label];

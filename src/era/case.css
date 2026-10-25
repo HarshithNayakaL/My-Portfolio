@@ -146,9 +146,9 @@
 }
 
 /* ── overview ───────────────────────────────────────────────────────── */
-.cs-status { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
-.cs-status.is-live { background: #1db954; box-shadow: 0 0 0 3px color-mix(in srgb, #1db954 20%, transparent); }
-.cs-status.is-wip { background: #e0a000; }
+.cs-status { width: 8px; height: 8px; border-radius: 2.5px; background: var(--faint); }
+.cs-status.is-live { background: var(--accent); }
+.cs-status.is-wip { background: var(--gold); }
 .cs-note {
   margin-top: 1rem;
   padding: 0.8rem 1rem;

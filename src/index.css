@@ -958,3 +958,22 @@
 .fig-notes li { display: flex; gap: 0.6rem; align-items: baseline; }
 .fig-notes b { font-weight: 600; color: var(--color-ink); }
 .fig-notes-n { flex: none; display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; border-radius: 5px; background: var(--color-btn); color: var(--color-on-btn); font-size: max(12px, 0.8125rem); font-weight: 700; }
+
+/* The theme switch: the new theme is uncovered by a circle growing out of the
+   toggle (ThemeToggle sets --theme-x/y). The old snapshot stays put under it. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+  animation: theme-reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+/* Grows to cover about a screen by the middle, then sweeps out to the
+   corners: a straight 0-to-150vmax ramp covered everything in a third of a
+   second and read as a cut. */
+@keyframes theme-reveal {
+  0% { clip-path: circle(0 at var(--theme-x, 50%) var(--theme-y, 0)); }
+  45% { clip-path: circle(45vmax at var(--theme-x, 50%) var(--theme-y, 0)); }
+  100% { clip-path: circle(150vmax at var(--theme-x, 50%) var(--theme-y, 0)); }
+}

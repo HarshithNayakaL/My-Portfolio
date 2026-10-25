@@ -257,13 +257,17 @@ export default function EraCaseStudy() {
         <div className="cs-prose">{study.build.map((p, k) => <p key={k}>{p}</p>)}</div>
       </Block>
 
-      {/* With no screenshot the figure is already at the top, so the
-          section only appears for studies that have one. */}
+      {/* A study with a screenshot shows the product, not the diagram: the
+          diagram is for work with nothing to show on screen. Its stages stay
+          in the page as text for screen readers and crawlers. */}
       {study.shot && (
-        <Block title="How it's wired">
-          <p className="text-[0.9375rem] leading-relaxed text-dim">{intro}</p>
-          <div className="mt-5">{figure}</div>
-        </Block>
+        <ol className="sr-only">
+          {study.pipeline.map((st) => (
+            <li key={st.title}>
+              {st.title}: {st.nodes.map((n) => (n.detail ? `${n.label} (${n.detail})` : n.label)).join("; ")}
+            </li>
+          ))}
+        </ol>
       )}
 
       <Block title="The judgment calls">

@@ -30,8 +30,8 @@ const prints: Print[] = [
   { side: "l", top: 3020, x: 0, rot: -5, src: impreza.src, w: 180, ratio: impreza.ratio, caption: "Impreza", tone: "sky" },
 ];
 
-// The small cameras: about the size of a car crossing the page.
-const SMALL_W = 110;
+// The small cameras: icon-sized, little things left about the desk.
+const SMALL_W = 62;
 const small = [
   { src: "/era/camera-canon.png", ratio: 480 / 297 },
   { src: "/era/camera-sony-purple.png", ratio: 480 / 291 },
@@ -55,9 +55,12 @@ const LINES = ["You look good.", "Hold that smile.", "Looking sharp.", "Nice sho
 
 // Centred in its margin, then nudged, so it keeps its place at any window
 // width instead of drifting toward the page or the edge.
+// The right margin also holds the section rail beside the page, so things on
+// that side sit RAIL_ROOM further out.
+const RAIL_ROOM = 26;
 const place = (s: Spot, w: number): CSSProperties => ({
   top: s.top,
-  [s.side === "l" ? "left" : "right"]: `calc((50% - var(--col) / 2) / 2 - ${w / 2}px + ${s.x}px)`,
+  [s.side === "l" ? "left" : "right"]: `calc((50% - var(--col) / 2) / 2 - ${w / 2}px + ${s.x - (s.side === "r" ? RAIL_ROOM : 0)}px)`,
   transform: `rotate(${s.rot}deg)`,
   width: w,
 });
