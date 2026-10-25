@@ -243,10 +243,19 @@
 .hg-cell:hover .hg-box,
 .hg-cell:hover .hg-cap { opacity: 1; }
 .hg-cell:hover .hg-cap { transform: translate(-50%, 0); }
+/* A phone keeps the same single row of six, scaled to fit: helmet 44 x 53
+   standing 7px into a 22px shelf (top 12, front 10) in a 112px bay. */
 @media (max-width: 640px) {
-  .hg { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .hg-cell:nth-child(3n + 1) .hg-wall { border-left: 0; }
-  .hg-cell:nth-child(n + 4) { border-top: 1px solid var(--grid); }
+  .hg-cell { height: 112px; }
+  .hg-wall { inset: 0 0 22px 0; }
+  .hg-shelf { height: 22px; background: linear-gradient(to bottom, var(--shelf-top) 0 12px, var(--shelf-front) 12px); }
+  .hg-shelf::before { inset: 0 0 10px 0; }
+  .hg-helmet, .hg-reflect { width: 44px; height: 53px; margin-left: -22px; }
+  .hg-helmet { top: 44px; }
+  .hg-reflect { top: 97px; }
+  .hg-shadow { top: 93px; width: 40px; height: 7px; margin-left: -20px; }
+  .hg-box { top: 38px; width: 56px; height: 64px; margin-left: -28px; }
+  .hg-cap { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hg-helmet, .hg-reflect, .hg-shadow { transition: none; }
