@@ -1,346 +1,730 @@
 /* The era homepage. Kept apart from index.css so the redesign can be judged,
-   changed or dropped without touching the live site's styles. */
+   changed or dropped without touching the live site's styles. Colours come
+   from the site tokens, so dark mode follows the toggle. */
 
 .era {
+  --col: 760px;
+  --rail: color-mix(in srgb, var(--ink) 18%, transparent);
+  --hatch: color-mix(in srgb, var(--ink) 7%, transparent);
+  --paper: color-mix(in srgb, var(--ink) 5.5%, transparent);
   position: relative;
-  overflow: hidden;
-  padding-bottom: 6rem;
-  background-color: #f4f4f1;
+  overflow: clip;
+  background-color: var(--canvas);
   background-image:
-    linear-gradient(rgba(20, 22, 26, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(20, 22, 26, 0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
-  color: #16171a;
-  --dim: #55595f;
-  --ink: #16171a;
+    linear-gradient(var(--paper) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
 }
 
+/* One column with dashed rails down both sides, the whole page long. */
 .era-col {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: var(--col);
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
+  border-inline: 1px dashed var(--rail);
+}
+.era-col-flush { padding: 0; }
+@media (max-width: 640px) {
+  .era-col { padding: 0 1rem; }
+  .era-col-flush { padding: 0; }
 }
 
-/* ── margins: the wavy tracks ───────────────────────────────────────── */
-.era-margin {
+/* Section band: full width, hatched outside the column, plain inside, with a
+   dot where each rail crosses each rule. */
+.era-band {
+  position: relative;
+  z-index: 1;
+  border-block: 1px solid var(--line);
+  background: repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 9px);
+}
+.era-band-cell {
+  position: relative;
+  max-width: var(--col);
+  margin: 0 auto;
+  min-height: 3.75rem;
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-inline: 1px dashed var(--rail);
+  background: var(--canvas);
+}
+.era-band-cell::before,
+.era-band-cell::after {
+  content: "";
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: calc((100% - 720px) / 2 - 2rem);
-  pointer-events: none;
+  inset: -3.5px -3.5px auto -3.5px;
+  height: 6px;
+  background:
+    radial-gradient(circle, var(--dim) 0 2px, transparent 2.5px) left / 6px 6px no-repeat,
+    radial-gradient(circle, var(--dim) 0 2px, transparent 2.5px) right / 6px 6px no-repeat;
 }
-.era-margin-left { left: 1rem; }
-.era-margin-right { right: 1rem; }
-@media (max-width: 1180px) {
-  .era-margin { display: none; }
+.era-band-cell::after { inset: auto -3.5px -3.5px -3.5px; }
+.era-band-thin .era-band-cell { min-height: 1.5rem; padding: 0; }
+@media (max-width: 640px) {
+  .era-band-cell { padding: 0.875rem 1rem; }
 }
-.era-road {
-  fill: none;
-  stroke: rgba(20, 22, 26, 0.09);
-  stroke-width: 22;
-  stroke-linecap: round;
+
+/* ── banner ─────────────────────────────────────────────────────────── */
+.era-banner {
+  position: relative;
+  height: 196px;
+  overflow: hidden;
+  border: 1px solid #1b1d21;
+  background: #2b2d31;
 }
-.era-road-line {
-  fill: none;
-  stroke: rgba(20, 22, 26, 0.32);
-  stroke-width: 1.5;
-  stroke-dasharray: 10 12;
+.era-banner-grass {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 44%;
+  background: repeating-linear-gradient(90deg, #3d7b37 0 46px, #468a3f 46px 92px);
 }
-.era-rider {
+.era-banner-kerb {
   position: absolute;
   left: 0;
-  top: 0;
-  will-change: transform;
-  transform-origin: 50% 100%;
+  right: 0;
+  top: 44%;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, #d40000 0 18px, #f2f2f2 18px 36px);
 }
-.era-rider img,
-.era-parked img,
-.era-idle img,
+.era-banner-road {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(44% + 8px);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 30px, transparent 30px 64px) 0 38% / 100% 2px no-repeat,
+    linear-gradient(180deg, #34363b, #26282c);
+}
+/* A grid box: the white bracket the car sits in. */
+.era-banner-road::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 128px);
+  bottom: 14px;
+  width: 24px;
+  height: 46px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-right: 0;
+}
+.era-gantry {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #121315;
+  border-radius: 4px;
+  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.6);
+}
+.era-gantry-pod {
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+  background: #1f2023;
+  border-radius: 3px;
+}
+.era-light {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #3a1414;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.era-light.is-on {
+  background: #ff2a1a;
+  box-shadow: 0 0 10px 2px rgba(255, 42, 26, 0.75);
+}
+.era-banner-passer {
+  position: absolute;
+  top: calc(44% + 12px);
+  left: 0;
+  opacity: 0.9;
+  animation: era-pass 9s linear infinite;
+  animation-delay: 2s;
+  transform: translateX(-200px);
+}
+.era-banner-passer img,
+.era-grid-car img,
+.era-pet img,
+.era-hang-cam img,
+.era-sticker img,
 .era-rossi-bike img {
   display: block;
   width: 100%;
   height: auto;
-  image-rendering: auto;
 }
+/* Right to left across the far lane, then a long gap before the next car. */
+@keyframes era-pass {
+  0% { transform: translateX(calc(var(--col) + 40px)); }
+  38%, 100% { transform: translateX(-200px); }
+}
+.era-grid-car {
+  position: absolute;
+  left: calc(50% - 104px);
+  bottom: 14px;
+  width: 236px;
+}
+@media (max-width: 640px) {
+  .era-banner { height: 170px; }
+  .era-grid-car { width: 164px; left: calc(50% - 92px); }
+  .era-banner-road::after { left: calc(50% - 108px); height: 36px; }
+  .era-banner-passer { display: none; }
+}
+.era-grid-car.is-go { animation: era-launch 1.8s forwards; }
+@keyframes era-launch {
+  0% { transform: translateX(0); animation-timing-function: cubic-bezier(0.5, 0, 1, 0.6); }
+  40% { transform: translateX(-640px); }
+  40.01% { transform: translateX(560px); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  86% { transform: translateX(-8px); }
+  94% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+.era-idle { display: block; animation: era-shake 0.16s steps(2) infinite; }
+@keyframes era-shake { 50% { transform: translateY(-1px); } }
+.era-speedlines {
+  position: absolute;
+  right: -60px;
+  top: 25%;
+  width: 90px;
+  height: 50%;
+  opacity: 0;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0 2px, transparent 2px 9px);
+}
+.era-grid-car.is-go .era-speedlines { animation: era-lines 1.8s forwards; }
+@keyframes era-lines { 0% { opacity: 0; } 8%, 38% { opacity: 1; } 40%, 100% { opacity: 0; } }
+.era-puff {
+  position: absolute;
+  right: -4px;
+  bottom: 14px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(190, 192, 198, 0.5);
+  animation: era-puff 1.4s ease-out infinite;
+}
+.era-puff-2 { animation-delay: 0.45s; }
+.era-puff-3 { animation-delay: 0.9s; }
+.era-grid-car.is-go .era-puff { display: none; }
+@keyframes era-puff {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translate(34px, -14px) scale(2); opacity: 0; }
+}
+.era-banner-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  background: #0f1012;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.era-banner-btn:disabled { cursor: default; opacity: 0.75; }
+.era-banner-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ── profile ────────────────────────────────────────────────────────── */
-.era-photo {
-  flex: 0 0 auto;
-  width: 168px;
-  height: 168px;
-  padding: 6px;
-  background: #fff;
-  border: 1px solid #d9d9d4;
-  box-shadow: 0 14px 26px -18px rgba(0, 0, 0, 0.45);
+.era-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 1.5rem;
+  padding: 1.75rem 0;
 }
-.era-photo img {
+.era-avatar {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+  padding: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--elevated);
+  box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.35);
+}
+.era-avatar img {
   width: 100%;
   height: 100%;
+  border-radius: 10px;
   object-fit: cover;
-  object-position: center 25%;
+  object-position: center 22%;
   display: block;
 }
-.era-rule {
-  margin: 3rem 0;
-  border: 0;
-  border-top: 1px solid #d3d3ce;
+.era-clocks {
+  margin: 0;
+  display: grid;
+  gap: 0.15rem;
+  text-align: right;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.era-clocks div { display: flex; justify-content: flex-end; gap: 0.4rem; }
+.era-clocks dt { color: var(--dim); }
+.era-clocks dd { margin: 0; min-width: 6.2em; font-weight: 600; color: var(--ink); }
+@media (max-width: 640px) {
+  .era-clocks { width: 100%; text-align: left; grid-auto-flow: column; justify-content: start; gap: 1.25rem; }
+  .era-clocks div { justify-content: flex-start; }
 }
 
-/* ── record player ──────────────────────────────────────────────────── */
-.era-deck {
-  position: relative;
-  aspect-ratio: 5 / 4;
-  max-width: 280px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #8f5e3f, #6b422a);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 18px 30px -20px rgba(0, 0, 0, 0.55);
+/* ── about ──────────────────────────────────────────────────────────── */
+.era-body { padding: 1.75rem 0; }
+.era-bullets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--dim);
 }
+.era-bullets li { position: relative; padding-left: 1.1rem; }
+.era-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+.era-bullets li:first-child { color: var(--ink); }
+
+/* The record card, after upriyanshu.tech's. */
+.era-music {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 0.9rem 1rem 0.9rem 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--elevated);
+}
+.era-platter { position: relative; flex: 0 0 auto; width: 76px; height: 76px; }
 .era-vinyl {
   position: absolute;
-  left: 7%;
-  top: 9%;
-  width: 66%;
-  aspect-ratio: 1;
+  inset: 0;
   border-radius: 50%;
-  background: repeating-radial-gradient(circle, #141416 0 2px, #222226 2px 3px);
-  box-shadow: 0 0 0 2px #0b0b0c;
+  background: repeating-radial-gradient(circle, #121214 0 1.5px, #232327 1.5px 3px);
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.5);
 }
 .era-vinyl::after {
   content: "";
   position: absolute;
-  left: 46%;
-  top: 9%;
-  width: 7%;
-  height: 14%;
-  background: rgba(255, 255, 255, 0.14);
+  inset: 14% 30% 60% 44%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(30deg);
 }
 .era-vinyl-label {
   position: absolute;
-  inset: 34%;
+  inset: 33%;
   border-radius: 50%;
   background: #d40000;
 }
 .era-vinyl-label::after {
   content: "";
   position: absolute;
-  inset: 44%;
+  inset: 42%;
   border-radius: 50%;
-  background: #f4f4f1;
+  background: var(--elevated);
 }
 .era-vinyl.is-spinning { animation: era-spin 1.8s linear infinite; }
 @keyframes era-spin { to { transform: rotate(360deg); } }
 .era-arm {
   position: absolute;
-  right: 12%;
-  top: 10%;
-  width: 4%;
-  height: 62%;
-  border-radius: 4px;
-  background: linear-gradient(90deg, #d8d8d4, #f2f2ef);
-  transform-origin: 50% 3%;
-  transform: rotate(4deg);
-  transition: transform 0.4s steps(5);
+  right: -10px;
+  top: -2px;
+  width: 4px;
+  height: 46px;
+  border-radius: 3px;
+  background: #9a9ca2;
+  transform-origin: 50% 4px;
+  transform: rotate(-8deg);
+  transition: transform 0.5s var(--ease);
 }
 .era-arm::before {
   content: "";
   position: absolute;
-  left: -90%;
-  top: -6%;
-  width: 280%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #cfcfca;
-}
-.era-arm.is-on { transform: rotate(26deg); }
-.era-play {
-  position: absolute;
-  right: 6%;
-  bottom: 8%;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 0;
-  background: #f4f4f1;
-  color: #16171a;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
-}
-.era-play:focus-visible { outline: 2px solid #d40000; outline-offset: 3px; }
-
-/* ── the F2004 stage ────────────────────────────────────────────────── */
-.era-stage {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 170px;
-  overflow: hidden;
-  border: 1px solid #d3d3ce;
-  border-radius: 14px;
-  background: #fbfbf9;
-  cursor: pointer;
-  padding: 0;
-}
-.era-stage:focus-visible { outline: 2px solid #d40000; outline-offset: 3px; }
-.era-stage-road {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 34px;
-  background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 26px, transparent 26px 52px) 0 15px / 100% 3px no-repeat,
-    #2b2d31;
-  border-top: 6px solid transparent;
-  border-image: repeating-linear-gradient(90deg, #d40000 0 14px, #fff 14px 28px) 6;
-}
-.era-lap,
-.era-launch {
-  position: absolute;
-  left: 50%;
-  bottom: 22px;
-  width: 260px;
-  margin-left: -130px;
-}
-.era-lap { animation: era-lap 11s infinite; }
-.era-launch { animation: era-launch 1.7s forwards; }
-/* Idle, rev, gone left, round from the right, brake onto the mark. */
-@keyframes era-lap {
-  0%, 60% { transform: translateX(0); animation-timing-function: ease-in; }
-  64% { transform: translateX(14px); animation-timing-function: ease-in; }
-  72% { transform: translateX(-560px); }
-  72.01% { transform: translateX(560px); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
-  86% { transform: translateX(-10px); }
-  90% { transform: translateX(3px); }
-  93%, 100% { transform: translateX(0); }
-}
-@keyframes era-launch {
-  0% { transform: translateX(0); animation-timing-function: ease-in; }
-  10% { transform: translateX(12px); animation-timing-function: ease-in; }
-  42% { transform: translateX(-560px); }
-  42.01% { transform: translateX(560px); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
-  84% { transform: translateX(-10px); }
-  92% { transform: translateX(3px); }
-  100% { transform: translateX(0); }
-}
-.era-idle { display: block; animation: era-shake 0.18s steps(2) infinite; }
-@keyframes era-shake {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-1px); }
-}
-.era-speedlines {
-  position: absolute;
-  right: -40px;
-  top: 30%;
-  width: 90px;
-  height: 40%;
-  opacity: 0;
-  background: repeating-linear-gradient(180deg, rgba(22, 23, 26, 0.35) 0 2px, transparent 2px 9px);
-}
-.era-lap .era-speedlines { animation: era-lines 11s infinite; }
-.era-launch .era-speedlines { animation: era-lines-launch 1.7s forwards; }
-@keyframes era-lines { 0%, 62% { opacity: 0; } 66%, 71% { opacity: 1; } 72%, 100% { opacity: 0; } }
-@keyframes era-lines-launch { 0% { opacity: 0; } 12%, 40% { opacity: 1; } 42%, 100% { opacity: 0; } }
-.era-puff {
-  position: absolute;
-  right: -6px;
-  bottom: 26px;
+  left: -4px;
+  top: -4px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: rgba(130, 132, 138, 0.55);
-  animation: era-puff 1.4s ease-out infinite;
+  background: #6f7177;
 }
-.era-puff-2 { animation-delay: 0.45s; }
-.era-puff-3 { animation-delay: 0.9s; }
-@keyframes era-puff {
-  0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
-  20% { opacity: 0.8; }
-  100% { transform: translate(34px, -16px) scale(2); opacity: 0; }
+.era-arm.is-on { transform: rotate(22deg); }
+.era-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
+.era-dot.is-on { background: #1db954; }
+.era-play {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: #1db954;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.era-play:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* ── contact ────────────────────────────────────────────────────────── */
+.era-contact {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.era-contact li + li { border-left: 1px solid var(--line); }
+.era-contact a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.era-contact a:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.era-contact a > svg:last-child { color: var(--faint); margin-left: auto; }
+.era-contact-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--elevated);
+}
+@media (max-width: 640px) {
+  .era-contact { grid-template-columns: 1fr 1fr; }
+  .era-contact li:nth-child(3) { border-left: 0; }
+  .era-contact li:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  .era-contact a { padding: 0.8rem 1rem; }
 }
 
-/* ── work cards, each with a car parked on top ──────────────────────── */
-.era-grid {
-  margin-top: 3.5rem;
+/* ── work ───────────────────────────────────────────────────────────── */
+.era-work {
+  padding: 1.75rem 0 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 4rem 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.era-work.is-collapsed .era-card:nth-child(n + 7) { display: none; }
+@media (max-width: 640px) {
+  .era-work { grid-template-columns: 1fr; }
 }
 .era-card {
   position: relative;
-  display: block;
-  border: 1px solid #d9d9d4;
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem 0.9rem 1rem;
+  border: 1px solid var(--line-strong);
   border-radius: 14px;
-  background: #fff;
-  text-decoration: none;
-  transition: border-color 0.2s;
+  background: var(--elevated);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.era-card:hover { border-color: #a9a9a3; }
-.era-card:focus-visible { outline: 2px solid #d40000; outline-offset: 3px; }
-.era-parked {
-  position: absolute;
-  right: 14px;
-  transition: transform 0.35s steps(6);
-}
-.era-card:hover .era-parked { transform: translateX(-26px); }
-.era-card-media {
-  display: block;
+.era-card:hover { border-color: color-mix(in srgb, var(--ink) 35%, transparent); box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.45); }
+.era-card-frame {
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 13px 13px 0 0;
-  border-bottom: 1px solid #ececea;
-  background: #f1f1ee;
-}
-.era-card-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.era-card-fig {
-  display: block;
-  max-width: 260px;
-  margin: 0 auto;
-  padding: 18px 8px 10px;
-}
-.era-card-media:has(.era-card-fig) { aspect-ratio: auto; min-height: 100%; }
-.era-card-blank {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(var(--paper) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper) 1px, transparent 1px);
+  background-size: 14px 14px;
   display: grid;
   place-items: center;
+}
+.era-card-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.era-card-cover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
   height: 100%;
-  padding: 1rem;
-  text-align: center;
+  isolation: isolate;
+}
+.era-card-cover img {
+  position: absolute;
+  left: 16%;
+  bottom: calc(22% + 3px);
+  width: 68%;
+  height: auto;
+  transition: transform 0.5s var(--ease);
+}
+/* Kerb under the parked car. */
+.era-card-cover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22%;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, #d40000 0 12px, #f2f2f2 12px 24px);
+  opacity: 0.85;
+  z-index: -1;
+}
+.era-card:hover .era-card-cover img { transform: translateX(-10px); }
+/* The title link covers the card; the icon links sit above it. */
+.era-card-link { color: inherit; text-decoration: none; }
+.era-card-link::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+.era-card-link:focus-visible { outline: none; }
+.era-card:has(.era-card-link:focus-visible) { outline: 2px solid var(--ink); outline-offset: 3px; }
+.era-card-outcome {
+  margin-top: 0.6rem;
   font-size: 0.9375rem;
-  color: #55595f;
-  background-image:
-    linear-gradient(rgba(20, 22, 26, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(20, 22, 26, 0.05) 1px, transparent 1px);
-  background-size: 16px 16px;
+  line-height: 1.6;
+  color: var(--dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.era-card-foot {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.era-card-outcome + .era-card-foot { border-top: 0; }
+.era-tags {
+  flex: 1;
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.era-tags li,
+.era-chips li {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: max(12px, 0.75rem);
+  color: var(--dim);
+}
+.era-card-links { position: relative; z-index: 1; display: flex; gap: 0.4rem; }
+.era-card-links a {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  color: var(--dim);
+}
+.era-card-links a:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
+
+.era-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--elevated);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.era-btn:hover { border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+.era-btn-dark { background: var(--ink); color: var(--canvas); border-color: var(--ink); }
+
+/* ── experience, skills ─────────────────────────────────────────────── */
+.era-exp { margin: 0; padding: 0; list-style: none; }
+.era-exp li { padding: 1.4rem 1.5rem; }
+.era-exp li + li { border-top: 1px solid var(--line); }
+@media (max-width: 640px) { .era-exp li { padding: 1.25rem 1rem; } }
+.era-inline-link { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.era-inline-link:hover { text-decoration-color: currentColor; }
+
+.era-chips {
+  margin: 0;
+  padding: 1.5rem 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.era-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  background: var(--elevated);
+  font-size: 0.875rem;
+  color: var(--ink);
 }
 
-/* ── footer: Rossi ──────────────────────────────────────────────────── */
+/* The graph's own heading row repeats the band above it. */
+.era-gh { padding: 1.5rem 0; }
+.era-gh div:has(> h3) { display: none; }
+
+/* ── questions ──────────────────────────────────────────────────────── */
+.era-faq.is-collapsed details:nth-child(n + 7) { display: none; }
+.era-faq details + details { border-top: 1px solid var(--line); }
+.era-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+.era-faq summary::-webkit-details-marker { display: none; }
+.era-faq summary:hover { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.era-faq p { margin: 0; padding: 0 1.5rem 1.25rem; font-size: 0.9375rem; line-height: 1.65; color: var(--dim); }
+.era-faq-plus { position: relative; flex: 0 0 auto; width: 12px; height: 12px; }
+.era-faq-plus::before,
+.era-faq-plus::after { content: ""; position: absolute; inset: 5px 0; background: var(--dim); transition: transform 0.25s var(--ease); }
+.era-faq-plus::after { transform: rotate(90deg); }
+.era-faq details[open] .era-faq-plus::after { transform: rotate(0deg); }
+@media (max-width: 640px) {
+  .era-faq summary { padding: 1rem; }
+  .era-faq p { padding: 0 1rem 1.25rem; }
+}
+
+/* ── end, quote ─────────────────────────────────────────────────────── */
+.era-end { display: grid; justify-items: center; gap: 1.1rem; padding: 2.25rem 0; text-align: center; }
+.era-quote { margin: 0; padding: 3rem 0; text-align: center; }
+
+/* ── margins: the hanging camera and the Delta sticker ──────────────── */
+.era-hang,
+.era-sticker { display: none; }
+@media (min-width: 1240px) {
+  .era-hang {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: calc((100% - var(--col)) / 4 - 75px);
+    width: 150px;
+    transform-origin: 50% 0;
+    animation: era-swing 5s ease-in-out infinite;
+  }
+  .era-sticker {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 1180px;
+    right: calc((100% - var(--col)) / 4 - 90px);
+    width: 180px;
+    padding: 6px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 10px 22px -14px rgba(0, 0, 0, 0.5);
+    transform: rotate(-7deg);
+  }
+}
+.era-hang-cord {
+  display: block;
+  width: 2px;
+  height: 300px;
+  margin: 0 auto;
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+.era-hang-cam {
+  display: block;
+  width: 150px;
+  margin-top: -4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.25));
+}
+.era-hang-cam:active { transform: scale(0.97); }
+.era-hang-cam:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+@keyframes era-swing {
+  0%, 100% { transform: rotate(2.5deg); }
+  50% { transform: rotate(-2.5deg); }
+}
+.era-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: #fff;
+  animation: era-flash 0.6s ease-out forwards;
+}
+@keyframes era-flash { 0% { opacity: 0.9; } 100% { opacity: 0; } }
+
+/* ── the car that follows the cursor ────────────────────────────────── */
+.era-pet {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  pointer-events: none;
+  transform: translate3d(24px, calc(100vh - 48px), 0);
+  will-change: transform;
+}
+/* A pet that follows the pointer means nothing without one. */
+@media (hover: none) { .era-pet { display: none; } }
+.era-pet-body { position: relative; display: block; transform-origin: 50% 80%; }
+.era-pet-body[data-state="idle"] img { animation: era-shake 0.16s steps(2) infinite; }
+.era-pet-puff {
+  position: absolute;
+  right: -6px;
+  bottom: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(150, 152, 158, 0.55);
+  opacity: 0;
+}
+.era-pet-body[data-state="drive"] .era-pet-puff { animation: era-puff 0.6s ease-out infinite; }
+
+/* ── footer strip: Rossi ────────────────────────────────────────────── */
 .era-rossi {
   position: relative;
-  height: 120px;
+  z-index: 1;
+  height: 110px;
   overflow: hidden;
-  background: #f4f4f1;
-  border-top: 1px solid #d3d3ce;
+  border-top: 1px solid var(--line);
+  background: repeating-linear-gradient(-45deg, var(--hatch) 0 1px, transparent 1px 9px);
 }
 .era-rossi-road {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 22px;
+  bottom: 18px;
   height: 2px;
-  background: repeating-linear-gradient(90deg, rgba(20, 22, 26, 0.4) 0 14px, transparent 14px 26px);
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--ink) 35%, transparent) 0 14px, transparent 14px 26px);
 }
 .era-rossi-bike {
   position: absolute;
   left: 0;
-  bottom: 18px;
+  bottom: 14px;
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -348,5 +732,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .era-lap, .era-launch, .era-idle, .era-puff, .era-speedlines, .era-vinyl.is-spinning { animation: none !important; }
+  .era-idle, .era-puff, .era-vinyl.is-spinning, .era-hang, .era-banner-passer,
+  .era-pet-body img, .era-pet-puff { animation: none !important; }
+  .era-grid-car.is-go { animation-duration: 0.01s; }
 }
