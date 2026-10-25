@@ -101,7 +101,16 @@ export default function EraHome() {
         <section aria-labelledby="era-name" className="era-hero">
           <figure className="era-polaroid">
             <span aria-hidden className="era-tape" />
-            <img src="/profile.jpg" alt={NAME} width={180} height={180} />
+            {/* A 360px copy for the 180px polaroid (2x), with the full photo
+                still in the srcset: it is the image the structured data names. */}
+            <img
+              src="/profile-360.webp"
+              srcSet="/profile-360.webp 360w, /profile.jpg 640w"
+              sizes="180px"
+              alt={NAME}
+              width={180}
+              height={180}
+            />
             <figcaption>harshith</figcaption>
           </figure>
           <div className="era-hero-name min-w-0">
@@ -209,7 +218,7 @@ export default function EraHome() {
           <ul className="era-chips">
             {tools.map((t) => (
               <li key={t.label}>
-                <img src={t.src} alt="" width={16} height={16} className={t.mono ? "icon-mono" : undefined} />
+                <img src={t.src} alt="" width={16} height={16} loading="lazy" decoding="async" className={t.mono ? "icon-mono" : undefined} />
                 {t.label}
               </li>
             ))}
@@ -217,7 +226,7 @@ export default function EraHome() {
               const icon = stackIcon[s.label];
               return (
                 <li key={s.label}>
-                  {icon && <img src={icon.src} alt="" width={16} height={16} className={icon.mono ? "icon-mono" : undefined} />}
+                  {icon && <img src={icon.src} alt="" width={16} height={16} loading="lazy" decoding="async" className={icon.mono ? "icon-mono" : undefined} />}
                   {s.label}
                 </li>
               );

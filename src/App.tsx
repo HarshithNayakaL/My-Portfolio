@@ -9,6 +9,10 @@ import OneeCompanion from "./components/OneeCompanion";
 // is untouched so main keeps the live design.
 import Home from "./era/EraHome";
 import { useWebMcpTools } from "./lib/useWebMcpTools";
+// The era case study's stylesheet is loaded with the main one, not with its
+// lazy chunk: the prerendered case study HTML arrives before the chunk, and
+// drew unstyled until it landed, then jumped ~250px (CLS 0.17 on a phone).
+import "./era/case.css";
 
 // Case study + legal live behind routes the landing page never needs up front,
 // so they are code-split — the initial bundle stays lean.

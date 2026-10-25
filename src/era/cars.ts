@@ -2,14 +2,14 @@
  * The pixel-art cars in public/era/. Every image faces left, so anything that
  * moves them mirrors the image when it drives to the right.
  *
- * `ratio` is width / height of the cleaned PNG, so a car can be laid out at
+ * `ratio` is width / height of the cleaned image, so a car can be laid out at
  * any width without waiting for the image to load.
  */
 export type EraCar = { id: string; src: string; label: string; ratio: number; kind: "f1" | "rally" };
 
 const car = (id: string, label: string, w: number, h: number, kind: EraCar["kind"] = "f1"): EraCar => ({
   id,
-  src: `/era/car-${id}.png`,
+  src: `/era/car-${id}.webp`,
   label,
   ratio: w / h,
   kind,
@@ -34,6 +34,6 @@ export const cars: EraCar[] = [
 export const byId = (id: string) => cars.find((c) => c.id === id) ?? cars[0];
 
 export const rossi = {
-  ride: { src: "/era/rossi-bike.png", ratio: 480 / 235 },
-  wheelie: { src: "/era/rossi-wheelie.png", ratio: 480 / 372 },
+  ride: { src: "/era/rossi-bike.webp", ratio: 480 / 235 },
+  wheelie: { src: "/era/rossi-wheelie.webp", ratio: 480 / 372 },
 };

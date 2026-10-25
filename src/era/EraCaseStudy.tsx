@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useParams, Link } from "react-router-dom";
-import "./case.css";
 import { getCaseStudy } from "../data/caseStudies";
 import { EMAIL, NAME, projects } from "../data/projects";
 import { headlineRole } from "../components/About";

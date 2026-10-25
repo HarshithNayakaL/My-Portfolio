@@ -30,13 +30,15 @@ export default function HelmetGrid() {
           </span>
           <span aria-hidden className="hg-shelf" />
           <span aria-hidden className="hg-shadow" />
-          <img src={`/era/helmet-${h.id}.png`} alt="" aria-hidden width={W} height={H} decoding="async" className="hg-reflect" />
+          <img src={`/era/helmet-${h.id}.webp`} alt="" aria-hidden width={W} height={H} decoding="async" {...{ fetchpriority: "low" }} className="hg-reflect" />
           <img
-            src={`/era/helmet-${h.id}.png`}
+            src={`/era/helmet-${h.id}.webp`}
             alt=""
             width={W}
             height={H}
             decoding="async"
+            // The page's text and photo come first; these are decoration.
+            {...{ fetchpriority: "low" }}
             className="hg-helmet"
           />
           <span aria-hidden className="hg-cap">

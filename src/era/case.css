@@ -64,6 +64,9 @@
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   color: color-mix(in srgb, var(--ink) 38%, transparent);
+  /* Room for "00:00:00" before the clock first ticks, so nothing moves. */
+  min-width: 4.3em;
+  text-align: right;
 }
 
 /* ── header ─────────────────────────────────────────────────────────── */

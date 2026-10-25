@@ -81,7 +81,7 @@ export default function RossiRide() {
   return (
     <div ref={strip} aria-hidden className="era-rossi">
       <div ref={bike} className="era-rossi-bike" style={{ transform: `translateX(${-RIDE_W - 40}px)` }}>
-        <img src={img.src} alt="" width={w} height={Math.round(w / img.ratio)} style={{ width: w }} />
+        <img src={img.src} alt="" width={w} height={Math.round(w / img.ratio)} loading="lazy" decoding="async" style={{ width: w }} />
       </div>
     </div>
   );

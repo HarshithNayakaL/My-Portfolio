@@ -70,7 +70,8 @@ export default function TyrePet() {
   return (
     // data-onee-avoid: the mascot keeps clear of this (src/lib/onee.ts).
     <div ref={el} aria-hidden className="era-pet" data-onee-avoid="body" style={{ width: D, height: D }}>
-      <img ref={wheel} src="/era/tyre.png" alt="" width={D} height={D} />
+      {/* Lazy, so a phone, where the tyre is hidden, never fetches it. */}
+      <img ref={wheel} src="/era/tyre.webp" alt="" width={D} height={D} loading="lazy" decoding="async" />
     </div>
   );
 }
