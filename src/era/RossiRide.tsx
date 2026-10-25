@@ -12,8 +12,8 @@ import "./rossi.css";
  * from the left edge, so swapping one for the other, left and bottom
  * aligned, keeps the rear wheel planted.
  */
-const RIDE_W = 150;
-const WHEELIE_W = 116;
+const RIDE_W = 130;
+const WHEELIE_W = 100;
 const SPEED = 190; // px per second
 
 export default function RossiRide() {

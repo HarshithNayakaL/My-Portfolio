@@ -74,7 +74,7 @@ export default function Footer() {
   const link = "footer-link";
 
   return (
-    <footer className="border-t border-line bg-surface/30">
+    <footer className="relative border-t border-line bg-surface/30">
       <div className="shell py-14 md:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.25fr_repeat(4,1fr)] lg:gap-10">
           {/* Brand */}
@@ -150,7 +150,7 @@ export default function Footer() {
           </p>
         </div>
       </div>
-      {/* Era redesign: Rossi rides the last strip of every page. */}
+      {/* Era redesign: Rossi rides the bottom edge of every page. */}
       <RossiRide />
     </footer>
   );
