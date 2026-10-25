@@ -59,12 +59,7 @@ export default function StartBanner() {
 
       <span aria-hidden className={`era-grid-car ${phase.k === "go" ? "is-go" : ""}`}>
         <span className="era-speedlines" />
-        <span className={phase.k === "go" ? "" : "era-idle"}>
-          <img src={car.src} alt="" width={236} height={Math.round(236 / car.ratio)} />
-        </span>
-        <span className="era-puff era-puff-1" />
-        <span className="era-puff era-puff-2" />
-        <span className="era-puff era-puff-3" />
+        <img src={car.src} alt="" width={236} height={Math.round(236 / car.ratio)} />
       </span>
 
       <button type="button" onClick={start} disabled={phase.k !== "idle"} className="era-banner-btn">

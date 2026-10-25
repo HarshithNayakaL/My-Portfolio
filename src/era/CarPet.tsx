@@ -3,7 +3,7 @@ import { byId } from "./cars";
 
 /**
  * A small F2004 that follows the pointer around the page, the way oneko's cat
- * does: it drives up behind the cursor, brakes, and sits idling until the
+ * does: it drives up behind the cursor, brakes, and waits until the
  * cursor moves off again. On touch screens it drives to wherever was tapped.
  * The sprite faces left, so it is mirrored when driving right.
  */
@@ -56,14 +56,10 @@ export default function CarPet() {
       if (Math.abs(dx) > 8 && moving) face = dx < 0 ? 1 : -1;
       x = Math.max(0, Math.min(window.innerWidth - W, x));
       y = Math.max(0, Math.min(window.innerHeight - h, y));
-      // A car doesn't climb walls: going up or down the page it only lifts or
-      // dips its nose. Rotation applies before the mirror, so the sign holds
-      // for both directions.
-      const lean = moving ? Math.max(-14, Math.min(14, (dy / (Math.abs(dx) + 40)) * -10)) : 0;
       if (el.current) el.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       if (body.current) {
-        body.current.style.transform = `scaleX(${face}) rotate(${lean}deg)`;
-        body.current.dataset.state = v > 1.2 ? "drive" : "idle";
+        // Flat at all times: an F1 car neither bounces nor tilts.
+        body.current.style.transform = `scaleX(${face})`;
       }
       raf = requestAnimationFrame(frame);
     };
@@ -78,9 +74,8 @@ export default function CarPet() {
 
   return (
     <div ref={el} aria-hidden className="era-pet" style={{ width: W }}>
-      <span ref={body} className="era-pet-body" data-state="idle">
+      <span ref={body} className="era-pet-body">
         <img src={car.src} alt="" width={W} height={Math.round(W / car.ratio)} />
-        <span className="era-pet-puff" />
       </span>
     </div>
   );

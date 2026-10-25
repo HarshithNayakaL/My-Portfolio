@@ -5,13 +5,14 @@
  * `ratio` is width / height of the cleaned PNG, so a car can be laid out at
  * any width without waiting for the image to load.
  */
-export type EraCar = { id: string; src: string; label: string; ratio: number };
+export type EraCar = { id: string; src: string; label: string; ratio: number; kind: "f1" | "rally" };
 
-const car = (id: string, label: string, w: number, h: number): EraCar => ({
+const car = (id: string, label: string, w: number, h: number, kind: EraCar["kind"] = "f1"): EraCar => ({
   id,
   src: `/era/car-${id}.png`,
   label,
   ratio: w / h,
+  kind,
 });
 
 export const cars: EraCar[] = [
@@ -23,11 +24,11 @@ export const cars: EraCar[] = [
   car("redbull-verstappen", "Red Bull, Verstappen", 640, 167),
   car("redbull-vettel", "Red Bull, Vettel", 640, 168),
   car("brawn-button", "Brawn, Button", 640, 164),
-  car("delta-integrale", "Lancia Delta Integrale", 640, 243),
-  car("impreza", "Subaru Impreza", 640, 210),
-  car("celica", "Toyota Celica", 640, 217),
-  car("evo", "Mitsubishi Lancer Evo", 640, 205),
-  car("escort", "Ford Escort RS Cosworth", 640, 214),
+  car("delta-integrale", "Lancia Delta Integrale", 640, 243, "rally"),
+  car("impreza", "Subaru Impreza", 640, 210, "rally"),
+  car("celica", "Toyota Celica", 640, 217, "rally"),
+  car("evo", "Mitsubishi Lancer Evo", 640, 205, "rally"),
+  car("escort", "Ford Escort RS Cosworth", 640, 214, "rally"),
 ];
 
 export const byId = (id: string) => cars.find((c) => c.id === id) ?? cars[0];
