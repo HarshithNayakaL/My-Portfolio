@@ -12,7 +12,9 @@ import { useWebMcpTools } from "./lib/useWebMcpTools";
 
 // Case study + legal live behind routes the landing page never needs up front,
 // so they are code-split — the initial bundle stays lean.
-const CaseStudy = lazy(() => import("./pages/CaseStudy"));
+// On this branch the case studies use the era layout too; pages/CaseStudy
+// is untouched so main keeps the live design.
+const CaseStudy = lazy(() => import("./era/EraCaseStudy"));
 const Legal = lazy(() => import("./pages/Legal"));
 const Profile = lazy(() => import("./pages/Profile"));
 

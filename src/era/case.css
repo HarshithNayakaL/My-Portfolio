@@ -1,0 +1,218 @@
+/* Case study pages on the era branch, after parascodes.is-a.dev's project
+   pages. One column with dashed rails; each row closed by a dashed rule that
+   runs the full width of the window, with a dot where it crosses a rail. */
+
+.cs {
+  --cs-col: 720px;
+  --paper: color-mix(in srgb, var(--ink) 6%, transparent);
+  --dash: color-mix(in srgb, var(--ink) 22%, transparent);
+  position: relative;
+  overflow: clip;
+  padding-top: 4.5rem;
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(var(--paper) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
+}
+
+.cs-row { position: relative; z-index: 1; border-top: 1px dashed var(--dash); }
+.cs-row-top { border-top: 0; }
+.cs-cell {
+  position: relative;
+  max-width: var(--cs-col);
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem;
+  border-inline: 1px dashed var(--dash);
+  background: color-mix(in srgb, var(--elevated) 88%, transparent);
+}
+/* The dots where this row's rule crosses the two rails. */
+.cs-row:not(.cs-row-top) > .cs-cell::before {
+  content: "";
+  position: absolute;
+  top: -3.5px;
+  left: -3.5px;
+  right: -3.5px;
+  height: 6px;
+  background:
+    radial-gradient(circle, var(--dim) 0 1.75px, transparent 2.25px) left / 6px 6px no-repeat,
+    radial-gradient(circle, var(--dim) 0 1.75px, transparent 2.25px) right / 6px 6px no-repeat;
+  pointer-events: none;
+}
+.cs-row-end > .cs-cell { min-height: 3rem; padding: 0; }
+@media (max-width: 760px) {
+  .cs-cell { margin-inline: 0.75rem; padding: 1.4rem 1.1rem; }
+}
+
+/* ── top: dot paper and the clock ───────────────────────────────────── */
+.cs-top {
+  min-height: 132px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-top: 0;
+  padding-bottom: 0.75rem;
+  background-color: color-mix(in srgb, var(--elevated) 88%, transparent);
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 16%, transparent) 1px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+.cs-clock {
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--ink) 38%, transparent);
+}
+
+/* ── header ─────────────────────────────────────────────────────────── */
+.cs-head { display: flex; align-items: flex-start; gap: 1rem; }
+.cs-back {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-top: 0.35rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--elevated);
+  color: var(--dim);
+  transition: color 0.2s, border-color 0.2s;
+}
+.cs-back:hover { color: var(--ink); border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+.cs-back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ── media ──────────────────────────────────────────────────────────── */
+.cs-shot {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 18px 34px -24px rgba(0, 0, 0, 0.45);
+}
+.cs-shot img { display: block; width: 100%; height: auto; }
+.cs-figure {
+  padding: 1.25rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(var(--paper) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* ── cells: links, facts, neighbours ────────────────────────────────── */
+.cs-links,
+.cs-facts,
+.cs-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.cs-links li:nth-child(even),
+.cs-facts > div:nth-child(even),
+.cs-nav > a:nth-child(even) { border-left: 1px dashed var(--dash); }
+.cs-links li:nth-child(n + 3),
+.cs-facts > div:nth-child(n + 3) { border-top: 1px dashed var(--dash); }
+.cs-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.95rem 1rem;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.cs-links a:hover,
+.cs-nav > a:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.cs-facts > div { padding: 1rem 1.5rem; }
+.cs-facts dt { font-size: max(12px, 0.8125rem); color: var(--dim); }
+.cs-facts dd { margin: 0.3rem 0 0; font-size: 0.9375rem; line-height: 1.45; color: var(--ink); }
+.cs-nav > a { display: block; padding: 1.15rem 1.5rem; text-decoration: none; transition: background-color 0.2s; }
+@media (max-width: 560px) {
+  .cs-facts, .cs-nav { grid-template-columns: 1fr; }
+  .cs-facts > div:nth-child(even), .cs-nav > a:nth-child(even) { border-left: 0; }
+  .cs-facts > div + div, .cs-nav > a + a { border-top: 1px dashed var(--dash); }
+  .cs-nav > a.text-right { text-align: left; }
+  .cs-facts > div { padding: 0.9rem 1.1rem; }
+}
+
+/* ── overview ───────────────────────────────────────────────────────── */
+.cs-status { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.cs-status.is-live { background: #1db954; box-shadow: 0 0 0 3px color-mix(in srgb, #1db954 20%, transparent); }
+.cs-status.is-wip { background: #e0a000; }
+.cs-note {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px dashed color-mix(in srgb, #e0a000 60%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, #e0a000 8%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--dim);
+}
+
+/* ── sections ───────────────────────────────────────────────────────── */
+.cs-prose { display: grid; gap: 1rem; font-size: 1rem; line-height: 1.7; color: var(--dim); }
+.cs-list { margin: 0; padding: 0; list-style: none; }
+.cs-list li { padding: 0.95rem 0; }
+.cs-list li:first-child { padding-top: 0; }
+.cs-list li + li { border-top: 1px solid var(--line); }
+.cs-chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.cs-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--elevated);
+  font-size: 0.875rem;
+  color: var(--ink);
+}
+.cs-faq details + details { border-top: 1px solid var(--line); }
+.cs-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  font-size: 0.9875rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+.cs-faq summary::-webkit-details-marker { display: none; }
+.cs-faq p { margin: 0; padding: 0 0 1rem; font-size: 0.9375rem; line-height: 1.65; color: var(--dim); }
+.cs-plus { position: relative; flex: 0 0 auto; width: 12px; height: 12px; }
+.cs-plus::before,
+.cs-plus::after { content: ""; position: absolute; inset: 5px 0; background: var(--dim); transition: transform 0.25s var(--ease); }
+.cs-plus::after { transform: rotate(90deg); }
+.cs-faq details[open] .cs-plus::after { transform: rotate(0deg); }
+.cs-sources { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.4rem; font-size: 0.875rem; line-height: 1.55; color: var(--dim); }
+.cs-sources a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.cs-sources a:hover { color: var(--ink); }
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--elevated);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+.cs-btn:hover { border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+.cs-btn-dark { background: var(--ink); border-color: var(--ink); color: var(--canvas); }
