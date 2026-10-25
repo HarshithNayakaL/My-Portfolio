@@ -1,7 +1,8 @@
 /**
  * The banner: six helmets mapped on a square grid, each in its own cell
  * inside a bounding box with crosshairs and anchor points, like objects laid
- * out in a drawing tool. In order of era, Ferrari to Ferrari.
+ * out in a drawing tool. Hovering one names the driver and team; the name is
+ * already in each image's alt text. In order of era, Ferrari to Ferrari.
  */
 const helmets = [
   { id: "schumacher", name: "Schumacher", team: "Ferrari", full: "Michael Schumacher" },
@@ -31,9 +32,8 @@ export default function HelmetGrid() {
             decoding="async"
             className="hg-helmet"
           />
-          <span className="hg-cap">
-            <span className="block text-[max(12px,0.8125rem)] font-semibold text-ink">{h.name}</span>
-            <span className="block text-[max(12px,0.75rem)] text-dim">{h.team}</span>
+          <span aria-hidden className="hg-cap">
+            <b className="font-semibold">{h.name}</b> · {h.team}
           </span>
         </li>
       ))}

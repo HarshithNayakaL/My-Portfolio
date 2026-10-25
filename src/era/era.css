@@ -10,41 +10,70 @@
   position: relative;
   overflow: clip;
   padding-bottom: 1rem;
-  /* The homepage's own paper: a scaled grid like a designer's cutting mat.
-     Fine lines every 16px, heavier ones every 80px, and the 45-degree
-     diagonals through each 160px square. The case studies keep a plain line
-     grid, so the two never read as the same page. One inline tile, in light
-     and dark. */
-  --mat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M0 0L160 160M160 0L0 160' stroke='%2314161c' stroke-opacity='0.05' stroke-width='1' fill='none'/%3E%3Cpath d='M16.5 0V160M0 16.5H160 M32.5 0V160M0 32.5H160 M48.5 0V160M0 48.5H160 M64.5 0V160M0 64.5H160 M96.5 0V160M0 96.5H160 M112.5 0V160M0 112.5H160 M128.5 0V160M0 128.5H160 M144.5 0V160M0 144.5H160' stroke='%2314161c' stroke-opacity='0.045' stroke-width='1'/%3E%3Cpath d='M0.5 0V160M0 0.5H160 M80.5 0V160M0 80.5H160' stroke='%2314161c' stroke-opacity='0.1' stroke-width='1'/%3E%3C/svg%3E");
+  /* Plain, like harshitr.me's: the structure is in a few lines, not a
+     texture. Two dashed rails mark the column from top to bottom, and each
+     section heading sits in a band of hairlines across the full width, with
+     a dot where they cross the rails. */
   background-color: var(--canvas);
-  background-image: var(--mat);
-  background-size: 160px 160px;
-  background-position: center top;
 }
-.dark .era {
-  --mat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M0 0L160 160M160 0L0 160' stroke='%23ffffff' stroke-opacity='0.04' stroke-width='1' fill='none'/%3E%3Cpath d='M16.5 0V160M0 16.5H160 M32.5 0V160M0 32.5H160 M48.5 0V160M0 48.5H160 M64.5 0V160M0 64.5H160 M96.5 0V160M0 96.5H160 M112.5 0V160M0 112.5H160 M128.5 0V160M0 128.5H160 M144.5 0V160M0 144.5H160' stroke='%23ffffff' stroke-opacity='0.035' stroke-width='1'/%3E%3Cpath d='M0.5 0V160M0 0.5H160 M80.5 0V160M0 80.5H160' stroke='%23ffffff' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E");
+/* The column's rails, the whole height of the page. */
+.era::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline: max(0.75rem, calc(50% - var(--col) / 2));
+  border-inline: 1px dashed var(--dash);
+  pointer-events: none;
 }
 
 /* ── the frame ──────────────────────────────────────────────────────── */
 .era-frame {
+  --pad: 2.5rem;
   position: relative;
   z-index: 1;
   max-width: var(--col);
   margin: 6.25rem auto 0;
-  padding: 1.25rem 2.5rem 3rem;
-  border: 1.5px dashed var(--dash);
-  border-radius: 28px;
-  /* Near solid: the crosshairs belong to the desk, not the sheet on it. */
-  background: color-mix(in srgb, var(--elevated) 97%, transparent);
+  padding: 1.25rem var(--pad) 3rem;
 }
 @media (max-width: 860px) {
   .era-frame { margin-inline: 0.75rem; }
 }
 @media (max-width: 640px) {
-  .era-frame { margin-top: 5.5rem; padding: 0.75rem 1rem 2rem; border-radius: 22px; }
+  .era-frame { --pad: 1rem; margin-top: 5.5rem; padding-top: 0.75rem; padding-bottom: 2rem; }
 }
 
-.era-section { margin-top: 3.5rem; scroll-margin-top: 6rem; }
+.era-section { margin-top: 3.5rem; scroll-margin-top: 4.5rem; }
+/* The heading band: hairlines above and below, run out to both edges of the
+   window, with a dot on each rail crossing. */
+.era-section > :first-child {
+  position: relative;
+  margin-inline: calc(var(--pad) * -1);
+  padding: 0.85rem var(--pad);
+  border-block: 1px solid var(--line);
+}
+.era-section > :first-child::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: -100vw;
+  right: -100vw;
+  border-block: 1px solid var(--line);
+  pointer-events: none;
+}
+.era-section > :first-child::after {
+  content: "";
+  position: absolute;
+  inset: -3px -3px;
+  background:
+    radial-gradient(circle, var(--faint) 0 1.75px, transparent 2.25px) left top / 6px 6px no-repeat,
+    radial-gradient(circle, var(--faint) 0 1.75px, transparent 2.25px) right top / 6px 6px no-repeat,
+    radial-gradient(circle, var(--faint) 0 1.75px, transparent 2.25px) left bottom / 6px 6px no-repeat,
+    radial-gradient(circle, var(--faint) 0 1.75px, transparent 2.25px) right bottom / 6px 6px no-repeat;
+  pointer-events: none;
+}
+.era-section > :first-child + * { margin-top: 1.75rem; }
 
 .era-box {
   margin: 0;
@@ -94,14 +123,9 @@
   padding: 0;
   list-style: none;
   border: 1px solid var(--grid);
-  background-color: var(--surface);
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
-  background-size: 8px 8px;
-  background-position: -1px -1px;
+  background: var(--surface);
 }
-.hg-cell { position: relative; display: grid; grid-template-rows: 104px auto; }
+.hg-cell { position: relative; display: grid; height: 104px; }
 .hg-cell + .hg-cell { border-left: 1px solid var(--grid); }
 .hg-guides { position: absolute; inset: 0 0 auto 0; height: 104px; pointer-events: none; }
 /* Crosshair through the centre, edge to edge. */
@@ -142,13 +166,26 @@
   filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.16));
   transition: transform 0.4s var(--ease);
 }
+/* Who it belongs to, on hover: a label under the cell. */
 .hg-cap {
-  padding: 0.4rem 0.35rem 0.5rem;
-  border-top: 1px solid var(--grid);
-  background: var(--elevated);
-  text-align: center;
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  left: 50%;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--canvas);
+  font-size: max(12px, 0.8125rem);
   line-height: 1.3;
+  white-space: nowrap;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  transition: opacity 0.2s, transform 0.2s var(--ease);
+  pointer-events: none;
 }
+.hg-cell:hover .hg-cap { opacity: 1; transform: translate(-50%, 0); }
 .hg-cell:hover .hg-helmet { transform: translateY(-3px); }
 .hg-cell:hover .hg-box,
 .hg-cell:hover .hg-box i { border-color: var(--accent); }
