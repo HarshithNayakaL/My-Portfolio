@@ -131,11 +131,6 @@ export default function EraHome() {
               pipelines to how they ship. What I care about is the unglamorous part: an AI system that behaves the
               same on the hundredth run as on the first.
             </p>
-            <p>
-              Born in 2004, raised on the cars of the years right after: Schumacher's F2004, Alonso's Renault,
-              Kimi and Hamilton at McLaren, Rossi on the Yamaha, and a Martini Lancia Delta in a Java game on a
-              Nokia. A petrolhead who doesn't drive.
-            </p>
           </div>
           <Turntable />
         </Section>

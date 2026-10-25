@@ -7,10 +7,10 @@ import DotMatrix from "./DotMatrix";
  * knob, a round four-way pad, and a wide backlit blue LCD with dark pixel
  * text and boxed soft keys. The pad's centre is the one real control, play
  * and pause; while it plays the time counts, the title scrolls and the Pause
- * key reads off. No maker's badge. No audio yet: the track is a placeholder
- * until there is one to name.
+ * key reads off. No maker's badge, and no audio: the disc in it is the one
+ * on repeat, "Yeah!" by Usher, 2004's biggest song.
  */
-const TITLE = "SONG TITLE - ARTIST";
+const TITLE = "USHER - YEAH!";
 const COLS = 15;
 
 export default function Turntable() {
@@ -55,8 +55,7 @@ export default function Turntable() {
       </div>
 
       <div className="pv-bezel">
-        <div className="pv-lcd">
-          <p className="sr-only">On repeat: song title by artist</p>
+        <div className="pv-lcd" aria-hidden>
           <div className="pv-main">
             <DotMatrix text="CD   TRACK 01" cols={13} px={2.2} />
             <DotMatrix text={line} cols={COLS} px={3.6} className="pv-title" />
