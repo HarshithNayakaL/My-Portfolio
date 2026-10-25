@@ -28,7 +28,9 @@ export default function RoamingCars() {
     let timer = 0;
 
     const launch = (car: EraCar, y: number, dir: 1 | -1, speed: number, gap: number, front: boolean) => {
-      const w = car.kind === "f1" ? 120 : 98;
+      // Smaller on a phone, where a 120px car is a third of the screen.
+      const small = window.innerWidth < 640;
+      const w = car.kind === "f1" ? (small ? 78 : 120) : small ? 64 : 98;
       const h = w / car.ratio;
       const img = document.createElement("img");
       img.src = car.src;
@@ -47,7 +49,8 @@ export default function RoamingCars() {
       // Each run starts LEAD px offscreen: the car is already in its lane,
       // out of sight, for about a second before it appears, which is the
       // warning the mascot needs to step out of the road (src/lib/onee.ts).
-      const from = dir > 0 ? -w - gap - LEAD : vw + gap + LEAD;
+      const lead = LEAD * Math.max(0.4, Math.min(1, vw / 1200));
+      const from = dir > 0 ? -w - gap - lead : vw + gap + lead;
       const to = dir > 0 ? vw + w + 160 : -w - 160;
       const flip = dir > 0 ? -1 : 1; // drawn facing left
       const anim = img.animate(
@@ -67,7 +70,10 @@ export default function RoamingCars() {
         const dir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
         const vh = window.innerHeight;
         const y = vh * (0.22 + Math.random() * 0.68);
-        const speed = rally ? 420 + Math.random() * 140 : 600 + Math.random() * 220;
+        // Speeds are for a desktop window; a narrow one gets them scaled down
+        // so a car is on screen long enough to be seen, not a blur.
+        const scale = Math.max(0.4, Math.min(1, window.innerWidth / 1200));
+        const speed = (rally ? 420 + Math.random() * 140 : 600 + Math.random() * 220) * scale;
         const lead = pick(pool);
         launch(lead, y, dir, speed, 0, false);
         if (Math.random() < 0.55) {

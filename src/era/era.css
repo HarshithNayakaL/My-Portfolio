@@ -831,11 +831,10 @@
 .dark .era-pet { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.4)); }
 
 
-/* A phone gets the page without the moving decorations: no cursor tyre and
-   no cars crossing it. */
+/* No cursor on a phone or tablet, so no tyre following one. The cars
+   still cross, smaller (RoamingCars sizes them by window width). */
 @media (max-width: 1023px) {
-  .era-pet,
-  .era-roam { display: none; }
+  .era-pet { display: none; }
 }
 
 /* ── the rally cars as CD albums ───────────────────────────────────────
