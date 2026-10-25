@@ -10,20 +10,19 @@
   position: relative;
   overflow: clip;
   padding-bottom: 1rem;
-  /* The homepage's own paper: drafting crosshairs, a small + on a 32px grid
-     and a larger one every 160px, like the registration marks on an
-     engineering sheet. The case studies have a line grid, so the two are
-     never the same page twice. */
-  --plus-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M16 13.5v5M13.5 16h5' stroke='%2314161c' stroke-opacity='.16' stroke-width='1'/%3E%3C/svg%3E");
-  --plus-lg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M80 72v16M72 80h16' stroke='%2314161c' stroke-opacity='.3' stroke-width='1'/%3E%3C/svg%3E");
+  /* The homepage's own paper: a scaled grid like a designer's cutting mat.
+     Fine lines every 16px, heavier ones every 80px, and the 45-degree
+     diagonals through each 160px square. The case studies keep a plain line
+     grid, so the two never read as the same page. One inline tile, in light
+     and dark. */
+  --mat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M0 0L160 160M160 0L0 160' stroke='%2314161c' stroke-opacity='0.05' stroke-width='1' fill='none'/%3E%3Cpath d='M16.5 0V160M0 16.5H160 M32.5 0V160M0 32.5H160 M48.5 0V160M0 48.5H160 M64.5 0V160M0 64.5H160 M96.5 0V160M0 96.5H160 M112.5 0V160M0 112.5H160 M128.5 0V160M0 128.5H160 M144.5 0V160M0 144.5H160' stroke='%2314161c' stroke-opacity='0.045' stroke-width='1'/%3E%3Cpath d='M0.5 0V160M0 0.5H160 M80.5 0V160M0 80.5H160' stroke='%2314161c' stroke-opacity='0.1' stroke-width='1'/%3E%3C/svg%3E");
   background-color: var(--canvas);
-  background-image: var(--plus-lg), var(--plus-sm);
-  background-size: 160px 160px, 32px 32px;
+  background-image: var(--mat);
+  background-size: 160px 160px;
   background-position: center top;
 }
 .dark .era {
-  --plus-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M16 13.5v5M13.5 16h5' stroke='%23ffffff' stroke-opacity='.13' stroke-width='1'/%3E%3C/svg%3E");
-  --plus-lg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M80 72v16M72 80h16' stroke='%23ffffff' stroke-opacity='.24' stroke-width='1'/%3E%3C/svg%3E");
+  --mat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M0 0L160 160M160 0L0 160' stroke='%23ffffff' stroke-opacity='0.04' stroke-width='1' fill='none'/%3E%3Cpath d='M16.5 0V160M0 16.5H160 M32.5 0V160M0 32.5H160 M48.5 0V160M0 48.5H160 M64.5 0V160M0 64.5H160 M96.5 0V160M0 96.5H160 M112.5 0V160M0 112.5H160 M128.5 0V160M0 128.5H160 M144.5 0V160M0 144.5H160' stroke='%23ffffff' stroke-opacity='0.035' stroke-width='1'/%3E%3Cpath d='M0.5 0V160M0 0.5H160 M80.5 0V160M0 80.5H160' stroke='%23ffffff' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 /* ── the frame ──────────────────────────────────────────────────────── */
@@ -80,97 +79,86 @@
 .era-inline-link { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 .era-inline-link:hover { text-decoration-color: currentColor; }
 
-/* ── banner: helmets on a construction grid ───────────────────────────
-   One cell per helmet, every helmet on the same baseline. The guides are
-   drawn in CSS: dashed dividers between cells, a dashed baseline and caption
-   rule, a ring and crosshair through each helmet's centre, and a small mark
-   wherever a divider meets the top or bottom edge. */
+/* ── banner: helmets mapped on a square grid ─────────────────────────
+   Square throughout: sharp corners, graph paper, solid grid lines between
+   cells. Each helmet sits in a dashed bounding box with its diagonals,
+   crosshairs out to the cell edges and an anchor point on every corner, the
+   way a selected object looks in a drawing tool. */
 .hg {
-  --guide: color-mix(in srgb, var(--ink) 16%, transparent);
-  --guide-strong: color-mix(in srgb, var(--ink) 34%, transparent);
-  position: relative;
+  --guide: color-mix(in srgb, var(--ink) 14%, transparent);
+  --grid: color-mix(in srgb, var(--ink) 22%, transparent);
+  --anchor: color-mix(in srgb, var(--ink) 55%, transparent);
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--line-strong);
-  border-radius: 16px;
-  overflow: hidden;
+  border: 1px solid var(--grid);
   background-color: var(--surface);
   background-image:
-    linear-gradient(color-mix(in srgb, var(--ink) 3.5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--ink) 3.5%, transparent) 1px, transparent 1px);
-  background-size: 12px 12px;
+    linear-gradient(color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
+  background-size: 8px 8px;
   background-position: -1px -1px;
 }
-.hg-cell {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  grid-template-rows: 150px auto;
-}
-.hg-cell + .hg-cell { border-left: 1px dashed var(--guide); }
-/* The marks where a divider meets the top and bottom edges. */
-.hg-cell + .hg-cell::before,
-.hg-cell + .hg-cell::after {
-  content: "";
-  position: absolute;
-  left: -5.5px;
-  width: 10px;
-  height: 10px;
-  background:
-    linear-gradient(var(--guide-strong), var(--guide-strong)) center / 1px 100% no-repeat,
-    linear-gradient(var(--guide-strong), var(--guide-strong)) center / 100% 1px no-repeat;
-}
-.hg-cell + .hg-cell::before { top: 6px; }
-.hg-cell + .hg-cell::after { bottom: 6px; }
-.hg-guides { position: absolute; left: 0; right: 0; top: 0; height: 150px; pointer-events: none; }
-/* The crosshair through the helmet's centre (the image is centred at y=78). */
+.hg-cell { position: relative; display: grid; grid-template-rows: 104px auto; }
+.hg-cell + .hg-cell { border-left: 1px solid var(--grid); }
+.hg-guides { position: absolute; inset: 0 0 auto 0; height: 104px; pointer-events: none; }
+/* Crosshair through the centre, edge to edge. */
 .hg-guides::before,
-.hg-guides::after { content: ""; position: absolute; transition: background-color 0.3s; }
-.hg-guides::before { left: 50%; top: 14px; bottom: 6px; border-left: 1px dashed var(--guide); }
-.hg-guides::after { top: 78px; left: 10px; right: 10px; border-top: 1px dashed var(--guide); }
-.hg-ring {
+.hg-guides::after { content: ""; position: absolute; }
+.hg-guides::before { left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--guide); }
+.hg-guides::after { top: 50%; left: 0; right: 0; border-top: 1px dashed var(--guide); }
+/* The bounding box, its diagonals and four anchor points. */
+.hg-box {
   position: absolute;
   left: 50%;
-  top: 78px;
-  width: 112px;
-  height: 112px;
-  margin: -56px 0 0 -56px;
+  top: 50%;
+  width: 78px;
+  height: 78px;
+  margin: -39px 0 0 -39px;
   border: 1px dashed var(--guide);
-  border-radius: 50%;
-  transition: border-color 0.3s, transform 0.5s var(--ease);
+  background:
+    linear-gradient(to top right, transparent calc(50% - 0.5px), var(--guide) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom right, transparent calc(50% - 0.5px), var(--guide) 50%, transparent calc(50% + 0.5px));
+  transition: border-color 0.3s;
 }
+.hg-box i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--anchor);
+  background: var(--elevated);
+  transition: border-color 0.3s;
+}
+.hg-box i:nth-child(1) { left: -3px; top: -3px; }
+.hg-box i:nth-child(2) { right: -3px; top: -3px; }
+.hg-box i:nth-child(3) { left: -3px; bottom: -3px; }
+.hg-box i:nth-child(4) { right: -3px; bottom: -3px; }
 .hg-helmet {
   position: relative;
   z-index: 1;
-  align-self: center;
-  margin-top: 6px;
-  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.18));
-  transition: transform 0.45s var(--ease);
+  place-self: center;
+  filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.16));
+  transition: transform 0.4s var(--ease);
 }
 .hg-cap {
-  width: 100%;
-  padding: 0.55rem 0.4rem 0.7rem;
-  border-top: 1px dashed var(--guide);
+  padding: 0.4rem 0.35rem 0.5rem;
+  border-top: 1px solid var(--grid);
+  background: var(--elevated);
   text-align: center;
-  line-height: 1.35;
+  line-height: 1.3;
 }
-/* On hover the cell's guides ink in and the helmet lifts off the sheet. */
-.hg-cell:hover .hg-helmet { transform: translateY(-5px) rotate(-3deg); }
-.hg-cell:hover .hg-ring { border-color: var(--accent); transform: scale(1.06); }
-.hg-cell:hover .hg-guides::before,
-.hg-cell:hover .hg-guides::after { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.hg-cell:hover .hg-helmet { transform: translateY(-3px); }
+.hg-cell:hover .hg-box,
+.hg-cell:hover .hg-box i { border-color: var(--accent); }
 @media (max-width: 640px) {
   .hg { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .hg-cell:nth-child(3n + 1) { border-left: 0; }
-  .hg-cell:nth-child(3n + 1)::before,
-  .hg-cell:nth-child(3n + 1)::after { display: none; }
-  .hg-cell:nth-child(n + 4) { border-top: 1px dashed var(--guide); }
+  .hg-cell:nth-child(n + 4) { border-top: 1px solid var(--grid); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hg-helmet, .hg-ring { transition: none; }
+  .hg-helmet { transition: none; }
 }
 
 /* Images in the margin objects, prints and parked row fill their box. */
@@ -508,73 +496,6 @@
   .era-tools { gap: 1.1rem; }
   .era-tools .orbit-tile { width: 62px; height: 62px; border-radius: 16px; }
 }
-
-/* ── the section rail ───────────────────────────────────────────────── */
-.era-rail { display: none; }
-@media (min-width: 1240px) {
-  .era-rail {
-    position: fixed;
-    z-index: 40;
-    top: 50%;
-    right: calc(50% + var(--col) / 2 + 16px);
-    display: flex;
-    flex-direction: column;
-    transform: translateY(-50%);
-    transition: opacity 0.35s, transform 0.35s var(--ease), visibility 0s;
-  }
-  /* Hidden after the fade, which also takes it out of the tab order. */
-  .era-rail.is-away {
-    opacity: 0;
-    visibility: hidden;
-    transform: translate(-6px, -50%);
-    transition: opacity 0.35s, transform 0.35s var(--ease), visibility 0s 0.35s;
-  }
-}
-.era-rail a {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  margin-bottom: 4px;
-  border-radius: 10px;
-  color: var(--faint);
-  transition: color 0.25s;
-}
-.era-rail a:hover,
-.era-rail a.is-active { color: var(--ink); }
-.era-rail a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.era-rail-tile {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--elevated);
-  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.3);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-/* Labels open outward, away from the page. */
-.era-rail-label {
-  position: absolute;
-  right: calc(100% + 8px);
-  top: 50%;
-  padding: 0.2rem 0.55rem;
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--canvas);
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translate(4px, -50%);
-  pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s;
-}
-.era-rail a:hover .era-rail-label,
-.era-rail a:focus-visible .era-rail-label { opacity: 1; transform: translate(0, -50%); }
 
 /* ── rows, chips, graph ─────────────────────────────────────────────── */
 .era-rows li { padding: 1.1rem 1.35rem; }

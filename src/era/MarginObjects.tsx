@@ -55,12 +55,9 @@ const LINES = ["You look good.", "Hold that smile.", "Looking sharp.", "Nice sho
 
 // Centred in its margin, then nudged, so it keeps its place at any window
 // width instead of drifting toward the page or the edge.
-// The left margin also holds the section rail beside the page, so things on
-// that side sit RAIL_ROOM further out.
-const RAIL_ROOM = 50;
 const place = (s: Spot, w: number): CSSProperties => ({
   top: s.top,
-  [s.side === "l" ? "left" : "right"]: `calc((50% - var(--col) / 2) / 2 - ${w / 2}px + ${s.x - (s.side === "l" ? RAIL_ROOM : 0)}px)`,
+  [s.side === "l" ? "left" : "right"]: `calc((50% - var(--col) / 2) / 2 - ${w / 2}px + ${s.x}px)`,
   transform: `rotate(${s.rot}deg)`,
   width: w,
 });

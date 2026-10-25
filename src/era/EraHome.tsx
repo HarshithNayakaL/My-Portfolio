@@ -13,7 +13,6 @@ import RoamingCars from "./RoamingCars";
 import MarginObjects from "./MarginObjects";
 import Garage from "./Garage";
 import WorkGrid from "./WorkGrid";
-import SectionRail from "./SectionRail";
 import { Arrow, GitHubMark, LinkedInMark, MailMark } from "./icons";
 
 /**
@@ -88,7 +87,6 @@ export default function EraHome() {
 
   return (
     <div className="era">
-      <SectionRail />
       <RoamingCars />
       <TyrePet />
       <MarginObjects />
