@@ -14,7 +14,6 @@ import CarPet from "./CarPet";
 import RoamingCars from "./RoamingCars";
 import MarginObjects from "./MarginObjects";
 import Garage from "./Garage";
-import RossiRide from "./RossiRide";
 import { Arrow, GitHubMark, GlobeMark, LinkedInMark, MailMark } from "./icons";
 
 /**
@@ -326,7 +325,6 @@ export default function EraHome() {
       </section>
 
       <Garage />
-      <RossiRide />
     </div>
   );
 }

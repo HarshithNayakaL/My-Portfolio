@@ -1,0 +1,26 @@
+/* Rossi's strip at the very bottom of the footer. Its own file because the
+   footer is on every page and the rest of era.css belongs to the homepage. */
+.era-rossi {
+  position: relative;
+  height: 112px;
+  overflow: hidden;
+}
+/* The line he rides on. */
+.era-rossi::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--line-strong) 0 14px, transparent 14px 26px);
+}
+.era-rossi-bike {
+  position: absolute;
+  left: 0;
+  bottom: 16px;
+  z-index: 1;
+  will-change: transform;
+  filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.18));
+}
+.era-rossi-bike img { display: block; height: auto; }

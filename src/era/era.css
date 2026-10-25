@@ -514,35 +514,6 @@
 }
 .era-bay:hover::after { opacity: 1; transform: translate(-50%, 0); }
 
-/* ── the last strip: Rossi ─────────────────────────────────────────── */
-.era-rossi {
-  position: relative;
-  z-index: 1;
-  height: 132px;
-  margin-top: 1.5rem;
-  overflow: hidden;
-  border-top: 1.5px dashed var(--dash);
-}
-/* The line he rides on. */
-.era-rossi::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 22px;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, var(--dash) 0 14px, transparent 14px 26px);
-}
-.era-rossi-bike {
-  position: absolute;
-  left: 0;
-  bottom: 20px;
-  z-index: 1;
-  will-change: transform;
-  filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.18));
-}
-.era-rossi-bike img { display: block; height: auto; }
-
 /* ── margins: cameras and taped prints ──────────────────────────────── */
 .era-object,
 .era-print { display: none; }

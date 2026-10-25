@@ -4,6 +4,7 @@ import { scrollToSection } from "../lib/scrollToSection";
 import { EMAIL, LINKEDIN, GITHUB, NAME, SITE_REPO } from "../data/projects";
 import { headlineRole } from "./About";
 import { contentDate } from "../lib/contentDate";
+import RossiRide from "../era/RossiRide";
 
 // UTC so the server render and the browser print the same day.
 const updatedFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
@@ -149,6 +150,8 @@ export default function Footer() {
           </p>
         </div>
       </div>
+      {/* Era redesign: Rossi rides the last strip of every page. */}
+      <RossiRide />
     </footer>
   );
 }

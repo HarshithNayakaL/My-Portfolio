@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { rossi } from "./cars";
+import "./rossi.css";
 
 /**
- * Rossi riding the last strip of the page, left to right, and pulling a
+ * Rossi riding along the very bottom of the footer, left to right, and pulling a
  * wheelie or two on the way across before he rides off and comes round
  * again. The bike is drawn facing right, so it never needs mirroring.
  *
