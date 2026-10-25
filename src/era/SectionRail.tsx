@@ -2,10 +2,13 @@ import { useEffect, useState, type ReactNode } from "react";
 import { scrollToSection } from "../lib/scrollToSection";
 
 /**
- * A rail of section icons down the right of the page, after harshitr.me's:
- * the one for the section you are reading sits on a tile that slides to it as
- * you scroll, and hovering an icon names it. Wide screens only, where the
- * margin has room for it.
+ * A rail of section icons down the left of the page: the one for the section
+ * you are reading sits on a tile that slides to it as you scroll, and
+ * hovering an icon names it. Wide screens only, where the margin has room.
+ *
+ * It is fixed to the window but belongs to the page's frame, so it fades out
+ * once the frame has scrolled past its middle; otherwise it hung over the
+ * parked cars and the footer links at the bottom.
  */
 const s = { width: 17, height: 17, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
 
@@ -23,6 +26,7 @@ const STEP = 40; // px from one icon to the next
 
 export default function SectionRail() {
   const [active, setActive] = useState(0);
+  const [away, setAway] = useState(false);
 
   useEffect(() => {
     // The section whose top has crossed the upper third of the window is the
@@ -35,6 +39,8 @@ export default function SectionRail() {
         if (el && el.getBoundingClientRect().top < line) at = i;
       });
       setActive(at);
+      const frame = document.querySelector(".era-frame");
+      setAway(!!frame && frame.getBoundingClientRect().bottom < window.innerHeight * 0.5 + 180);
     };
     pick();
     window.addEventListener("scroll", pick, { passive: true });
@@ -46,7 +52,7 @@ export default function SectionRail() {
   }, []);
 
   return (
-    <nav aria-label="Sections on this page" className="era-rail">
+    <nav aria-label="Sections on this page" className={`era-rail ${away ? "is-away" : ""}`}>
       <span aria-hidden className="era-rail-tile" style={{ transform: `translateY(${active * STEP}px)` }} />
       {sections.map((sec, i) => (
         <a

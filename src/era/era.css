@@ -10,12 +10,20 @@
   position: relative;
   overflow: clip;
   padding-bottom: 1rem;
+  /* The homepage's own paper: drafting crosshairs, a small + on a 32px grid
+     and a larger one every 160px, like the registration marks on an
+     engineering sheet. The case studies have a line grid, so the two are
+     never the same page twice. */
+  --plus-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M16 13.5v5M13.5 16h5' stroke='%2314161c' stroke-opacity='.16' stroke-width='1'/%3E%3C/svg%3E");
+  --plus-lg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M80 72v16M72 80h16' stroke='%2314161c' stroke-opacity='.3' stroke-width='1'/%3E%3C/svg%3E");
   background-color: var(--canvas);
-  background-image:
-    linear-gradient(var(--paper) 1px, transparent 1px),
-    linear-gradient(90deg, var(--paper) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image: var(--plus-lg), var(--plus-sm);
+  background-size: 160px 160px, 32px 32px;
   background-position: center top;
+}
+.dark .era {
+  --plus-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M16 13.5v5M13.5 16h5' stroke='%23ffffff' stroke-opacity='.13' stroke-width='1'/%3E%3C/svg%3E");
+  --plus-lg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M80 72v16M72 80h16' stroke='%23ffffff' stroke-opacity='.24' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 /* ── the frame ──────────────────────────────────────────────────────── */
@@ -27,7 +35,8 @@
   padding: 1.25rem 2.5rem 3rem;
   border: 1.5px dashed var(--dash);
   border-radius: 28px;
-  background: color-mix(in srgb, var(--elevated) 90%, transparent);
+  /* Near solid: the crosshairs belong to the desk, not the sheet on it. */
+  background: color-mix(in srgb, var(--elevated) 97%, transparent);
 }
 @media (max-width: 860px) {
   .era-frame { margin-inline: 0.75rem; }
@@ -536,10 +545,18 @@
     position: fixed;
     z-index: 40;
     top: 50%;
-    left: calc(50% + var(--col) / 2 + 16px);
+    right: calc(50% + var(--col) / 2 + 16px);
     display: flex;
     flex-direction: column;
     transform: translateY(-50%);
+    transition: opacity 0.35s, transform 0.35s var(--ease), visibility 0s;
+  }
+  /* Hidden after the fade, which also takes it out of the tab order. */
+  .era-rail.is-away {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-6px, -50%);
+    transition: opacity 0.35s, transform 0.35s var(--ease), visibility 0s 0.35s;
   }
 }
 .era-rail a {
@@ -569,9 +586,10 @@
   box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.3);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* Labels open outward, away from the page. */
 .era-rail-label {
   position: absolute;
-  left: calc(100% + 8px);
+  right: calc(100% + 8px);
   top: 50%;
   padding: 0.2rem 0.55rem;
   border-radius: 6px;
@@ -580,51 +598,12 @@
   font-size: 12px;
   white-space: nowrap;
   opacity: 0;
-  transform: translate(-4px, -50%);
+  transform: translate(4px, -50%);
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
 }
 .era-rail a:hover .era-rail-label,
 .era-rail a:focus-visible .era-rail-label { opacity: 1; transform: translate(0, -50%); }
-
-/* ── the opening: the layout drawn on a drafting sheet ──────────────── */
-.era-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  padding: 6vh 6vw;
-  color: #d9dbe0;
-  background-color: #0b0c0e;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-  background-size: 32px 32px;
-  pointer-events: none;
-  animation: era-intro-out 0.55s cubic-bezier(0.65, 0, 0.35, 1) 1.85s forwards;
-}
-.era-intro-sheet { width: min(820px, 100%); max-height: 100%; }
-.era-intro .ln {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.2;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: era-draw 0.55s cubic-bezier(0.65, 0, 0.35, 1) var(--d, 0s) forwards;
-}
-.era-intro .ln.thin { stroke-width: 0.8; opacity: 0.55; }
-.era-intro .fill { fill: url(#era-hatch); stroke: currentColor; stroke-width: 0.8; opacity: 0; animation: era-fade 0.35s ease-out var(--d, 0s) forwards; }
-.era-intro .fill.soft { opacity: 0; }
-@keyframes era-draw { to { stroke-dashoffset: 0; } }
-@keyframes era-fade { to { opacity: 1; } }
-/* The sheet lifts away rather than fading flat. */
-@keyframes era-intro-out {
-  to { opacity: 0; transform: translateY(-2%) scale(1.02); visibility: hidden; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .era-intro { display: none; }
-}
 
 /* ── rows, chips, graph ─────────────────────────────────────────────── */
 .era-rows li { padding: 1.1rem 1.35rem; }
