@@ -18,6 +18,11 @@ const CaseStudy = lazy(() => import("./era/EraCaseStudy"));
 const Legal = lazy(() => import("./pages/Legal"));
 const Profile = lazy(() => import("./pages/Profile"));
 
+function CaseStudyOnee() {
+  const { pathname } = useLocation();
+  return pathname.startsWith("/work/") ? <OneeCompanion /> : null;
+}
+
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
@@ -132,10 +137,10 @@ export default function App() {
           document, and here it no longer sits in front of the first word of
           content for agents that read the HTML on a byte budget. */}
       <GlassFilter />
-      {/* Outside the routes so Onee carries across navigation instead of being
-          torn down and rebuilt — it is one character living on the site, not a
-          decoration belonging to a page. */}
-      <OneeCompanion />
+      {/* Era branch: Onee lives on the case studies only; the homepage has the
+          cars. Mounted outside the routes so it carries from one case study to
+          the next instead of being torn down and rebuilt. */}
+      <CaseStudyOnee />
     </>
   );
 }

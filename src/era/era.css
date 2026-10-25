@@ -793,7 +793,10 @@
 }
 .era-object-btn:hover .era-bubble,
 .era-object-btn:focus-visible .era-bubble { opacity: 1; margin-bottom: 0; }
-.era-object-small { filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.2)); }
+/* One camera per theme: black on the light page, silver on the dark one. */
+.era-cam-dark { display: none !important; }
+.dark .era-cam-light { display: none !important; }
+.dark .era-cam-dark { display: block !important; }
 .era-print {
   padding: 12px 12px 0;
   background: #fff;
@@ -845,3 +848,10 @@
 /* A black tyre on a dark page needs a rim of light to be seen at all. */
 .dark .era-pet { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.4)); }
 
+
+/* A phone gets the page without the moving decorations: no cursor tyre and
+   no cars crossing it. */
+@media (max-width: 1023px) {
+  .era-pet,
+  .era-roam { display: none; }
+}

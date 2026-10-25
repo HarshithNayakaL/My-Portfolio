@@ -7,7 +7,6 @@ import { headlineRole } from "../components/About";
 import SystemFigure, { fitsCanvas } from "../components/SystemFigure";
 import AllStudies from "../components/AllStudies";
 import TyrePet from "./TyrePet";
-import RoamingCars from "./RoamingCars";
 import { techIcon } from "./techIcons";
 import { Arrow, GitHubMark, GlobeMark } from "./icons";
 
@@ -128,7 +127,6 @@ export default function EraCaseStudy() {
   return (
     <article className="cs">
       <TyrePet />
-      <RoamingCars />
 
       {/* Over the top: dot paper and Bengaluru's time. */}
       <div className="cs-row cs-row-top">
