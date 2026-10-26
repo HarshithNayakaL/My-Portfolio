@@ -1,9 +1,12 @@
 # Harshith — Portfolio
 
-AI Engineer portfolio. One scrolling page (Hero, Selected Work, Capabilities,
-Agent Skills, About, FAQ, Contact) plus per-project case-study routes and legal
-pages. Light canvas with a dark mode, a single rust accent, Instrument Serif
-headings over Inter body and labels, with a Poppins hero headline.
+AI Engineer portfolio. One scrolling page (profile, About, Work, What I build,
+Experience, Stack, Agent skills, GitHub activity, Questions, Contact) plus
+per-project case-study routes and legal pages, in an early-2000s motorsport
+design: F1 helmets on display, rally cars as CD albums, a period car stereo,
+cars crossing the screen. Light canvas with a dark mode, Instrument Serif
+headings over Inter body and labels. The previous design is archived on the
+`classic-design` branch.
 
 The site is also built to be read by machines: every page is prerendered to
 static HTML, has a markdown twin, and is mirrored by a read-only JSON API.

@@ -150,7 +150,7 @@ export default function Footer() {
           </p>
         </div>
       </div>
-      {/* Era redesign: Rossi rides the bottom edge of every page. */}
+      {/* Rossi rides the bottom edge of every page. */}
       <RossiRide />
     </footer>
   );

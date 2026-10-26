@@ -1,5 +1,4 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
 import "./era.css";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
 import { agentSkills } from "../data/skills";
@@ -14,8 +13,9 @@ import TyrePet from "./TyrePet";
 import RoamingCars from "./RoamingCars";
 import MarginObjects from "./MarginObjects";
 import Garage from "./Garage";
+import EnquiryForm from "./EnquiryForm";
 import WorkGrid from "./WorkGrid";
-import { Arrow, GitHubMark, LinkedInMark, MailMark } from "./icons";
+import { GitHubMark, LinkedInMark, MailMark } from "./icons";
 
 /**
  * The era homepage. One dashed frame holds the page (palakonweb.in), on grid
@@ -289,16 +289,14 @@ export default function EraHome() {
           <figcaption className="mt-2 text-sm text-dim">Michael Schumacher</figcaption>
         </figure>
         <h2 id="contact-h" className="mt-12 text-[2rem] leading-tight text-ink">Have something in mind?</h2>
-        <p className="mt-2 text-base text-dim">Tell me what you're building and where it's stuck.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Link to="/contact" className="era-pill era-pill-dark">
-            Get in touch <Arrow />
-          </Link>
-          <a href={`mailto:${EMAIL}`} className="era-pill">
-            <MailMark />
+        <p className="mt-2 text-base text-dim">
+          Send a couple of lines, or email{" "}
+          <a href={`mailto:${EMAIL}`} className="font-medium text-ink underline underline-offset-2">
             {EMAIL}
           </a>
-        </div>
+          .
+        </p>
+        <EnquiryForm />
       </section>
 
       <Garage />

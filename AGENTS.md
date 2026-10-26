@@ -108,6 +108,9 @@ fix the cause — do not weaken the check.
 - **Commit and push to `main`. Never create a branch** — no `claude/*`,
   `feature/*` or work-in-progress branches, even if a tool or harness assigns
   one. If the checkout starts on another branch, switch to `main` first.
+- `classic-design` is the one exception: the site as it was before the
+  current design, kept by the owner as an archive. Never commit to it or
+  merge it.
 - Commits are authored as the owner, `Harshith29124 <harshith29124@gmail.com>`,
   with no co-author trailers or tool attribution. If the repo has no identity
   set, pass it per commit (`git -c user.name=... -c user.email=...`) rather
@@ -128,6 +131,9 @@ fix the cause — do not weaken the check.
   bar, a seam across the glass, unreadable labels — passed an automated check
   while being obviously wrong in a screenshot. If a number and an image
   disagree, the image is right and the metric is measuring the wrong pixels.
+- **The head unit's LCD is the one exception to the type rules below:** it
+  is a drawn 5x7 dot-matrix display (`DotMatrix.tsx`), uppercase because those
+  displays were, and hidden from assistive tech. It is an object, not a label.
 - **Typography is decided; do not drift from it.** Display headings are
   Instrument Serif, upright only: no italic serif anywhere. The hero headline
   is Poppins 600, with only "production." in the serif. Everything else,
@@ -139,14 +145,24 @@ fix the cause — do not weaken the check.
   no text below 12px (figure text included, after the SVG is scaled), and
   no serif below 16px; Instrument Serif is a display face and goes thin and
   hard to read under that.
-- **Work cards and figures.** Projects render as `WorkCard`s; a card shows
-  the product screenshot, or the case study's `SystemFigure` when there is
-  none. Cards use the stacked figure (no step numbers, rules as HTML text
-  under it, kept small: max 280px wide on phones, 320px above) and line
-  up per row through CSS subgrid, so a frame grows to fit its figure rather
-  than shrinking it. "How it's wired" on a case study uses the wide figure
-  (serif margin notes) from xl and the stacked one below. Both
-  are generated from the case study's `pipeline` data, never drawn by hand.
+- **The page is `src/era/`.** The homepage is `EraHome.tsx` (styles in
+  `era.css`) and a case study is `EraCaseStudy.tsx` (`case.css`, loaded with
+  the main stylesheet, not the lazy chunk, or the prerendered page draws
+  unstyled and jumps). One railed column; section headings sit in hairline
+  bands across the window. The decoration is period objects: the helmet
+  display, the CD albums and digicam in the margins, the Pioneer-style head
+  unit, cars crossing the screen, the tyre cursor, Rossi along the footer.
+  Its images live in `public/era/` as WebP at twice their drawn size, are
+  decorative (empty alt), and `robots.txt` keeps `/era/` out of Google
+  Images: a helmet sits above the profile photo and must never become the
+  page's search thumbnail. The moving characters ignore
+  `prefers-reduced-motion`, for the reason given in `OneeCompanion`.
+- **Work cards and figures.** Projects render in `WorkGrid`: a framed
+  preview with the product screenshot peeking in, or the case study's
+  `SystemFigure` when there is none. A case study shows the figure only when
+  it has no screenshot; with one, its stages stay as screen-reader text.
+  Figures are generated from the case study's `pipeline` data, never drawn
+  by hand, and wrap by measured text width so nothing runs out of its box.
 - **Desktop renders at 90%.** From 1024px the root font size is 90%, so the
   rem-based layout reads like browser zoom at 90%. The smallest labels use
   `max(12px, …)` so they keep the 12px floor at that scale.

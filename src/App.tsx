@@ -5,8 +5,7 @@ import GlassFilter from "./components/GlassFilter";
 import Footer from "./components/Footer";
 import ScrollProgress from "./components/ScrollProgress";
 import OneeCompanion from "./components/OneeCompanion";
-// The era redesign replaces the homepage on this branch only; pages/Home
-// is untouched so main keeps the live design.
+// The previous design is kept, untouched, on the classic-design branch.
 import Home from "./era/EraHome";
 import { useWebMcpTools } from "./lib/useWebMcpTools";
 // The era case study's stylesheet is loaded with the main one, not with its
@@ -16,8 +15,6 @@ import "./era/case.css";
 
 // Case study + legal live behind routes the landing page never needs up front,
 // so they are code-split — the initial bundle stays lean.
-// On this branch the case studies use the era layout too; pages/CaseStudy
-// is untouched so main keeps the live design.
 const CaseStudy = lazy(() => import("./era/EraCaseStudy"));
 const Legal = lazy(() => import("./pages/Legal"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -141,8 +138,7 @@ export default function App() {
           document, and here it no longer sits in front of the first word of
           content for agents that read the HTML on a byte budget. */}
       <GlassFilter />
-      {/* Era branch: Onee lives on the case studies only; the homepage has the
-          cars. Mounted outside the routes so it carries from one case study to
+      {/* Onee lives on the case studies only; the homepage has the cars. Mounted outside the routes so it carries from one case study to
           the next instead of being torn down and rebuilt. */}
       <CaseStudyOnee />
     </>

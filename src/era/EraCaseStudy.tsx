@@ -10,7 +10,7 @@ import { techIcon } from "./techIcons";
 import { Arrow, GitHubMark, GlobeMark } from "./icons";
 
 /**
- * A case study on the era branch, laid out after parascodes.is-a.dev's project
+ * A case study, laid out after parascodes.is-a.dev's project
  * pages: one narrow railed column, every row closed by a dashed rule that runs
  * the width of the window with a dot where it crosses each rail, a clock over
  * the top, the screenshot framed, the links as cells. Everything the live
