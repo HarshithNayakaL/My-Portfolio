@@ -179,8 +179,8 @@ export default function About() {
                 At DemandNXT I lead AI engineering: AI work across the
                 company's six B2B brands runs through me, from the agents and
                 pipelines to how they ship. I'm also leading the migration of
-                the company website off legacy WordPress onto a codebase built
-                with Astro.
+                DemandNXT's own website off legacy WordPress onto a codebase
+                built with Astro.
               </p>
               <p>
                 In practice that means the model, the backend, and the

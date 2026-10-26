@@ -23,7 +23,7 @@ import Icon from "./Icon";
 export const faqs: { q: string; a: string }[] = [
   {
     q: "Who are you?",
-    a: "I'm Harshith Nayaka L, an AI engineer in Bengaluru (Bangalore), India. I lead AI engineering at DemandNXT, where my title is AI Engineer - Full Stack. I own AI work across its six B2B brands. At work I build AI systems for marketing and creative teams and I'm moving the company website off legacy WordPress onto an Astro codebase; in public I've shipped things like Octo, a multi-agent research workspace on the OpenAI Agents API, and Maestro, a multi-model LLM orchestration engine, both live and open-source.",
+    a: "I'm Harshith Nayaka L, an AI engineer in Bengaluru (Bangalore), India. I lead AI engineering at DemandNXT, where my title is AI Engineer - Full Stack. I own AI work across its six B2B brands. At work I build AI systems for marketing and creative teams and I'm moving DemandNXT's own website off legacy WordPress onto an Astro codebase; in public I've shipped things like Octo, a multi-agent research workspace on the OpenAI Agents API, and Maestro, a multi-model LLM orchestration engine, both live and open-source.",
   },
   {
     q: "Are you available for freelance work?",
@@ -96,6 +96,12 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: "What kind of projects do you take on?",
     a: "AI systems that have to work without someone babysitting them: multi-agent assistants, AI that answers from your own data, AI features inside an existing product, and the backend and interface around all of that. Also plain automation with n8n when that's what the problem needs, rather than adding a model for its own sake.",
+  },
+  {
+    // Google AI Mode credited this portfolio with DemandNXT's WordPress to
+    // Astro migration. A published answer is what an answer engine quotes.
+    q: "What is this site built with?",
+    a: "This portfolio is a React and TypeScript site built with Vite, prerendered to static HTML and hosted on Vercel. It isn't the Astro migration: that's DemandNXT's own company website. Every page also has a markdown version for AI agents, the same content is served as a read-only JSON API and MCP server, and the source is public on GitHub.",
   },
 ];
 

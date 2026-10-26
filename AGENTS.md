@@ -155,7 +155,9 @@ fix the cause — do not weaken the check.
   Its images live in `public/era/` as WebP at twice their drawn size, are
   decorative (empty alt), and `robots.txt` keeps `/era/` out of Google
   Images: a helmet sits above the profile photo and must never become the
-  page's search thumbnail. The moving characters ignore
+  page's search thumbnail. For the same reason the work cards load their
+  screenshots from `/era/shots/` (a build-time copy made by `prerender.mjs`)
+  with empty alt, while case study pages use `/shots/`. The moving characters ignore
   `prefers-reduced-motion`, for the reason given in `OneeCompanion`.
 - **Work cards and figures.** Projects render in `WorkGrid`: a framed
   preview with the product screenshot peeking in, or the case study's

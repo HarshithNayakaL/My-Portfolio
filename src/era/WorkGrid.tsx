@@ -54,7 +54,13 @@ export default function WorkGrid({ items, collapsed }: { items: Project[]; colla
                 </span>
                 {shot ? (
                   <span className="wk-peek wk-peek-shot">
-                    <img src={shot.small ?? shot.src} alt={shot.alt} width={640} height={400} loading="lazy" decoding="async" />
+                    {/* Decorative here, as on the old cards: the title below
+                        names the project. Served from /era/ (copied there by
+                        prerender.mjs), which robots.txt keeps out of Google
+                        Images, because Google picked this Spectra shot as the
+                        homepage's image for questions about the owner. The
+                        case study page keeps the /shots/ copy and its alt. */}
+                    <img src={`/era${shot.small ?? shot.src}`} alt="" width={640} height={400} loading="lazy" decoding="async" />
                   </span>
                 ) : cs ? (
                   <span aria-hidden className="wk-peek wk-peek-fig">

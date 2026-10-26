@@ -14,7 +14,7 @@
  */
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -49,6 +49,17 @@ const {
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 let template = await readFile(join(DIST, "index.html"), "utf8");
+
+// The homepage's work cards load their screenshots from /era/shots/, a copy
+// of the same hashed files under the path robots.txt keeps out of Google
+// Images: with them indexable, Google showed a project screenshot instead of
+// the profile photo for questions about the owner. Case study pages keep
+// /shots/, where the screenshot is the right image.
+await mkdir(join(DIST, "era/shots"), { recursive: true });
+for (const cs of Object.values(caseStudies)) {
+  const file = cs.shot && (cs.shot.small ?? cs.shot.src);
+  if (file) await copyFile(join(DIST, file), join(DIST, "era", file));
+}
 
 // --------------------------------------------- keep the stylesheet in <head>
 //

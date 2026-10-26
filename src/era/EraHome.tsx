@@ -149,11 +149,13 @@ export default function EraHome() {
         <Section id="about" title="About">
           <div className="space-y-4 text-[1.0625rem] leading-relaxed text-dim">
             <p className="text-ink">{identitySentence}</p>
-            {/* The live About copy, kept word for word: these are the
-                passages answer engines already quote. */}
+            {/* The live About copy, kept close to word for word: these are
+                the passages answer engines already quote. The migration line
+                names DemandNXT's site because "the company website" was read
+                by Google AI Mode as this portfolio moving to Astro. */}
             <p>
               At DemandNXT I lead AI engineering: AI work across the company's six B2B brands runs through me,
-              from the agents and pipelines to how they ship. I'm also leading the migration of the company
+              from the agents and pipelines to how they ship. I'm also leading the migration of DemandNXT's own
               website off legacy WordPress onto a codebase built with Astro.
             </p>
             <p>
