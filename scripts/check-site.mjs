@@ -131,10 +131,6 @@ for (const [route, s] of pages) {
 // ---- facts that must read the same everywhere
 const STALE = [
   [/(?<![Cc]o-)\bAuthor of\b/, "the paper is co-authored"],
-  // The role is AI Engineer, and "full stack" is not used at all: first as a
-  // headline, then even as the employer's designation beside DemandNXT,
-  // Google's answers turned it into "full-stack AI Engineer".
-  [/full[ -]?stack/i, "the role is AI Engineer; the owner had \"full stack\" removed everywhere"],
   [/blogspace|BlogSpace/, "BlogSpace was retired (410)"],
   [/seo-command-center/, "the old audit-platform URL only redirects"],
   [/select freelance/, "availability wording changed"],
@@ -146,6 +142,12 @@ const STALE = [
 // Loosely framed as "previously ..." in the summary, Google's AI Mode quoted
 // it as the current role, so anything else fails the build.
 const RETIRED_TITLE = /AI Workflow Engineer/gi;
+// The role is AI Engineer. DemandNXT's designation, "AI Engineer - Full
+// Stack", is stated once, as the current Experience entry; stated beside the
+// employer everywhere, Google's answers made him a "full-stack AI Engineer".
+// So "full stack" in any spelling fails unless it is that exact title next
+// to its "Current role" label.
+const DESIGNATION = /full[ -]?stack/gi;
 const PAST_FRAMING = /Previous role|moved (?:into this role )?from|Moved from this role/i;
 for (const f of files.filter((f) => TEXT.test(f))) {
   const s = read(f);
@@ -157,6 +159,11 @@ for (const f of files.filter((f) => TEXT.test(f))) {
     // Wide enough to span the HTML markup between a title and its label.
     const around = s.slice(Math.max(0, m.index - 140), m.index + 360);
     if (!PAST_FRAMING.test(around)) fail("stale fact", `${rel(f)}: "${m[0]}" outside an explicit previous-role framing`);
+  }
+  for (const m of s.matchAll(DESIGNATION)) {
+    const exact = m[0] === "Full Stack" && s.slice(m.index - 14, m.index) === "AI Engineer - ";
+    const around = s.slice(Math.max(0, m.index - 140), m.index + 200);
+    if (!exact || !/current role/i.test(around)) fail("stale fact", `${rel(f)}: "${m[0]}" outside the Experience entry (the role is AI Engineer)`);
   }
 }
 

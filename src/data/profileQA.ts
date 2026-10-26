@@ -43,7 +43,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `What is ${NAME}'s current job title?`,
-    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${headlineRole}; in practice he leads the company's AI engineering, across DemandNXT's six B2B brands. He moved into this role from his previous role at DemandNXT, AI Workflow Engineer.`,
+    a: `${NAME} is an ${headlineRole} at DemandNXT in Bengaluru; in practice he leads the company's AI engineering, across DemandNXT's six B2B brands. He moved into this role from his previous role at DemandNXT, AI Workflow Engineer.`,
   },
   {
     q: `Where is ${NAME} based?`,

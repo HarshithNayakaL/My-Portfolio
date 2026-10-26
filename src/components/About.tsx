@@ -20,12 +20,17 @@ export const paper = {
  */
 /**
  * The role: AI Engineer, on every surface (H1s, the Person jobTitle, social
- * cards, twin frontmatter, the API). The site used to add the employer's
- * full designation beside DemandNXT as well; Google turned that into
- * "full-stack AI Engineer" in its answers, so the owner had it removed and
- * scripts/check-site.mjs now fails the build on "full stack" anywhere.
+ * cards, twin frontmatter, the API, the summary sentences). The employer's
+ * full designation is stated once, as the current Experience entry below.
+ * It used to sit beside DemandNXT about forty times, the first sentence
+ * about him included, and Google's answers turned it into "full-stack AI
+ * Engineer"; scripts/check-site.mjs fails the build if it appears anywhere
+ * but that entry.
  */
 export const headlineRole = "AI Engineer";
+
+/** The job title at DemandNXT, exactly as the company writes it. */
+const designation = "AI Engineer - Full Stack";
 
 /**
  * Career at DemandNXT, newest first. The earlier title appears only here, in
@@ -35,7 +40,7 @@ export const headlineRole = "AI Engineer";
  * clearly-past framing.
  */
 export const experience = [
-  { title: headlineRole, org: "DemandNXT", when: "Current role", note: "Leads AI engineering across DemandNXT's six B2B brands." },
+  { title: designation, org: "DemandNXT", when: "Current role", note: "Leads AI engineering across DemandNXT's six B2B brands." },
   { title: "AI Workflow Engineer", org: "DemandNXT", when: "Previous role", note: "Moved from this role to AI Engineer." },
 ];
 
