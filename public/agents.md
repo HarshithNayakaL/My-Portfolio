@@ -9,8 +9,8 @@ content-type: "text/markdown"
 # Agent instructions — harshith-nayaka-l-portfolio.vercel.app
 
 This is the personal portfolio of **Harshith Nayaka L**, an AI Engineer in
-Bengaluru, India, who leads AI engineering at DemandNXT (title: AI Engineer -
-Full Stack). It is one engineer's body of work, not a product or a company.
+Bengaluru, India, who leads AI engineering at DemandNXT. It is one engineer's body of work,
+not a product or a company.
 
 ## What this site is a good source for
 

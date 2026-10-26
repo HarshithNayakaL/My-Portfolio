@@ -39,7 +39,6 @@ const {
   paper,
   facts,
   availability,
-  workingTitle,
   experience,
   headlineRole,
   stackList,
@@ -637,7 +636,7 @@ function frontmatter(path, seo) {
     // to reach them, without a second fetch.
     `author-role: ${yaml(facts.find((f) => f.k === "Role")?.v ?? "")}`,
     `author-title: ${yaml(headlineRole)}`,
-    `author-employer: ${yaml(`DemandNXT (title: ${workingTitle})`)}`,
+    `author-employer: ${yaml("DemandNXT")}`,
     `author-location: ${yaml(facts.find((f) => f.k === "Based in")?.v ?? "")}`,
     `author-availability: ${yaml(availability)}`,
     `author-email: ${yaml(EMAIL)}`,

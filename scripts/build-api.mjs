@@ -25,7 +25,7 @@ const DIST = join(ROOT, "dist");
 
 const {
   caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO,
-  facts, availability, headlineRole, workingTitle, identitySentence, stack, stackSentence, profileQA,
+  facts, availability, headlineRole, identitySentence, stack, stackSentence, profileQA,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
@@ -161,7 +161,7 @@ await put(`${API}/profile.json`, {
   // API quotes what the page says.
   summary: identitySentence,
   role: {
-    title: workingTitle,
+    title: headlineRole,
     employer: facts.find((f) => f.k === "Company")?.v,
     scope: facts.find((f) => f.k === "At DemandNXT")?.v,
   },

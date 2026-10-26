@@ -1,6 +1,6 @@
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "./projects";
 import { caseStudies } from "./caseStudies";
-import { availability, headlineRole, stackList, workingTitle } from "../components/About";
+import { availability, headlineRole, stackList } from "../components/About";
 
 /**
  * The follow-up questions people ask an AI about a person, answered the way
@@ -35,7 +35,7 @@ const withCode = withStudies.filter((p) =>
 export const profileQA: { q: string; a: string }[] = [
   {
     q: `Who is ${NAME}?`,
-    a: `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India, where he leads AI engineering at DemandNXT; his title there is ${workingTitle}. He builds AI agents, RAG pipelines and AI workflow automation, along with the backends and interfaces around them, and he is available for freelance work.`,
+    a: `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India, where he leads AI engineering at DemandNXT. He builds AI agents, RAG pipelines and AI workflow automation, along with the backends and interfaces around them, and he is available for freelance work.`,
   },
   {
     q: `What does ${NAME} do?`,
@@ -43,7 +43,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `What is ${NAME}'s current job title?`,
-    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${workingTitle}, an AI engineering role; in practice he leads the company's AI engineering, across DemandNXT's six B2B brands. He moved into this role from his previous role at DemandNXT, AI Workflow Engineer.`,
+    a: `${NAME}'s current job title at DemandNXT in Bengaluru is ${headlineRole}; in practice he leads the company's AI engineering, across DemandNXT's six B2B brands. He moved into this role from his previous role at DemandNXT, AI Workflow Engineer.`,
   },
   {
     q: `Where is ${NAME} based?`,
@@ -72,7 +72,7 @@ export const profileQA: { q: string; a: string }[] = [
   },
   {
     q: `How much experience does ${NAME} have?`,
-    a: `${NAME} has been building software since 2022. He is an ${headlineRole} at DemandNXT, where his title is ${workingTitle}; he has ${withStudies.length} projects with published case studies, and co-authored a peer-reviewed paper on local LLM inference (IJRTMR, 2025).`,
+    a: `${NAME} has been building software since 2022. He is an ${headlineRole} at DemandNXT, where he leads AI engineering; he has ${withStudies.length} projects with published case studies, and co-authored a peer-reviewed paper on local LLM inference (IJRTMR, 2025).`,
   },
   {
     q: `Is ${NAME} available for freelance work?`,

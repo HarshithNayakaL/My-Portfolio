@@ -75,15 +75,6 @@ for (const [route, s] of pages) {
   if (description.length < 25 || description.length > 160) fail("description length", `${route} is ${description.length}`);
   const h1 = (s.match(/<h1[\s>]/g) ?? []).length;
   if (h1 !== 1) fail("h1", `${route} has ${h1}`);
-  // The role is "AI Engineer". "AI Engineer - Full Stack" is the employer's
-  // designation and appears only beside DemandNXT: as a headline, Google
-  // rewrote it to "Full Stack AI Engineer" and filed him as a full-stack
-  // developer. Headline surfaces are the title, the H1 and the social titles.
-  const h1Text = unescape((s.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "").replace(/<[^>]+>/g, " "));
-  const socialTitles = [...s.matchAll(/<meta\s+(?:property|name)="(?:og|twitter):title"\s+content="([^"]*)"/g)].map((m) => unescape(m[1]));
-  for (const [where, text] of [["title", title], ["h1", h1Text], ...socialTitles.map((t) => ["social title", t])]) {
-    if (/full[ -]?stack/i.test(text)) fail("headline role", `${route} ${where} says "${text.trim()}": the headline role is AI Engineer`);
-  }
 }
 for (const loc of sitemap) {
   const route = loc.slice(ORIGIN.length).replace(/\/$/, "") || "/";
@@ -140,7 +131,10 @@ for (const [route, s] of pages) {
 // ---- facts that must read the same everywhere
 const STALE = [
   [/(?<![Cc]o-)\bAuthor of\b/, "the paper is co-authored"],
-  [/Full-Stack AI Engineer|AI Engineer, Full-Stack|AI Engineer \(Full-Stack\)|full-stack AI Engineer/, "the title is \"AI Engineer - Full Stack\""],
+  // The role is AI Engineer, and "full stack" is not used at all: first as a
+  // headline, then even as the employer's designation beside DemandNXT,
+  // Google's answers turned it into "full-stack AI Engineer".
+  [/full[ -]?stack/i, "the role is AI Engineer; the owner had \"full stack\" removed everywhere"],
   [/blogspace|BlogSpace/, "BlogSpace was retired (410)"],
   [/seo-command-center/, "the old audit-platform URL only redirects"],
   [/select freelance/, "availability wording changed"],

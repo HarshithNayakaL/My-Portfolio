@@ -19,18 +19,11 @@ export const paper = {
  * the visible text, and the same reasoning applies to the agent surface.
  */
 /**
- * The job title at DemandNXT, exactly as the company writes it ("AI Engineer -
- * Full Stack"; not "Full-Stack AI Engineer", which reads as a different
- * title). Every surface that states the role uses this constant.
- */
-export const workingTitle = "AI Engineer - Full Stack";
-
-/**
- * The role he is known by: AI Engineer. It is the headline on every surface
- * (H1s, the Person jobTitle, social cards, twin frontmatter). The DemandNXT
- * designation above appears only beside the employer's name, as a title,
- * because as a headline Google rewrote it to "Full Stack AI Engineer" and
- * filed him with full-stack developers, which is not the work.
+ * The role: AI Engineer, on every surface (H1s, the Person jobTitle, social
+ * cards, twin frontmatter, the API). The site used to add the employer's
+ * full designation beside DemandNXT as well; Google turned that into
+ * "full-stack AI Engineer" in its answers, so the owner had it removed and
+ * scripts/check-site.mjs now fails the build on "full stack" anywhere.
  */
 export const headlineRole = "AI Engineer";
 
@@ -42,14 +35,13 @@ export const headlineRole = "AI Engineer";
  * clearly-past framing.
  */
 export const experience = [
-  { title: workingTitle, org: "DemandNXT", when: "Current role", note: "Leads AI engineering across DemandNXT's six B2B brands." },
+  { title: headlineRole, org: "DemandNXT", when: "Current role", note: "Leads AI engineering across DemandNXT's six B2B brands." },
   { title: "AI Workflow Engineer", org: "DemandNXT", when: "Previous role", note: "Moved from this role to AI Engineer." },
 ];
 
 export const facts = [
   { k: "Role", v: headlineRole },
   { k: "Company", v: "DemandNXT" },
-  { k: "Title at DemandNXT", v: workingTitle },
   { k: "At DemandNXT", v: "Leads AI engineering" },
   { k: "Based in", v: "Bengaluru, India" },
   { k: "Building since", v: "2022" },
@@ -64,7 +56,7 @@ export const facts = [
  * Person schema, word for word. Every clause is a fact stated elsewhere on
  * the site; nothing here is new.
  */
-export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where his title is ${workingTitle}. He owns AI work across DemandNXT's six B2B brands. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
+export const identitySentence = `${NAME} is an ${headlineRole} in Bengaluru (Bangalore), India. He leads AI engineering at DemandNXT, where he owns AI work across the company's six B2B brands. He builds AI agents, RAG pipelines and AI workflow automation for marketing and creative operations, and is available for freelance work.`;
 
 /**
  * The stack, stated once in words. AI Mode fans a question like "AI engineer
