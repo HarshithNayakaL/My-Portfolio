@@ -24,6 +24,11 @@
       "permanent": true
     },
     {
+      "source": "/(getting-started|quickstart|docs/getting-started|docs/quickstart)",
+      "destination": "/developers",
+      "permanent": true
+    },
+    {
       "source": "/work/seo-command-center",
       "destination": "/work/brand-audit-platform",
       "permanent": true

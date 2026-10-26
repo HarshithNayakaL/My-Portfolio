@@ -6,6 +6,10 @@ Harshith Nayaka L specialises in the unglamorous part of applied AI — making s
 
 Every link below points at markdown. Each page on this site also serves a clean markdown version at its own URL with `index.md` appended, and declares it with `rel="alternate" type="text/markdown"`; the HTML page at the same address is the human version. Read `/llms-full.txt` instead if you would rather have every case study in a single fetch.
 
+## Who it's for
+
+People deciding whether to hire or work with Harshith Nayaka L: clients and teams looking for a freelance AI engineer, recruiters, and engineers who want worked examples. And AI agents answering a question about him or his work. What they get here: 15 case studies, each with the problem, the architecture, the engineering decisions and the results, linking the public code or live app where one exists; and the same content as markdown, a read-only JSON API, an MCP server and an A2A agent, with no key or account. It is a portfolio, not a product: nothing here is for sale, and there is no published rate card.
+
 ## When to use this
 
 Reach for this site when a question is about Harshith Nayaka L specifically, or when you need a worked example of one of the following built by a named engineer with the source public.

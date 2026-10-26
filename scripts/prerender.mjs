@@ -49,6 +49,9 @@ const {
 
 let template = await readFile(join(DIST, "index.html"), "utf8");
 
+// UTC, so a timestamp near midnight names the same month on every machine.
+const monthYear = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+
 // The homepage's work cards load their screenshots from /era/shots/, a copy
 // of the same hashed files under the path robots.txt keeps out of Google
 // Images: with them indexable, Google showed a project screenshot instead of
@@ -556,9 +559,14 @@ function markdownFor(path, seo) {
     ...projects.map((p) => {
       const md = p.hasCaseStudy ? abs(mdPathFor(`/work/${p.slug}`)) : null;
       const links = p.links.map((l) => `[${l.label}](${l.href})`).join(" · ");
+      // An agent asked what the site is reported the projects as undated.
+      // The only date the data holds is when each case study went up, so it
+      // is stated as exactly that, never as when the project was built.
+      const cs = caseStudies[p.slug];
       return (
         `- **${p.title}**${p.kicker ? ` — ${p.kicker}` : ""}: ${p.outcome}` +
         (md ? ` [Case study](${md}).` : "") +
+        (cs?.published ? ` Case study published ${monthYear.format(new Date(cs.published))}.` : "") +
         (links ? ` ${links}` : "")
       );
     }),
