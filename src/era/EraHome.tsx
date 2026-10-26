@@ -53,6 +53,17 @@ function Section({ id, title, aside, children }: { id: string; title: string; as
   );
 }
 
+// A quote set between two sections, in the same voice as the Schumacher line
+// at the close: the owner's picks, three in all.
+function Interlude({ quote, by }: { quote: string; by: ReactNode }) {
+  return (
+    <figure className="era-quote">
+      <blockquote className="font-display text-[1.5rem] leading-snug text-ink md:text-[1.75rem]">“{quote}”</blockquote>
+      <figcaption className="mt-2 text-sm text-dim">{by}</figcaption>
+    </figure>
+  );
+}
+
 const socials = [
   { label: "GitHub", href: GITHUB, icon: <GitHubMark /> },
   { label: "LinkedIn", href: LINKEDIN, icon: <LinkedInMark /> },
@@ -159,6 +170,8 @@ export default function EraHome() {
           <Turntable />
         </Section>
 
+        <Interlude quote="Attack life, it’s going to kill you anyway." by="Steve McQueen" />
+
         <Section id="work" title="Work" aside={<p className="text-sm text-dim">{studies.length} case studies</p>}>
           <WorkGrid items={studies} collapsed={!allWork} />
           {studies.length > FIRST && (
@@ -212,6 +225,8 @@ export default function EraHome() {
             </li>
           </ol>
         </Section>
+
+        <Interlude quote="Will he perform when he has money right in front of him?" by={<>Remble, “Touchable”</>} />
 
         <Section id="stack" title="Stack">
           <p className="mb-4 text-[0.9375rem] leading-relaxed text-dim">{stackSentence}</p>
