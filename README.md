@@ -3,7 +3,7 @@
 AI Engineer portfolio. One scrolling page (profile, About, Work, What I build,
 Experience, Stack, Agent skills, GitHub activity, Questions, Contact) plus
 per-project case-study routes and legal pages, in an early-2000s motorsport
-design: F1 helmets on display, rally cars as CD albums, a period car stereo,
+design: F1 helmets on display, a period digicam, a period car stereo,
 cars crossing the screen. Light canvas with a dark mode, Instrument Serif
 headings over Inter body and labels. The previous design is archived on the
 `classic-design` branch.

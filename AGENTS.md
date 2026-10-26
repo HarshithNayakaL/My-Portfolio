@@ -152,8 +152,9 @@ fix the cause — do not weaken the check.
   the main stylesheet, not the lazy chunk, or the prerendered page draws
   unstyled and jumps). One railed column; section headings sit in hairline
   bands across the window. The decoration is period objects: the helmet
-  display, the CD albums and digicam in the margins, the Pioneer-style head
-  unit, cars crossing the screen, the tyre cursor, Rossi along the footer.
+  display, the digicam in the margin, the Pioneer-style head unit, cars
+  crossing the screen, Rossi along the footer. (The rally-car CD albums and
+  the tyre cursor were removed at the owner's request; don't bring them back.)
   Its images live in `public/era/` as WebP at twice their drawn size, are
   decorative (empty alt), and `robots.txt` keeps `/era/` out of Google
   Images: a helmet sits above the profile photo and must never become the

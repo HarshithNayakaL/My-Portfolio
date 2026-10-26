@@ -9,7 +9,6 @@ import { statement as reliability } from "../components/Approach";
 import GitHubActivity from "../components/GitHubActivity";
 import HelmetGrid from "./HelmetGrid";
 import Turntable from "./Turntable";
-import TyrePet from "./TyrePet";
 import RoamingCars from "./RoamingCars";
 import MarginObjects from "./MarginObjects";
 import Garage from "./Garage";
@@ -21,9 +20,9 @@ import { GitHubMark, LinkedInMark, MailMark } from "./icons";
 /**
  * The era homepage. One dashed frame holds the page (palakonweb.in), on grid
  * paper (upriyanshu.tech), with the photo taped down as a polaroid and the
- * margins set with objects of the time (garvitsingla.in). The cars are the
- * part that is mine: a Pirelli tyre follows the cursor, the cars cross the page
- * on their own, and all of them are parked in a row at the bottom.
+ * margin set with an object of the time (garvitsingla.in). The cars are the
+ * part that is mine: they cross the page on their own, and all of them are
+ * parked in a row at the bottom.
  */
 // Every frame in the grid is the same height now, so the studies keep their
 // data order: the order the site, the API and the agents all use.
@@ -92,7 +91,6 @@ export default function EraHome() {
   return (
     <div className="era">
       <RoamingCars />
-      <TyrePet />
       <MarginObjects />
 
       <div className="era-frame">

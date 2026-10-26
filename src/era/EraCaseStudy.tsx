@@ -5,7 +5,6 @@ import { EMAIL, NAME, projects } from "../data/projects";
 import { headlineRole } from "../components/About";
 import SystemFigure, { fitsCanvas } from "../components/SystemFigure";
 import AllStudies from "../components/AllStudies";
-import TyrePet from "./TyrePet";
 import { techIcon } from "./techIcons";
 import { Arrow, GitHubMark, GlobeMark } from "./icons";
 
@@ -125,8 +124,6 @@ export default function EraCaseStudy() {
 
   return (
     <article className="cs">
-      <TyrePet />
-
       {/* Over the top: dot paper and Bengaluru's time. */}
       <div className="cs-row cs-row-top">
         <div className="cs-cell cs-top">

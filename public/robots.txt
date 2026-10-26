@@ -7,7 +7,7 @@ Allow: /
 # The tool logos are decoration, but Google picked the OpenAI logo as the
 # homepage's search-result thumbnail. Keeping /icons/ out of Google Images
 # leaves the photo and the product screenshots as the only candidates.
-# /era/ is the same: helmets, cars, cameras and the tyre are decoration, and
+# /era/ is the same: helmets, cars and the camera are decoration, and
 # the helmets sit above the photo on the homepage. The homepage's work-card
 # screenshots load from /era/shots/ for the same reason (Google showed the
 # Spectra screenshot for questions about the owner); case study pages use

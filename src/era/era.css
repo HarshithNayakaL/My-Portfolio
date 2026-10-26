@@ -853,18 +853,15 @@
 }
 .era-bay:hover::after { opacity: 1; transform: translate(-50%, 0); }
 
-/* ── margins: cameras and taped prints ──────────────────────────────── */
-.era-object,
-.era-album { display: none; }
+/* ── margins: the camera ────────────────────────────────────────────── */
+.era-object { display: none; }
 @media (min-width: 1240px) {
-  .era-object,
-  .era-album { display: block; position: absolute; z-index: 2; margin: 0; }
+  .era-object { display: block; position: absolute; z-index: 2; margin: 0; }
 }
-/* Narrower margins below 1440px: the objects shrink with them instead of
+/* Narrower margins below 1440px: the camera shrinks with them instead of
    reaching over the page or the rail. */
 @media (min-width: 1240px) and (max-width: 1439px) {
-  .era-object,
-  .era-album { scale: 0.78; }
+  .era-object { scale: 0.78; }
 }
 .era-object { filter: drop-shadow(0 14px 14px rgba(0, 0, 0, 0.22)); }
 .era-object-btn { padding: 0; border: 0; background: none; cursor: pointer; }
@@ -934,90 +931,4 @@
   will-change: transform;
   filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.2));
 }
-.era-pet {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 35;
-  pointer-events: none;
-  transform: translate3d(24px, calc(100vh - 48px), 0);
-  will-change: transform;
-  filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.2));
-}
-/* A pet that follows the pointer means nothing without one. */
-@media (hover: none) { .era-pet { display: none; } }
-.era-pet img { display: block; width: 100%; height: 100%; will-change: transform; }
-/* A black tyre on a dark page needs a rim of light to be seen at all. */
-.dark .era-pet { filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.4)); }
 
-
-/* No cursor on a phone or tablet, so no tyre following one. The cars
-   still cross, smaller (RoamingCars sizes them by window width). */
-@media (max-width: 1023px) {
-  .era-pet { display: none; }
-}
-
-/* ── the rally cars as CD albums ───────────────────────────────────────
-   A jewel case (clear plastic, the hinge down the left), the cover in the
-   livery's colours with the car on its road, and the disc half out on the
-   side away from the page; on hover it slides further and turns. */
-.era-album { width: 162px; height: 162px; }
-.era-album-case {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 162px;
-  height: 162px;
-  padding: 6px 6px 6px 14px;
-  box-sizing: border-box;
-  border-radius: 3px;
-  background:
-    linear-gradient(90deg, rgba(40, 44, 50, 0.55) 0 8px, rgba(255, 255, 255, 0.5) 8px 9px, transparent 9px),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.75), rgba(220, 226, 232, 0.45) 40%, rgba(255, 255, 255, 0.65));
-  box-shadow: 0 0 0 1px rgba(120, 128, 138, 0.55), inset 0 1px 0 #fff, 0 16px 24px -14px rgba(0, 0, 0, 0.5);
-}
-/* The glare across the plastic. */
-.era-album-case::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 3px;
-  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.35) 42%, transparent 54%);
-  pointer-events: none;
-}
-.era-album-cover {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  color: var(--al-ink);
-  background: var(--al-bg);
-}
-.era-album-title { position: absolute; left: 9px; top: 9px; right: 9px; }
-.era-album-cover img { position: absolute; z-index: 1; left: 7px; right: 7px; bottom: 13px; width: calc(100% - 14px); height: auto; }
-/* The road under the car. */
-.era-album-cover::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: var(--al-road); }
-.era-album-disc {
-  position: absolute;
-  top: 9px;
-  width: 144px;
-  height: 144px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, #d7dbe0 0 9%, rgba(255, 255, 255, 0.9) 10% 11%, #b9bec4 12% 19%, transparent 20%),
-    conic-gradient(from 30deg, #dfe3e8, #fafafa, #bfe0f6, #f6d5ee, #fff2bf, #dfe3e8, #fafafa, #c8ead6, #e6d3f6, #dfe3e8);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), 0 6px 12px -6px rgba(0, 0, 0, 0.4);
-  transition: transform 0.5s var(--ease);
-}
-.era-album-r .era-album-disc { right: -40px; }
-.era-album-l .era-album-disc { left: -40px; }
-.era-album-r:hover .era-album-disc { transform: translateX(24px) rotate(50deg); }
-.era-album-l:hover .era-album-disc { transform: translateX(-24px) rotate(-50deg); }
-/* Each livery's colours. */
-.tone-martini { --al-bg: linear-gradient(180deg, #f4f1e8 0 64%, #e9e4d6 64%); --al-ink: #0f2a5c; --al-road: linear-gradient(180deg, #0f2a5c 0 4px, #4aa3df 4px 8px, #d4202a 8px 12px, #6b6b6b 12px); }
-.tone-castrol { --al-bg: linear-gradient(180deg, #ffffff 0 64%, #eef2ee 64%); --al-ink: #0b7a3b; --al-road: linear-gradient(180deg, #0b7a3b 0 5px, #d6202b 5px 10px, #6b6b6b 10px); }
-.tone-555 { --al-bg: linear-gradient(180deg, #123a8f 0 64%, #0d2d72 64%); --al-ink: #ffd21f; --al-road: linear-gradient(180deg, #ffd21f 0 5px, #4a4a4a 5px); }
-.tone-ralliart { --al-bg: linear-gradient(180deg, #d4202a 0 64%, #b8161f 64%); --al-ink: #ffffff; --al-road: linear-gradient(180deg, #ffffff 0 4px, #5a5a5a 4px); }
-.tone-rothmans { --al-bg: linear-gradient(180deg, #14306b 0 64%, #0e2452 64%); --al-ink: #ffffff; --al-road: linear-gradient(180deg, #c9a24a 0 4px, #4a4a4a 4px); }
-@media (prefers-reduced-motion: reduce) { .era-album-disc { transition: none; } }
