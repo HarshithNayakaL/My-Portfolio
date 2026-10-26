@@ -918,8 +918,10 @@
 @keyframes era-flash { 0% { opacity: 0.9; } 100% { opacity: 0; } }
 
 /* ── cars on the move ───────────────────────────────────────────────── */
+/* Spans the page rather than the window: a car is pinned to the gap it was
+   sent through, so it scrolls with it. */
 .era-roam {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 30;
   overflow: hidden;
