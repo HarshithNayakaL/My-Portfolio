@@ -75,9 +75,6 @@
 }
 .era-section > :first-child + * { margin-top: 1.75rem; }
 
-.era-quote { max-width: 30em; margin: 4rem auto 0.5rem; text-align: center; }
-.era-quote blockquote,
-.era-close blockquote { text-wrap: balance; }
 
 .era-box {
   margin: 0;
@@ -724,6 +721,53 @@
   text-align: center;
   scroll-margin-top: 6rem;
 }
+
+/* ── the quote at the close (QuoteCycle) ────────────────────────────── */
+/* One grid cell holds all three, so the spot is as tall as the tallest and
+   the form below never moves. The incoming quote rises a few px out of a
+   soft blur; the outgoing one fades where it stands. */
+.qc { display: grid; }
+.qc-item {
+  grid-area: 1 / 1;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(4px);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+.qc-item.is-on {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: opacity 0.9s var(--ease) 0.25s, transform 0.9s var(--ease) 0.25s, filter 0.9s var(--ease) 0.25s;
+}
+.qc-item blockquote { margin: 0; text-wrap: balance; }
+@media (prefers-reduced-motion: reduce) {
+  .qc-item, .qc-item.is-on { transform: none; filter: none; }
+}
+.qc-dots { display: flex; justify-content: center; margin-top: 0.75rem; }
+/* 24px targets around a small mark; the current one stretches into a pill. */
+.qc-dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.qc-dot::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--faint);
+  transition: width 0.35s var(--ease), background-color 0.35s var(--ease);
+}
+.qc-dot:hover::before { background: var(--dim); }
+.qc-dot[aria-pressed="true"]::before { width: 16px; background: var(--ink); }
+.qc-dot:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 6px; }
 
 /* ── the enquiry form ───────────────────────────────────────────────── */
 .enq {
