@@ -20,6 +20,7 @@ export const cars: EraCar[] = [
   car("r26", "Renault R26, Alonso", 640, 172),
   car("mp4-20", "McLaren MP4-20, Raikkonen", 640, 175),
   car("mp4-22", "McLaren MP4-22, Hamilton", 640, 170),
+  car("bmw-kubica", "BMW Sauber F1.08, Kubica", 2063, 522),
   car("ferrari-hamilton", "Ferrari, Hamilton", 640, 167),
   car("redbull-verstappen", "Red Bull, Verstappen", 640, 167),
   car("redbull-vettel", "Red Bull, Vettel", 640, 168),

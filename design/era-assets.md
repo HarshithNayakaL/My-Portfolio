@@ -15,6 +15,7 @@ car faces left.
 | `car-r26.webp` | 15 | |
 | `car-mp4-20.webp` | 24 | Chosen over 09: has the driver |
 | `car-mp4-22.webp` | 17 | Chosen over 23 and 27: driver, and the right number (2) |
+| `car-bmw-kubica.webp` | 29 | BMW Sauber F1.08, 2008; cut at 5% with a 1px edge trim, as its black was noisier |
 | `car-ferrari-hamilton.webp` | 08 | Chosen over 06 and 10 |
 | `car-redbull-verstappen.webp` | 05 | |
 | `car-redbull-vettel.webp` | 11 | |
