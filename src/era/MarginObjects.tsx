@@ -43,9 +43,9 @@ export default function MarginObjects() {
         onPointerEnter={() => setLine((n) => n + 1)}
         onClick={() => setFlash((n) => n + 1)}
       >
-        <span aria-hidden className="era-bubble" style={{ transform: `translateX(-50%) rotate(${-CAMERA.rot}deg)` }}>
-          {said}
-        </span>
+        {/* Drawn from the attribute, not page text, like every decorative
+            label here (see .hg-cap in era.css). */}
+        <span aria-hidden className="era-bubble" data-said={said} style={{ transform: `translateX(-50%) rotate(${-CAMERA.rot}deg)` }} />
         <img className="era-cam-light" src="/era/camera-sony-purple.webp" alt="" loading="lazy" width={CAMERA.w} height={Math.round((CAMERA.w * 291) / 480)} />
         <img className="era-cam-dark" src="/era/camera-sony-silver.webp" alt="" loading="lazy" width={CAMERA.w} height={Math.round((CAMERA.w * 293) / 480)} />
       </button>

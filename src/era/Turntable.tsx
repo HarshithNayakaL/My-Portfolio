@@ -49,8 +49,8 @@ export default function Turntable() {
       <div aria-hidden className="pv-side">
         <span className="pv-knob" />
         <span className="pv-btns">
-          <span className="pv-btn"><i />Source</span>
-          <span className="pv-btn"><i />Display</span>
+          <span className="pv-btn" data-label="Source"><i /></span>
+          <span className="pv-btn" data-label="Display"><i /></span>
         </span>
       </div>
 
@@ -99,8 +99,8 @@ export default function Turntable() {
           </button>
         </span>
         <span aria-hidden className="pv-btns">
-          <span className="pv-btn"><i />Band</span>
-          <span className="pv-btn"><i />Eject</span>
+          <span className="pv-btn" data-label="Band"><i /></span>
+          <span className="pv-btn" data-label="Eject"><i /></span>
         </span>
       </div>
     </div>

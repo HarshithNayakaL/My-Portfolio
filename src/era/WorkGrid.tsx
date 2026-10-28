@@ -49,7 +49,7 @@ export default function WorkGrid({ items, collapsed }: { items: Project[]; colla
                     not lettering, apart from one word. */}
                 <span aria-hidden className="wk-finder">
                   <i className="tl" /><i className="tr" /><i className="bl" /><i className="br" />
-                  <span className="wk-rec"><span className="era-mark is-rec" />Rec</span>
+                  <span className="wk-rec" data-label="Rec"><span className="era-mark is-rec" /></span>
                   <span className="wk-batt" />
                 </span>
                 {shot ? (

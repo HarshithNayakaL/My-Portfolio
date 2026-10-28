@@ -238,6 +238,13 @@
   transition: opacity 0.2s, transform 0.2s var(--ease);
   pointer-events: none;
 }
+/* Every decorative label on the page (these, the camera's bubble, the head
+   unit's keys, the viewfinder's "Rec", the parked cars' names) is drawn
+   from an attribute rather than written as text. Google reads hidden text
+   all the same, and AI Mode described these six helmets as the owner's
+   "F1 competitors". check-site fails the build if decoration has text. */
+.hg-cap::before { content: attr(data-name); font-weight: 600; }
+.hg-cap::after { content: " · " attr(data-team); }
 .hg-cell:hover .hg-helmet { transform: translateY(-5px); }
 .hg-cell:hover .hg-reflect { transform: translateY(5px) scaleY(-1); opacity: 0.18; }
 .hg-cell:hover .hg-shadow { transform: scale(0.8); opacity: 0.6; }
@@ -372,6 +379,7 @@
 }
 .pv-btns { display: flex; gap: 10px; }
 .pv-btn { display: grid; justify-items: center; gap: 3px; font-size: 12px; line-height: 1; color: #5a5f66; }
+.pv-btn::after { content: attr(data-label); }
 .pv-btn i {
   width: 20px;
   height: 20px;
@@ -571,6 +579,7 @@
   font-weight: 600;
   color: var(--ink);
 }
+.wk-rec::after { content: attr(data-label); }
 .wk-rec .era-mark { animation: wk-blink 1.1s steps(2, jump-none) infinite; }
 @keyframes wk-blink { 50% { opacity: 0.2; } }
 /* A battery, three bars full. */
@@ -886,6 +895,7 @@
   pointer-events: none;
   transition: opacity 0.2s, margin-bottom 0.25s var(--ease);
 }
+.era-bubble::before { content: attr(data-said); }
 .era-bubble::after {
   content: "";
   position: absolute;

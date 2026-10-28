@@ -83,6 +83,34 @@ for (const loc of sitemap) {
 for (const [t, rs] of titles) if (rs.length > 1) fail("duplicate title", `"${t}" on ${rs.join(", ")}`);
 for (const [d, rs] of descriptions) if (rs.length > 1) fail("duplicate description", rs.join(", "));
 
+// ---- decoration carries no text
+// Search engines index hidden text: AI Mode described the helmet display's
+// hover labels as the owner's "F1 competitors". Decorative labels are drawn
+// by CSS from attributes, so these blocks must contain no text at all.
+const DECOR = ["hg", "era-garage", "era-object", "pv-btns", "wk-finder", "era-rossi"];
+const textOf = (s, cls) => {
+  const out = [];
+  for (const m of s.matchAll(new RegExp(`<([a-z]+)\\b[^>]*\\bclass="(?:[^"]* )?${cls}(?: [^"]*)?"[^>]*>`, "g"))) {
+    // Walk to the matching close tag of the same element.
+    const tag = m[1];
+    const re = new RegExp(`<(/?)${tag}\\b[^>]*>`, "g");
+    re.lastIndex = m.index + m[0].length;
+    let depth = 1;
+    let end = s.length;
+    for (let t; depth && (t = re.exec(s)); ) {
+      if (!t[0].endsWith("/>")) depth += t[1] ? -1 : 1;
+      if (!depth) end = t.index;
+    }
+    out.push(unescape(s.slice(m.index + m[0].length, end).replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim());
+  }
+  return out;
+};
+for (const [route, s] of pages) {
+  for (const cls of DECOR) {
+    for (const t of textOf(s, cls)) if (t) fail("decoration has text", `${route} .${cls}: "${t.slice(0, 60)}"`);
+  }
+}
+
 // The Person node's jobTitle is the headline role, not the designation.
 for (const [route, s] of pages) {
   for (const m of s.matchAll(/"jobTitle":\s*"([^"]*)"/g)) {

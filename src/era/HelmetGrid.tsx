@@ -41,9 +41,9 @@ export default function HelmetGrid() {
             {...{ fetchpriority: "low" }}
             className="hg-helmet"
           />
-          <span aria-hidden className="hg-cap">
-            <b className="font-semibold">{h.name}</b> · {h.team}
-          </span>
+          {/* The label lives in attributes and CSS draws it: as text, Google's
+              AI Mode listed these six as the owner's "F1 competitors". */}
+          <span aria-hidden className="hg-cap" data-name={h.name} data-team={h.team} />
         </li>
       ))}
     </ul>
