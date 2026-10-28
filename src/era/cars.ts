@@ -38,3 +38,6 @@ export const rossi = {
   ride: { src: "/era/rossi-bike.webp", ratio: 480 / 235 },
   wheelie: { src: "/era/rossi-wheelie.webp", ratio: 480 / 372 },
 };
+
+// Stoner's Ducati with the #1 plate, as in 2008, the Laguna Seca year.
+export const stoner = { src: "/era/stoner-bike.webp", ratio: 230 / 127 };

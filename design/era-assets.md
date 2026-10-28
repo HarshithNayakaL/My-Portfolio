@@ -4,7 +4,7 @@
 cleaned versions the page uses: black backgrounds removed (pure black flooded
 from the corners at 1% tolerance; more ate into dark liveries), trimmed to the
 subject, two-up images split, then saved as WebP at twice the size each is
-drawn (cars 280px wide, helmets 136, cameras 340, Rossi 260). Every
+drawn (cars 280px wide, helmets 136, cameras 340, Rossi 260, Stoner 230). Every
 car faces left.
 
 ## In `public/era/`
@@ -29,6 +29,7 @@ car faces left.
 | `camera-sony-purple.webp` | 12 | |
 | `rossi-bike.webp` | 13 (bottom) | |
 | `rossi-wheelie.webp` | 13 (top) | |
+| `stoner-bike.webp` | 30 | `30_ducati_stoner_no1.png`, cut at 1.5% with holes filled (dilate 7, fill, erode 7): its tyres are near-black, so a corner floodfill ate into them |
 
 Not used: 01 (the four rally cars again, as one grid), 19 (the Razr), 20 (the
 Canon), 04, 06, 09, 10, 22,

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { rossi } from "./cars";
+import { rossi, stoner } from "./cars";
 import "./rossi.css";
 
 /**
@@ -7,7 +7,11 @@ import "./rossi.css";
  * wheelie or two on the way across before he rides off and comes round
  * again. The bike is drawn facing right, so it never needs mirroring.
  *
- * The two sprites aren't drawn at the same scale. At these widths their
+ * Stoner chases him on the Ducati, Laguna Seca 2008 style: right behind on
+ * the same line, closing into his slipstream and dropping back again, the
+ * gap swinging between about 0 and 80px.
+ *
+ * The two Rossi sprites aren't drawn at the same scale. At these widths their
  * tyres come out the same size and the rear wheel sits the same distance
  * from the left edge, so swapping one for the other, left and bottom
  * aligned, keeps the rear wheel planted.
@@ -15,10 +19,13 @@ import "./rossi.css";
 const RIDE_W = 130;
 const WHEELIE_W = 100;
 const SPEED = 190; // px per second
+// Wide enough that his tyres come out the size of Rossi's.
+const STONER_W = 106;
 
 export default function RossiRide() {
   const strip = useRef<HTMLDivElement>(null);
   const bike = useRef<HTMLDivElement>(null);
+  const chaser = useRef<HTMLDivElement>(null);
   const [wheelie, setWheelie] = useState(false);
 
   useEffect(() => {
@@ -36,6 +43,8 @@ export default function RossiRide() {
     // each lasts in px of travel.
     let plan: { at: number; len: number }[] = [];
     let on = false;
+    // Where in his closing and dropping back the chase is, in radians.
+    let phase = Math.random() * Math.PI * 2;
     const newPass = () => {
       const w = box.clientWidth;
       const n = Math.random() < 0.5 ? 1 : 2;
@@ -62,14 +71,19 @@ export default function RossiRide() {
         }
       } else {
         x += SPEED * dt;
-        if (x > w + 40) restAt = t + 1500 + Math.random() * 2500;
+        phase += dt * ((Math.PI * 2) / 4.5);
       }
+      const gap = 40 + 42 * Math.sin(phase);
+      const sx = x - STONER_W - gap;
+      // The pass is over once the chaser is off the far edge too.
+      if (!restAt && sx > w + 40) restAt = t + 1500 + Math.random() * 2500;
       const up = plan.some((p) => x >= p.at && x < p.at + p.len);
       if (up !== on) {
         on = up;
         setWheelie(up);
       }
       if (bike.current) bike.current.style.transform = `translateX(${x}px)`;
+      if (chaser.current) chaser.current.style.transform = `translateX(${sx}px)`;
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -80,6 +94,17 @@ export default function RossiRide() {
   const w = wheelie ? WHEELIE_W : RIDE_W;
   return (
     <div ref={strip} aria-hidden className="era-rossi">
+      <div ref={chaser} className="era-rossi-bike" style={{ transform: `translateX(${-RIDE_W - STONER_W - 160}px)` }}>
+        <img
+          src={stoner.src}
+          alt=""
+          width={STONER_W}
+          height={Math.round(STONER_W / stoner.ratio)}
+          loading="lazy"
+          decoding="async"
+          style={{ width: STONER_W }}
+        />
+      </div>
       <div ref={bike} className="era-rossi-bike" style={{ transform: `translateX(${-RIDE_W - 40}px)` }}>
         <img src={img.src} alt="" width={w} height={Math.round(w / img.ratio)} loading="lazy" decoding="async" style={{ width: w }} />
       </div>
