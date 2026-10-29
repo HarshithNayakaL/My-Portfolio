@@ -46,7 +46,7 @@ export const guides: Guide[] = [
       {
         h: "The work is checked by something other than the model that did it",
         p: [
-          "A model asked to grade its own output is a weak check. In Maestro, a multi-model orchestration engine, the verifier is always from a different model family than the worker, because LLM judges tend to favour their own kind: in the MT-Bench study GPT-4 gave its own answers a 10% higher win rate, a result its authors call suggestive rather than conclusive. A failed check triggers exactly one bounded retry, never an open-ended loop.",
+          "A model asked to grade its own output is a weak check. In Maestro, a multi-model orchestration engine, the verifier is always from a different model family than the worker, because LLM judges tend to favour their own kind: research on LLM-as-a-judge has found that evaluators recognise their own generations and rate them higher. A failed check triggers exactly one bounded retry, never an open-ended loop.",
           "Sometimes the right checker isn't a model at all. In BrandForge, a multimodal QA pass scores each generated image against the product's invariants, but deterministic code decides what happens next: a failed invariant forces a repair however good the aesthetic score, and an invariant the model didn't report on counts as a failure, so silence can never pass.",
         ],
         from: ["maestro", "brandforge"],
@@ -79,7 +79,7 @@ export const guides: Guide[] = [
         h: "Failures are shown, not hidden",
         p: [
           "A fallback that hides what happened is its own failure. Cannon wraps Groq with Gemini behind it as a typed provider, and it separates a call that never connects from one that fails mid-stream: once content is flowing, the error is surfaced rather than silently restarted, because re-running a half-executed tool chain is worse than a visible error. Octo pins each run to the provider and model it started with, and reports an error instead of quietly switching, which would change both the cost and the quality without anyone choosing it.",
-          "Degrading is fine when it's deliberate. In Nova, the routing arbiter gets a four-second budget; if it times out or returns something unusable, a deterministic scorer's decision stands, so routing never blocks an answer. And when BrandForge runs out of repairs, the image ships marked as blocked with the reason, not dropped, because a pipeline that hides its failures reports a success rate it didn't earn.",
+          "Degrading is fine when it's deliberate. Nova routes each turn to gpt-oss-20b, qwen3.6-27b or gpt-oss-120b, and its routing arbiter gets a four-second budget; if it times out or returns something unusable, a deterministic scorer's decision stands, so routing never blocks an answer. And when BrandForge runs out of repairs, the image ships marked as blocked with the reason, not dropped, because a pipeline that hides its failures reports a success rate it didn't earn.",
         ],
         from: ["cannon", "octo", "nova-ai", "brandforge"],
       },
