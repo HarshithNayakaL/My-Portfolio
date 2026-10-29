@@ -7,6 +7,9 @@
  *
  * Every factual sentence here is taken from a case study, and each section
  * names the studies it draws on in `from`, which the page renders as links.
+ * Model names are each project's configured default, read from its public
+ * code (Maestro's config.yaml, Octo's server/config.ts and so on), so an
+ * example names the model that actually runs, not a famous older one.
  * Nothing is added that no case study shows: no technique the projects don't
  * use, no metric they don't report, no rates. A guide states its own limits
  * the way the case studies do.
@@ -46,8 +49,8 @@ export const guides: Guide[] = [
       {
         h: "The work is checked by something other than the model that did it",
         p: [
-          "A model asked to grade its own output is a weak check. In Maestro, a multi-model orchestration engine, the verifier is always from a different model family than the worker, because LLM judges tend to favour their own kind: research on LLM-as-a-judge has found that evaluators recognise their own generations and rate them higher. A failed check triggers exactly one bounded retry, never an open-ended loop.",
-          "Sometimes the right checker isn't a model at all. In BrandForge, a multimodal QA pass scores each generated image against the product's invariants, but deterministic code decides what happens next: a failed invariant forces a repair however good the aesthetic score, and an invariant the model didn't report on counts as a failure, so silence can never pass.",
+          "A model asked to grade its own output is a weak check. In Maestro, a multi-model orchestration engine, the verifier is always from a different model family than the worker: qwen3.6-27b does the work and gpt-oss-120b checks it, because LLM judges tend to favour their own kind: research on LLM-as-a-judge has found that evaluators recognise their own generations and rate them higher. A failed check triggers exactly one bounded retry, never an open-ended loop.",
+          "Sometimes the right checker isn't a model at all. In BrandForge, Gemini 3.8 Flash scores each image gpt-image-2.5 generates against the product's invariants, but deterministic code decides what happens next: a failed invariant forces a repair however good the aesthetic score, and an invariant the model didn't report on counts as a failure, so silence can never pass.",
         ],
         from: ["maestro", "brandforge"],
       },
@@ -78,7 +81,7 @@ export const guides: Guide[] = [
       {
         h: "Failures are shown, not hidden",
         p: [
-          "A fallback that hides what happened is its own failure. Cannon wraps Groq with Gemini behind it as a typed provider, and it separates a call that never connects from one that fails mid-stream: once content is flowing, the error is surfaced rather than silently restarted, because re-running a half-executed tool chain is worse than a visible error. Octo pins each run to the provider and model it started with, and reports an error instead of quietly switching, which would change both the cost and the quality without anyone choosing it.",
+          "A fallback that hides what happened is its own failure. Cannon wraps Groq, whose models in its picker include gpt-oss-120b and Kimi K2, with Gemini 3.6 Flash behind it as a typed provider, and it separates a call that never connects from one that fails mid-stream: once content is flowing, the error is surfaced rather than silently restarted, because re-running a half-executed tool chain is worse than a visible error. Octo pins each run to the provider and model it started with, gpt-6-astra on OpenAI or Gemini 3.8 Flash on Google, and reports an error instead of quietly switching, which would change both the cost and the quality without anyone choosing it.",
           "Degrading is fine when it's deliberate. Nova routes each turn to gpt-oss-20b, qwen3.6-27b or gpt-oss-120b, and its routing arbiter gets a four-second budget; if it times out or returns something unusable, a deterministic scorer's decision stands, so routing never blocks an answer. And when BrandForge runs out of repairs, the image ships marked as blocked with the reason, not dropped, because a pipeline that hides its failures reports a success rate it didn't earn.",
         ],
         from: ["cannon", "octo", "nova-ai", "brandforge"],
@@ -117,11 +120,11 @@ export const guides: Guide[] = [
       },
       {
         q: "Should an LLM check its own output?",
-        a: "Not on its own. In Maestro, built by Harshith Nayaka L, the verifier is always from a different model family than the worker, because LLM judges tend to favour their own family's output; in BrandForge, the model scores and deterministic code decides, and a check the model skipped counts as a failure.",
+        a: "Not on its own. In Maestro, built by Harshith Nayaka L, the verifier is always from a different model family than the worker (gpt-oss-120b checking qwen3.6-27b), because LLM judges tend to favour their own family's output; in BrandForge, the model scores and deterministic code decides, and a check the model skipped counts as a failure.",
       },
       {
         q: "What should an agent do when its model provider fails?",
-        a: "Fall back deliberately, and say so. Cannon, built by Harshith Nayaka L, falls back from Groq to Gemini through a typed provider but surfaces a failure once a response is streaming rather than re-running half a tool chain; Octo reports a provider error instead of silently switching providers mid-run.",
+        a: "Fall back deliberately, and say so. Cannon, built by Harshith Nayaka L, falls back from Groq to Gemini 3.6 Flash through a typed provider but surfaces a failure once a response is streaming rather than re-running half a tool chain; Octo reports a provider error instead of silently switching providers mid-run.",
       },
     ],
   },
@@ -139,7 +142,7 @@ export const guides: Guide[] = [
       {
         h: "Read the source instead of the model's memory",
         p: [
-          "A model asked about a company recalls a stereotype of its category rather than the company itself. BrandForge doesn't ask: a bounded crawl reads the brand's own site, and every conclusion is tagged observed, meaning backed by a specific piece of evidence on a specific page, or inferred, meaning the model generalised. The interface shows that distinction instead of flattening it, so a reviewer can see which claims are grounded.",
+          "A model asked about a company recalls a stereotype of its category rather than the company itself. BrandForge doesn't ask: a bounded crawl reads the brand's own site, and every conclusion Gemini 3.8 Flash draws from it is tagged observed, meaning backed by a specific piece of evidence on a specific page, or inferred, meaning the model generalised. The interface shows that distinction instead of flattening it, so a reviewer can see which claims are grounded.",
           "CraftConnect applies the same idea to two inputs. A product photo and a spoken description are analysed separately and then reconciled; when they disagree, say the voice says silk but the image reads cotton, the system surfaces the conflict rather than silently guessing.",
         ],
         from: ["brandforge", "craftconnect"],
@@ -163,7 +166,7 @@ export const guides: Guide[] = [
       {
         h: "The model observes; code decides",
         p: [
-          "In SPECTRA the model never produces a score. It classifies the site and emits typed observations against a response schema, those are validated before anything downstream sees them, and a separate engine computes every number from a registry of typed checks. An observation the registry doesn't know about cannot move the number, which is the difference between a score you can argue with and one you can only accept. Classification runs first, so checks that don't apply to a site come back as not applicable instead of counting against it.",
+          "In SPECTRA the model, Gemini 3.1 Flash Lite by default, never produces a score. It classifies the site and emits typed observations against a response schema, those are validated before anything downstream sees them, and a separate engine computes every number from a registry of typed checks. An observation the registry doesn't know about cannot move the number, which is the difference between a score you can argue with and one you can only accept. Classification runs first, so checks that don't apply to a site come back as not applicable instead of counting against it.",
           "BrandForge uses the same split for images: the QA model returns numbers, deterministic code reads them against the product's invariants, and an invariant the model didn't mention counts as a failure.",
         ],
         from: ["spectra", "brandforge"],
@@ -267,7 +270,7 @@ export const guides: Guide[] = [
       {
         h: "Self-hosting the app and self-hosting the model are separate choices",
         p: [
-          "Octo is a self-hosted, single-workspace app that runs locally on Node's built-in SQLite or on Vercel with Neon Postgres, yet it calls hosted models: the OpenAI Agents API and Gemini. Where the app runs and where the model runs are two decisions. Make the first on who needs to use it, and the second on whether the data can leave the machine.",
+          "Octo is a self-hosted, single-workspace app that runs locally on Node's built-in SQLite or on Vercel with Neon Postgres, yet it calls hosted models: gpt-6-astra through the OpenAI Agents API, and Gemini 3.8 Flash. Where the app runs and where the model runs are two decisions. Make the first on who needs to use it, and the second on whether the data can leave the machine.",
         ],
         from: ["octo"],
       },
