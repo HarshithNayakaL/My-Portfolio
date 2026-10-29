@@ -27,6 +27,7 @@ const {
   allRoutes,
   ORIGIN,
   caseStudies,
+  guides,
   projects,
   NAME,
   EMAIL,
@@ -205,6 +206,7 @@ function jsonLdFor(path, seo) {
   const personId = `${ORIGIN}/#person`;
   const slug = path.startsWith("/work/") ? path.slice("/work/".length) : null;
   const cs = slug ? caseStudies[slug] : null;
+  const guide = path.startsWith("/guides/") ? guides.find((g) => `/guides/${g.slug}` === path) : null;
 
   // Two levels: every page here sits directly under the homepage. This used
   // to insert a middle level named "Work" for case studies and "Legal" for
@@ -219,7 +221,7 @@ function jsonLdFor(path, seo) {
       {
         "@type": "ListItem",
         position: 2,
-        name: cs ? cs.title : profileDoc ? profileDoc.title : seo.title.split(" | ")[0],
+        name: cs ? cs.title : guide ? guide.title : profileDoc ? profileDoc.title : seo.title.split(" | ")[0],
         item: seo.canonical,
       },
     ],
@@ -319,6 +321,41 @@ function jsonLdFor(path, seo) {
       name: NAME,
       url: `${ORIGIN}/`,
     });
+  }
+
+  if (guide) {
+    graph.unshift({
+      "@type": "Article",
+      "@id": `${seo.canonical}#article`,
+      headline: guide.title,
+      name: guide.title,
+      description: guide.summary,
+      author: { "@id": personId },
+      mainEntityOfPage: seo.canonical,
+      url: seo.canonical,
+      inLanguage: "en",
+      datePublished: guide.published,
+      dateModified: contentDate(path),
+      isPartOf: { "@id": `${ORIGIN}/#website` },
+      // The case studies each section is taken from, as the page links them.
+      citation: [...new Set(guide.sections.flatMap((s) => s.from))].map((s) => ({
+        "@type": "CreativeWork",
+        name: caseStudies[s].title,
+        url: `${ORIGIN}/work/${s}`,
+      })),
+      image: { "@type": "ImageObject", url: `${ORIGIN}/og-image.png`, width: 1200, height: 630 },
+    });
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${seo.canonical}#questions`,
+      url: seo.canonical,
+      mainEntity: guide.questions.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
+    });
+    graph.unshift({ "@type": "Person", "@id": personId, name: NAME, url: `${ORIGIN}/` });
   }
 
   return JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
@@ -466,6 +503,25 @@ function caseStudyBody(cs, depth) {
   return L;
 }
 
+/** Guide body, with headings starting at `depth`. Every case study a section
+ *  draws on is linked as markdown, so an agent can follow a claim to its
+ *  source without leaving the agent-readable surface. */
+function guideBody(g, depth) {
+  const h = "#".repeat(depth);
+  const md = (slug) => `[${caseStudies[slug].title}](${ORIGIN}/work/${slug}/index.md)`;
+  return [
+    ...g.sections.flatMap((s) => [
+      `${h} ${s.h}`,
+      "",
+      ...s.p.flatMap((p) => [p, ""]),
+      ...(s.from.length ? [`From the case ${s.from.length > 1 ? "studies" : "study"}: ${s.from.map(md).join(", ")}.`, ""] : []),
+    ]),
+    `${h} Questions this answers`,
+    "",
+    ...g.questions.flatMap((q) => [`${h}# ${q.q}`, "", q.a, ""]),
+  ];
+}
+
 function markdownFor(path, seo) {
   const abs = (p) => `${ORIGIN}${p}`;
   const slug = path.startsWith("/work/") ? path.slice("/work/".length) : null;
@@ -481,6 +537,20 @@ function markdownFor(path, seo) {
       `Canonical page: ${seo.canonical}`,
       "",
       ...caseStudyBody(cs, 2),
+    ].join("\n");
+  }
+
+  const guide = path.startsWith("/guides/") ? guides.find((g) => `/guides/${g.slug}` === path) : null;
+  if (guide) {
+    return [
+      `# ${guide.title}`,
+      "",
+      `> ${guide.summary}`,
+      "",
+      `Guide by ${NAME}, ${headlineRole}, Bengaluru, India.`,
+      `Canonical page: ${seo.canonical}`,
+      "",
+      ...guideBody(guide, 2),
     ].join("\n");
   }
 
@@ -637,6 +707,9 @@ function frontmatter(path, seo) {
     ...(path.startsWith("/work/") && caseStudies[path.slice(6)]
       ? [`published: ${yaml(caseStudies[path.slice(6)].published)}`]
       : []),
+    ...(path.startsWith("/guides/")
+      ? [`published: ${yaml(guides.find((g) => `/guides/${g.slug}` === path)?.published ?? "")}`]
+      : []),
     `author: ${yaml(NAME)}`,
     // The identity fields an answer engine needs to place this person, on
     // every page rather than only the homepage: an agent that lands on a case
@@ -747,7 +820,7 @@ for (const path of allRoutes) {
 // "Discovered - currently not indexed".
 //
 const priorityFor = (path) =>
-  path === "/" ? "1.0" : path.startsWith("/work/") ? "0.9" : "0.3";
+  path === "/" ? "1.0" : path.startsWith("/work/") ? "0.9" : path.startsWith("/guides/") ? "0.8" : "0.3";
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
@@ -871,6 +944,22 @@ const full = [
   "",
   ...Object.entries(caseStudies).map(([slug, cs]) =>
     caseStudyMarkdown(slug, cs),
+  ),
+  // The guides: the case studies' shared patterns, by question. Their
+  // sections already link the studies above, so nothing is said twice.
+  ...guides.map((g) =>
+    [
+      `## Guide: ${g.title}`,
+      "",
+      `URL: ${ORIGIN}/guides/${g.slug}`,
+      `Markdown: ${ORIGIN}/guides/${g.slug}/index.md`,
+      "",
+      g.summary,
+      "",
+      ...guideBody(g, 3),
+      "---",
+      "",
+    ].join("\n"),
   ),
   // The FAQ was the one body of text on the site missing from this file,
   // and it is the most answer-shaped text there is: questions in the words

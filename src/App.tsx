@@ -16,6 +16,7 @@ import "./era/case.css";
 // Case study + legal live behind routes the landing page never needs up front,
 // so they are code-split — the initial bundle stays lean.
 const CaseStudy = lazy(() => import("./era/EraCaseStudy"));
+const Guide = lazy(() => import("./era/EraGuide"));
 const Legal = lazy(() => import("./pages/Legal"));
 const Profile = lazy(() => import("./pages/Profile"));
 
@@ -73,6 +74,16 @@ function AnimatedRoutes() {
           <Page>
             <Suspense fallback={<div className="min-h-screen" />}>
               <CaseStudy />
+            </Suspense>
+          </Page>
+        }
+      />
+      <Route
+        path="/guides/:slug"
+        element={
+          <Page>
+            <Suspense fallback={<div className="min-h-screen" />}>
+              <Guide />
             </Suspense>
           </Page>
         }

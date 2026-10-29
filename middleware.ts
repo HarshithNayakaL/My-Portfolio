@@ -26,7 +26,7 @@ export const config = {
   matcher: ["/((?!assets/|fonts/|icons/|shots/|_vercel/).*)"],
 };
 
-const PAGE_ROUTE = /^\/$|^\/(about|contact)$|^\/work\/[a-z0-9-]+$|^\/legal\/[a-z0-9-]+$/;
+const PAGE_ROUTE = /^\/$|^\/(about|contact)$|^\/(work|guides)\/[a-z0-9-]+$|^\/legal\/[a-z0-9-]+$/;
 
 /**
  * `<route>.md` as well as `<route>/index.md`.
@@ -83,6 +83,13 @@ const PROJECT_SLUGS = new Set([
   "youtube-scraper-google-sheets",
   "slack-weekly-report-bot",
 ]);
+/** The guides, as MCP resources. Checked against src/data/guides.ts by
+ *  `scripts/build-api.mjs`, like the slug tables. */
+const GUIDE_PAGES: [slug: string, title: string][] = [
+  ["production-ready-llm-agents", "What makes an LLM agent production-ready"],
+  ["grounded-llm-answers", "How to stop ungrounded answers in LLM and RAG pipelines"],
+  ["running-llms-locally", "Running LLMs locally: when to keep AI on your own machine"],
+];
 const CASE_STUDY_SLUGS = new Set([
   "spectra",
   "personal-os-mcp",
@@ -695,6 +702,7 @@ const MCP_SERVERS: Record<string, McpServer> = {
         page("/about", "about", "About Harshith Nayaka L", "Role, background, stack and the questions people ask about him"),
         page("/contact", "contact", "Contact"),
         ...studies.map((s) => page(`/work/${s.slug}`, s.slug, s.title, s.outcome)),
+        ...GUIDE_PAGES.map(([slug, title]) => page(`/guides/${slug}`, slug, title)),
         { uri: `${ORIGIN}/llms-full.txt`, name: "llms-full", title: "Every case study in one file", mimeType: "text/markdown" },
       ];
     },

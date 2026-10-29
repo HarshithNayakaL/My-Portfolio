@@ -24,7 +24,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
 
 const {
-  caseStudies, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO,
+  caseStudies, guides, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO,
   facts, availability, headlineRole, identitySentence, stack, stackSentence, profileQA,
 } = await import(join(ROOT, "dist-ssr/entry-server.js"));
 
@@ -1651,6 +1651,17 @@ for (const [name, want] of [
         (missing.length ? ` Missing: ${missing.join(", ")}.` : "") +
         (extra.length ? ` Stale: ${extra.join(", ")}.` : ""),
     );
+  }
+}
+
+// The guides as MCP resources: slug and title, both checked.
+{
+  const block = middleware.match(/GUIDE_PAGES[^=]*=\s*\[([\s\S]*?)\n\];/);
+  if (!block) throw new Error("build-api: could not find GUIDE_PAGES in middleware.ts");
+  const have = [...block[1].matchAll(/\["([^"]+)",\s*"([^"]+)"\]/g)].map((m) => `${m[1]}|${m[2]}`);
+  const want = guides.map((g) => `${g.slug}|${g.title}`);
+  if (have.join("\n") !== want.join("\n")) {
+    throw new Error(`build-api: middleware.ts GUIDE_PAGES is out of sync with src/data/guides.ts. Want: ${want.join(", ")}.`);
   }
 }
 

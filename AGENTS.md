@@ -46,6 +46,7 @@ reason to hand-edit the output.
 | --- | --- |
 | Projects (the homepage grid) | `src/data/projects.ts` |
 | Case studies | `src/data/caseStudies.ts` |
+| Guides (`/guides/<slug>`) | `src/data/guides.ts`: every fact taken from a case study, which each section names in `from` |
 | Per-route title/description/canonical | `src/data/seo.ts` |
 | Agent Skills section | `src/data/skills.ts` |
 | FAQ entries | `src/components/Faq.tsx` (exported as `faqs`) |
@@ -184,7 +185,12 @@ fix the cause — do not weaken the check.
 
 If you change routes, you change all of these — check each one:
 
-- `/<route>/index.md` — markdown twin, with YAML frontmatter
+- `/<route>/index.md` — markdown twin, with YAML frontmatter. Routes are
+  `/`, `/about`, `/contact`, `/work/<slug>`, `/guides/<slug>` and
+  `/legal/<doc>`; a new route type also needs `PAGE_ROUTE` in `middleware.ts`
+  and a group in `scripts/content-dates.mjs`
+- Guides are also MCP resources: `GUIDE_PAGES` in `middleware.ts`, which
+  `scripts/build-api.mjs` checks against `src/data/guides.ts`
 - `Accept: text/markdown`, `?mode=agent`, and answer-engine user agents all
   resolve to the twin, via `middleware.ts`
 - `/api/v1/...` — read-only JSON, described by `/openapi.json` (also

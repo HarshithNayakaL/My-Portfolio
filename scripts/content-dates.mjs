@@ -16,8 +16,10 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SHARED = ["src/data/seo.ts", "src/components/About.tsx", "src/components/Footer.tsx"];
 
 export const SOURCE_GROUPS = {
-  home: [...SHARED, "src/data/projects.ts", "src/data/caseStudies.ts", "src/data/skills.ts", "src/components/Faq.tsx", "src/components/Capabilities.tsx", "src/components/Approach.tsx", "src/era/EraHome.tsx", "index.html"],
-  work: [...SHARED, "src/data/caseStudies.ts", "src/data/projects.ts", "src/era/EraCaseStudy.tsx"],
+  home: [...SHARED, "src/data/projects.ts", "src/data/caseStudies.ts", "src/data/guides.ts", "src/data/skills.ts", "src/components/Faq.tsx", "src/components/Capabilities.tsx", "src/components/Approach.tsx", "src/era/EraHome.tsx", "index.html"],
+  work: [...SHARED, "src/data/caseStudies.ts", "src/data/projects.ts", "src/data/guides.ts", "src/era/EraCaseStudy.tsx"],
+  // A guide quotes the case studies, so a change to one is a change to it.
+  guides: [...SHARED, "src/data/guides.ts", "src/data/caseStudies.ts", "src/era/EraGuide.tsx"],
   legal: ["src/data/seo.ts", "src/components/Footer.tsx", "src/pages/Legal.tsx"],
   profile: [...SHARED, "src/pages/Profile.tsx", "src/data/profileQA.ts"],
 };

@@ -49,6 +49,14 @@ How to use it: read /llms-full.txt for every case study in one fetch, or follow 
 - [ReplyDesk](https://harshith-nayaka-l-portfolio.vercel.app/work/replydesk/index.md): An interactive prototype of a WhatsApp lead agent: a simulated inbound lead gets a first reply in ~8 seconds, with a live operations dashboard for the lead feed, pipeline, and response-time KPIs. Not yet connected to WhatsApp in production.
 - [AI Notes](https://harshith-nayaka-l-portfolio.vercel.app/work/ai-notes/index.md): A notes app running DeepSeek R1 locally through Ollama, so inference never leaves the machine.
 
+## Guides
+
+The patterns the case studies share, written up by question. Every section links the case studies it is taken from.
+
+- [What makes an LLM agent production-ready](https://harshith-nayaka-l-portfolio.vercel.app/guides/production-ready-llm-agents/index.md): Seven patterns from the agents and pipelines in the case studies: independent checks of the model's work, human approval for risky actions, retries that can't repeat a paid action, validated output, visible failures, traceable decisions and isolated data.
+- [How to stop ungrounded answers in LLM and RAG pipelines](https://harshith-nayaka-l-portfolio.vercel.app/guides/grounded-llm-answers/index.md): Read the source instead of the model's memory, keep every claim's evidence, scope retrieval, let the model observe while code decides, and treat retrieved text as data.
+- [Running LLMs locally: when to keep AI on your own machine](https://harshith-nayaka-l-portfolio.vercel.app/guides/running-llms-locally/index.md): When local inference is the right call, what it asks of you, and how to build AI apps that run with no API keys at all.
+
 ## Published research
 
 - [AI-Powered Note-Taking System: A Local Machine Learning Approach DeepSeek R1 Integration](https://www.doi.org/10.59256/ijrtmr.20250506023): Peer-reviewed paper co-authored by Harshith Nayaka L, published in the International Journal of Research Trends and Multidisciplinary Research (IJRTMR), Nov-Dec 2025, pp. 178-189. DOI: 10.59256/ijrtmr.20250506023. Documents the local-inference architecture behind the AI Notes project: running a model on-device for summarization, writing improvement, idea expansion, and keyword extraction, reporting 87% user satisfaction on summarization with 1.9-3.8 second response times.

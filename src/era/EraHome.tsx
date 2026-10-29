@@ -1,7 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import "./era.css";
 import { EMAIL, GITHUB, LINKEDIN, NAME, projects } from "../data/projects";
 import { agentSkills } from "../data/skills";
+import { guides } from "../data/guides";
 import { faqs } from "../components/Faq";
 import { experience, headlineRole, identitySentence, paper, stack, stackSentence } from "../components/About";
 import { tiles as capabilities } from "../components/Capabilities";
@@ -169,6 +171,21 @@ export default function EraHome() {
               </button>
             </div>
           )}
+        </Section>
+
+        {/* The case studies' shared patterns, written up by question: the
+            shape answer engines quote for "how do I" searches. */}
+        <Section id="guides" title="Guides">
+          <ul className="era-box era-rows">
+            {guides.map((g) => (
+              <li key={g.slug}>
+                <h3 className="font-sans text-base font-semibold text-ink">
+                  <Link to={`/guides/${g.slug}`} className="era-inline-link">{g.title}</Link>
+                </h3>
+                <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">{g.metaDescription}</p>
+              </li>
+            ))}
+          </ul>
         </Section>
 
         {/* What the live homepage's Capabilities and reliability sections said,

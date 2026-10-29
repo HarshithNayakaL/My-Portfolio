@@ -1,5 +1,6 @@
 import { profileDocs } from "../pages/Profile";
 import { caseStudies } from "./caseStudies";
+import { guides } from "./guides";
 import { NAME } from "./projects";
 
 /** Canonical origin. Every canonical/OG URL is built from this one constant,
@@ -55,6 +56,17 @@ for (const [slug, cs] of Object.entries(caseStudies)) {
     title: `${cs.title} — ${cs.searchKicker ?? cs.kicker} | ${NAME}`,
     description: cs.metaDescription,
     canonical: abs(`/work/${slug}`),
+    ogType: "article",
+  };
+}
+
+// Guides: the case studies' shared patterns, written up by question. The
+// question-shaped title is the point, so it leads, with the name after it.
+for (const g of guides) {
+  routeSeo[`/guides/${g.slug}`] = {
+    title: `${g.searchTitle ?? g.title} | ${NAME}`,
+    description: g.metaDescription,
+    canonical: abs(`/guides/${g.slug}`),
     ogType: "article",
   };
 }

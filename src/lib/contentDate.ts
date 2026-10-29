@@ -1,9 +1,10 @@
 /** Page groups that share source files, and so share a last-updated date.
  *  Must match SOURCE_GROUPS in scripts/content-dates.mjs. */
-export type ContentGroup = "home" | "work" | "legal" | "profile";
+export type ContentGroup = "home" | "work" | "guides" | "legal" | "profile";
 
 export const groupFor = (path: string): ContentGroup =>
   path.startsWith("/work/") ? "work"
+  : path.startsWith("/guides/") ? "guides"
   : path.startsWith("/legal/") ? "legal"
   : path === "/about" || path === "/contact" ? "profile"
   : "home";

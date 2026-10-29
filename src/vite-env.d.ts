@@ -45,7 +45,7 @@ declare module "react" {
 // never picks it up.
 declare global {
   /** Injected by vite.config.ts from scripts/content-dates.mjs. */
-  const __CONTENT_DATES__: Record<"home" | "work" | "legal" | "profile", string>;
+  const __CONTENT_DATES__: Record<"home" | "work" | "guides" | "legal" | "profile", string>;
 
   interface WebMcpToolDescriptor {
     name: string;

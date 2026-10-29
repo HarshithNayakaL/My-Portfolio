@@ -312,7 +312,7 @@
 .era-polaroid figcaption {
   padding: 0.55rem 0 0.7rem;
   text-align: center;
-  font-size: 0.8125rem;
+  font-size: max(12px, 0.8125rem);
   color: #55595f;
 }
 /* A strip of masking tape: translucent, with torn ends. */

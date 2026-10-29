@@ -28,6 +28,11 @@ Worked examples, with the source public, of:
 - Keeping provider credentials server-side behind a serverless proxy
 - Free-tier rate-limit handling: RPM and TPM token buckets, provider fallback chains
 
+Three guides draw those patterns together by question: what makes an LLM
+agent production-ready, how to stop ungrounded answers in LLM and RAG
+pipelines, and when to run an LLM locally. Each links the case studies it is
+taken from, under /guides/.
+
 It is also the authoritative source for anything about Harshith Nayaka L
 himself — background, published research, and how to reach him.
 

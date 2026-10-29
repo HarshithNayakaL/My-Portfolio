@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getCaseStudy } from "../data/caseStudies";
+import { guidesCiting } from "../data/guides";
 import { EMAIL, NAME, projects } from "../data/projects";
 import { headlineRole } from "../components/About";
 import SystemFigure, { fitsCanvas } from "../components/SystemFigure";
@@ -327,6 +328,21 @@ export default function EraCaseStudy() {
           </ol>
         </Block>
       ) : null}
+
+      {guidesCiting(study.slug).length > 0 && (
+        <Block title="Guides that draw on this project">
+          <ul className="cs-list">
+            {guidesCiting(study.slug).map((g) => (
+              <li key={g.slug}>
+                <Link to={`/guides/${g.slug}`} className="font-semibold text-ink underline underline-offset-4">
+                  {g.title}
+                </Link>
+                <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-dim">{g.metaDescription}</p>
+              </li>
+            ))}
+          </ul>
+        </Block>
+      )}
 
       <Row>
         <h2 className="text-[1.625rem] leading-tight tracking-tight text-ink">Want something like this built?</h2>
