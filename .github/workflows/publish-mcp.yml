@@ -1,0 +1,67 @@
+# Publishes the site's two remote MCP servers (/mcp and /mcp/docs) to the
+# official MCP Registry, from which other directories sync. Authentication is
+# GitHub OIDC, which proves this repository's owner holds the
+# io.github.HarshithNayakaL namespace, so no token is stored anywhere.
+#
+# The registry refuses a version it already has: bump "version" in a
+# registry/*.server.json file when its listing should change.
+name: Publish to MCP Registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "registry/**"
+      - ".github/workflows/publish-mcp.yml"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+
+      - name: Authenticate to MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      # mcp-publisher reads ./server.json, so each file is published from a
+      # directory of its own. A version already in the registry is reported
+      # and skipped rather than failing the run.
+      - name: Validate and publish each server
+        run: |
+          set -uo pipefail
+          status=0
+          for f in registry/*.server.json; do
+            dir="$(mktemp -d)"
+            cp "$f" "$dir/server.json"
+            echo "::group::$f"
+            (cd "$dir" && "$GITHUB_WORKSPACE/mcp-publisher" validate) || { status=1; echo "::endgroup::"; continue; }
+            out="$(cd "$dir" && "$GITHUB_WORKSPACE/mcp-publisher" publish 2>&1)"; code=$?
+            echo "$out"
+            if [ $code -ne 0 ] && ! grep -qi "already exists\|cannot publish duplicate\|duplicate version" <<<"$out"; then status=1; fi
+            echo "::endgroup::"
+          done
+          exit $status

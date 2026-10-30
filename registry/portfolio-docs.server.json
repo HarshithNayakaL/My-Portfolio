@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.HarshithNayakaL/portfolio-docs",
+  "title": "Harshith Nayaka L portfolio docs",
+  "description": "Read-only MCP server over the developer docs for the portfolio's JSON API, MCP, A2A and NLWeb.",
+  "repository": {
+    "url": "https://github.com/HarshithNayakaL/My-Portfolio",
+    "source": "github"
+  },
+  "websiteUrl": "https://harshith-nayaka-l-portfolio.vercel.app/developers",
+  "version": "1.1.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://harshith-nayaka-l-portfolio.vercel.app/mcp/docs"
+    }
+  ]
+}
