@@ -656,7 +656,8 @@ function markdownFor(path, seo) {
     "",
     ...agentSkills.map(
       (s) =>
-        `- **${s.name}**${s.repo ? ` ([repo](${s.repo}))` : ""} — ${s.tagline}. ${s.premise}`,
+        `- **${s.name}**${s.repo ? ` ([repo](${s.repo}))` : ""} — ${s.tagline}. ${s.premise}` +
+          (s.listings?.length ? ` Also listed: ${s.listings.map((l) => `[${l.label}](${l.href})`).join(", ")}.` : ""),
     ),
     "",
     "## Elsewhere",

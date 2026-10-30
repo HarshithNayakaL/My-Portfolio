@@ -26,6 +26,10 @@ export type AgentSkill = {
   /** Raw URL of the skill's SKILL.md, the file an agent installs. Listed in
    *  /.well-known/ard.json; set only alongside `repo`. */
   skillFile?: string;
+  /** Where the skill is also listed or sold off the site. Linked from the
+   *  page, the twin, the API and llms.txt, so the listing and the site point
+   *  at each other. */
+  listings?: { label: string; href: string }[];
   /** 2-5 requests the skill serves, phrased the way a user asks. Taken from
    *  the triggers in the skill's own SKILL.md description; they are what an
    *  ARD registry builds its search index from. */
@@ -73,6 +77,7 @@ export const agentSkills: AgentSkill[] = [
     tags: ["Register vs genericness", "Markdown-safe", "Scored 0-100", "Python"],
     repo: "https://github.com/HarshithNayakaL/humanizer-claude-skill",
     skillFile: "https://raw.githubusercontent.com/HarshithNayakaL/humanizer-claude-skill/main/humanizer/SKILL.md",
+    listings: [{ label: "Content Humanizer on PromptBase", href: "https://promptbase.com/skill/content-humanizer-2" }],
     queries: ["make this sound less like AI", "does this draft read as ChatGPT wrote it", "humanize this blog post without changing its meaning", "score how human this email reads"],
   },
   {

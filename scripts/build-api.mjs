@@ -202,6 +202,7 @@ await put(
       discipline: s.discipline,
       tags: s.tags,
       repository: s.repo ?? null,
+      listings: (s.listings ?? []).map((l) => ({ label: l.label, url: l.href })),
     })),
   ),
 );
@@ -634,6 +635,15 @@ const openapi = {
           discipline: { type: "string", description: "The methodological rule it keeps." },
           tags: { type: "array", items: { type: "string" } },
           repository: { type: ["string", "null"], format: "uri", description: "Null when the skill is not published publicly." },
+          listings: {
+            type: "array",
+            description: "Where the skill is also listed or sold off the site. Empty when it is only on GitHub.",
+            items: {
+              type: "object",
+              required: ["label", "url"],
+              properties: { label: { type: "string" }, url: { type: "string", format: "uri" } },
+            },
+          },
         },
       },
       Faq: {
@@ -1233,6 +1243,12 @@ await put_text(
     "## Using this site",
     "",
     `Free, with no key, account or payment: the pages, the [JSON API](${abs("/api")}), the [MCP servers](${abs("/developers")}), the [A2A agent](${abs("/.well-known/agent-card.json")}) and [NLWeb /ask](${abs("/ask?query=what+has+he+built")}). There is no paid tier and nothing to upgrade to.`,
+    "",
+    "## Agent skills",
+    "",
+    // The one thing of his that is sold, stated so an agent that finds the
+    // PromptBase price doesn't report it as contradicting this page.
+    `The four agent skills are open source on GitHub, free to install. Content Humanizer, a version of the humanizer skill, is also sold on [PromptBase](${"https://promptbase.com/skill/content-humanizer-2"}); its price is set there.`,
     "",
     `## Hiring ${NAME}`,
     "",

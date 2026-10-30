@@ -264,6 +264,12 @@ export default function EraHome() {
                   )}
                 </h3>
                 <p className="mt-1 text-[0.9375rem] leading-relaxed text-dim">{s.tagline}</p>
+                {s.listings?.map((l) => (
+                  <p key={l.href} className="mt-1 text-[max(12px,0.8125rem)] text-dim">
+                    Also on{" "}
+                    <a href={l.href} target="_blank" rel="noreferrer noopener" className="era-inline-link">{l.label}</a>
+                  </p>
+                ))}
               </li>
             ))}
           </ul>
