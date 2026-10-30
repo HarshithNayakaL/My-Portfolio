@@ -1115,6 +1115,14 @@ const developerPortal = [
   "",
   `Agent card: [\`/.well-known/agent-card.json\`](${abs("/.well-known/agent-card.json")}). With the official SDK (\`pip install a2a-sdk\`), pass the site origin to \`A2ACardResolver\` and the client picks the interface itself.`,
   "",
+  // Where the servers and skills are listed off the site, linked back so a
+  // directory entry and this page point at each other.
+  "## Where this is listed",
+  "",
+  "- **Official MCP Registry**: [`io.github.HarshithNayakaL/portfolio`](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.HarshithNayakaL/portfolio) for `/mcp`, and `io.github.HarshithNayakaL/portfolio-docs` for `/mcp/docs`. Both are published from [`registry/`](https://github.com/HarshithNayakaL/My-Portfolio/tree/main/registry) by a GitHub Actions workflow.",
+  "- **Claude Code plugin marketplace**: `/plugin marketplace add HarshithNayakaL/My-Portfolio`, then `/plugin install harshith-portfolio@harshith-nayaka-l` for both MCP servers, or `humanizer`, `ui-ux-taste`, `linkedin-boost` or `x-algorithm-boost` for a skill.",
+  "- **Glama**: [Personal MCP OS](https://glama.ai/mcp/servers/HarshithNayakaL/personal-os-mcp), the local MCP server from the case studies.",
+  "",
   "## Authentication",
   "",
   "None, deliberately. Every record served here is already public on the site, so there is no key to obtain, no token to refresh and no scope to request. Every operation is a read; nothing can be mutated, so there is no separate test environment to point you at and no production data at risk from calling it.",

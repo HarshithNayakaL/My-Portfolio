@@ -88,6 +88,8 @@ Packaged capability rather than deployed product: instructions plus executable d
 - [API catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/api-catalog): RFC 9727 linkset pointing at the service description and its documentation.
 - [Agent resource catalog](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/ard.json): Agentic Resource Discovery catalog of every agent-readable resource on this host.
 - [A2A agent](https://harshith-nayaka-l-portfolio.vercel.app/.well-known/agent-card.json): Agent2Agent agent at https://harshith-nayaka-l-portfolio.vercel.app/a2a (JSON-RPC, A2A 1.0 and 0.3, read-only, no auth). Send it a question; it answers by quoting the site's published FAQ, case studies and profile with source URLs. Skills: answer-question, list-projects, get-case-study.
+- [Official MCP Registry entries](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.HarshithNayakaL): Both MCP servers are listed as io.github.HarshithNayakaL/portfolio and io.github.HarshithNayakaL/portfolio-docs.
+- [Claude Code plugin marketplace](https://github.com/HarshithNayakaL/My-Portfolio/blob/main/.claude-plugin/marketplace.json): `/plugin marketplace add HarshithNayakaL/My-Portfolio` installs the MCP servers (harshith-portfolio) or any of the four agent skills.
 - [Schema map](https://harshith-nayaka-l-portfolio.vercel.app/schema-map.xml): Index of the structured-data feeds below, with the date each was last changed.
 - [Case studies as JSONL](https://harshith-nayaka-l-portfolio.vercel.app/feeds/case-studies.jsonl): One schema.org TechArticle per line, for ingestion rather than scraping.
 

@@ -1,0 +1,53 @@
+{
+  "name": "harshith-nayaka-l",
+  "description": "Harshith Nayaka L's agent skills, and read-only MCP access to his portfolio.",
+  "owner": {
+    "name": "Harshith Nayaka L",
+    "url": "https://harshith-nayaka-l-portfolio.vercel.app/"
+  },
+  "plugins": [
+    {
+      "name": "humanizer",
+      "source": { "source": "github", "repo": "HarshithNayakaL/humanizer-claude-skill" },
+      "description": "Scores and fixes the mechanical tells of machine-written text, markdown-safe, and never invents specifics to sound human.",
+      "skills": ["./humanizer"],
+      "homepage": "https://harshith-nayaka-l-portfolio.vercel.app/#skills",
+      "keywords": ["writing", "editing", "humanizer"]
+    },
+    {
+      "name": "ui-ux-taste",
+      "source": { "source": "github", "repo": "HarshithNayakaL/ui-ux-taste-skill" },
+      "description": "Finds what an app should look like by showing real interfaces, then returns one frontend stack and ASCII wireframes.",
+      "skills": ["./ui-ux-taste"],
+      "homepage": "https://harshith-nayaka-l-portfolio.vercel.app/#skills",
+      "keywords": ["design", "ui", "frontend", "wireframes"]
+    },
+    {
+      "name": "linkedin-boost",
+      "source": { "source": "github", "repo": "HarshithNayakaL/linkedin-algorithm-source" },
+      "description": "LinkedIn strategy grounded in LinkedIn Engineering's published architecture, separating documented mechanism from folklore.",
+      "skills": ["."],
+      "homepage": "https://harshith-nayaka-l-portfolio.vercel.app/#skills",
+      "keywords": ["linkedin", "personal-brand", "job-search"]
+    },
+    {
+      "name": "x-algorithm-boost",
+      "source": { "source": "github", "repo": "HarshithNayakaL/x-algorithm-source" },
+      "description": "X (Twitter) strategy read from the open-source ranking code: account audits, post scoring and reach, without folklore.",
+      "skills": ["./x-algorithm-boost"],
+      "homepage": "https://harshith-nayaka-l-portfolio.vercel.app/#skills",
+      "keywords": ["x", "twitter", "growth"]
+    },
+    {
+      "name": "harshith-portfolio",
+      "source": "./plugins/portfolio-mcp",
+      "description": "Read-only MCP access to Harshith Nayaka L's portfolio (profile, case studies, FAQ, guides) and to its developer docs.",
+      "mcpServers": {
+        "harshith-portfolio": { "type": "http", "url": "https://harshith-nayaka-l-portfolio.vercel.app/mcp" },
+        "harshith-portfolio-docs": { "type": "http", "url": "https://harshith-nayaka-l-portfolio.vercel.app/mcp/docs" }
+      },
+      "homepage": "https://harshith-nayaka-l-portfolio.vercel.app/developers",
+      "keywords": ["mcp", "portfolio", "case-studies"]
+    }
+  ]
+}
