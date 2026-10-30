@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { Project } from "../data/projects";
 import { getCaseStudy } from "../data/caseStudies";
 import SystemFigure from "../components/SystemFigure";
+import { isDeployment, isRepo } from "./links";
 import { GitHubMark, GlobeMark } from "./icons";
 
 /**
@@ -12,7 +13,6 @@ import { GitHubMark, GlobeMark } from "./icons";
  * a label follows the cursor. A project with no screenshot peeks its system
  * figure instead, so the frame still shows how it is built.
  */
-const isRepo = (href: string) => href.includes("github.com");
 const yearOf = (iso?: string) => (iso ? new Date(iso).getUTCFullYear() : null);
 
 export default function WorkGrid({ items, collapsed }: { items: Project[]; collapsed: boolean }) {
@@ -31,7 +31,7 @@ export default function WorkGrid({ items, collapsed }: { items: Project[]; colla
         {items.map((p) => {
           const cs = getCaseStudy(p.slug);
           const shot = cs?.shot;
-          const live = p.links.some((l) => !isRepo(l.href));
+          const live = p.links.some((l) => isDeployment(l.href));
           const year = yearOf(cs?.published);
           return (
             <article

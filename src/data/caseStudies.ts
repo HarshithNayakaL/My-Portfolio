@@ -1446,6 +1446,10 @@ const personalOsMcp: CaseStudy = {
       label: "View on GitHub",
       href: "https://github.com/HarshithNayakaL/personal-os-mcp",
     },
+    {
+      label: "Listed on Glama",
+      href: "https://glama.ai/mcp/servers/HarshithNayakaL/personal-os-mcp",
+    },
   ],
 };
 

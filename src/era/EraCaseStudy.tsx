@@ -8,6 +8,7 @@ import SystemFigure, { fitsCanvas } from "../components/SystemFigure";
 import AllStudies from "../components/AllStudies";
 import { techIcon } from "./techIcons";
 import { Arrow, GitHubMark, GlobeMark } from "./icons";
+import { isDeployment, isRepo } from "./links";
 
 /**
  * A case study, laid out after parascodes.is-a.dev's project
@@ -53,7 +54,6 @@ function Block({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-const isRepo = (href: string) => href.includes("github.com");
 
 export default function EraCaseStudy() {
   const { slug } = useParams();
@@ -74,7 +74,7 @@ export default function EraCaseStudy() {
     );
   }
 
-  const live = study.links.some((l) => !isRepo(l.href));
+  const live = study.links.some((l) => isDeployment(l.href));
   const status = study.inProgress ? "In progress" : live ? "Live" : "Code on GitHub";
   const i = studyOrder.findIndex((p) => p.slug === study.slug);
   const prev = studyOrder[(i - 1 + studyOrder.length) % studyOrder.length];
