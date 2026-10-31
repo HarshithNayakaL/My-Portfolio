@@ -1459,10 +1459,11 @@ const octo: CaseStudy = {
   title: "Octo",
   kicker: "Multi-agent research workspace",
   outcome:
-    "A research workspace where a director agent hands questions to specialist agents with live web search and returns cited reports and structured company records, built so a lost response can never turn into a second paid session.",
+    "A research workspace where a director agent hands questions to specialist agents with live web search and returns cited reports and structured company records, checks each citation itself, and takes questions by voice through Gemini Live. Built so a lost response can never turn into a second paid session.",
   meta: [
     { label: "Type", value: "Agent research workspace" },
     { label: "Providers", value: "OpenAI Agents API (primary), Google Antigravity (secondary)" },
+    { label: "Voice", value: "Gemini Live, with push-to-talk and Gemini TTS as fallback" },
     { label: "Role", value: "Solo build" },
     { label: "Status", value: "Live on Vercel" },
   ],
@@ -1474,12 +1475,17 @@ const octo: CaseStudy = {
     "Octo is a TypeScript workspace (React 19 and Express 5) built around the OpenAI Agents API. A research director delegates independent questions to specialist agents, at most two at a time: market, competitor, pricing and regulation specialists for market research, and company-discovery and company-evidence specialists for sales research. Google Antigravity on Gemini Interactions is the secondary provider. The public deployment runs on it by default, on a free tier, because every OpenAI run is billed: OpenAI is unlocked with an access word the server checks.",
     "There are three workflows. Market intelligence covers market structure, company comparisons, public pricing and regulation, ending in an investor briefing. Sales research takes an explicit ideal customer profile and a target of 1 to 100 companies, and returns fit evidence, potential needs, public decision makers and source links. Ongoing research keeps a saved session and re-checks it on a schedule against what it found before. Each run takes a brief and up to five context files, and every finished run downloads as PDF, Word, CSV, Markdown or JSON. Octo renders those files itself from the agent's report, so a download costs no extra agent usage, and the PDFs embed their font so characters such as ₹ print correctly.",
     "The evidence rules are part of the job, not an afterthought. Every material claim needs a dated source URL; unknown values stay unknown; facts, estimates and hypotheses are kept apart; and websites and uploaded files are treated as data, never as instructions. Structured output from either provider is validated before any company record is shown, and CSV export neutralises spreadsheet formulas.",
+    "The work around the research has grown since launch. Before spending a search, Octo says what it understood and asks questions with options. Afterwards, an evidence check opens every cited page and PDF itself and marks each claim Supported, Partly supported, Not found, No source cited or Could not check, with a score; a JavaScript-only page or a site that refuses the request counts as Could not check and stays out of the score rather than failing the claim. Ask this research answers only from the report and its checked claims, and turns a question the report cannot answer into a follow-up run. Community voices gathers themes and verbatim, linked quotes from public Reddit and Hacker News discussions, Challenge this report searches for counter-evidence, and a refresh keeps the earlier version with a line-by-line diff.",
+    "A Talk to Octo button on every page opens a voice assistant on the same Gemini key. The browser streams speech to Gemini Live (gemini-3.8-live) and plays the reply with live transcripts, and the speaker can interrupt it mid-sentence. It knows the research that is open, reading the report and its evidence score, and when asked to set up research it fills in the research form's title, brief and workflow. If Live is unavailable, push-to-talk takes over: one gemini-3.5-flash-lite call transcribes and answers, Gemini TTS speaks the reply, and the browser's own voice reads it if TTS hits its free-tier limit. A usage and limits view shows each visitor's voice allowance and Octo's Gemini requests per model for the day.",
     "It runs locally on Node's built-in SQLite, or on Vercel as one function backed by Neon Postgres. A serverless function cannot hold a background worker, so on Vercel a run advances in short leased steps while the workspace is open, and pauses when nobody has it open.",
   ],
   pipeline: [
     {
       title: "Brief",
-      nodes: [{ id: "brief", label: "Brief + files", detail: "Workflow, ICP, up to 5 documents", kind: "input" }],
+      nodes: [
+        { id: "brief", label: "Brief + files", detail: "Workflow, ICP, up to 5 documents", kind: "input" },
+        { id: "voice", label: "Voice assistant", detail: "Gemini Live fills in the form", kind: "input" },
+      ],
     },
     {
       title: "Direct",
@@ -1494,7 +1500,10 @@ const octo: CaseStudy = {
     },
     {
       title: "Check",
-      nodes: [{ id: "validate", label: "Validate output", detail: "Schema + dated sources", kind: "gate" }],
+      nodes: [
+        { id: "validate", label: "Validate output", detail: "Schema + dated sources", kind: "gate" },
+        { id: "evidence", label: "Evidence check", detail: "Opens every cited page", kind: "gate" },
+      ],
     },
     {
       title: "Deliver",
@@ -1525,19 +1534,35 @@ const octo: CaseStudy = {
       title: "The paid provider is locked on the server, not in the UI",
       body: "Every OpenAI run costs money, so on a public deployment it is locked by default. The access word is checked on the server and never reaches the browser bundle; a correct word returns a signed token kept only in that tab's session. Without it the API refuses live OpenAI runs, follow-ups and exports, five wrong attempts lock the form for ten minutes, and changing the word invalidates every earlier unlock.",
     },
+    {
+      title: "The browser talks to Gemini Live without ever holding the key",
+      body: "Live audio has to stream from the browser, but the Gemini key has to stay on the server. For each session the server mints a single-use token that locks the model, voice, instructions and tools; it must open a session within two minutes and expires after thirty, so a leaked token cannot be pointed at anything else. The Content Security Policy allows one external address, Google's Live WebSocket. The first version sent the locked setup under the SDKs' name for it, liveConnectConstraints, where Google's REST endpoint expects bidiGenerateContentSetup; a later commit corrected it.",
+    },
+    {
+      title: "Voice can prepare research, never start it",
+      body: "Every research run spends quota, so the assistant's one action is to open the research form filled in; the person reviews it and presses Continue. On the deployed site, a spoken request to set up research on India's electric scooter market for an investor opened the form ten seconds later with the title, brief and Market intelligence workflow filled in, and nothing started.",
+    },
+    {
+      title: "Limits are counted in the database, not in one instance's memory",
+      body: "On Vercel each request can land on a different function instance, so an allowance held in memory would disagree between them. Each visitor's 12 Live chats an hour and 20 push-to-talk or typed questions per 10 minutes are counted in the database, keyed by a hash of the address, and a request that fails on Google's side is not counted. Google publishes no fixed free-tier numbers for these models, so Octo hard-codes none: it shows limits copied from AI Studio, or the limit Google states in its QuotaFailure error when it rejects a request.",
+    },
   ],
   results: [
     {
       label: "Live",
-      body: "Deployed on Vercel with Neon Postgres at octo-agents.vercel.app. The live API reports Postgres storage with both providers configured and OpenAI behind the access word, and a seeded run was read back from the database, confirming writes.",
+      body: "Deployed on Vercel with Neon Postgres at octo-agents.vercel.app, on Gemini by default. On the live site, an open-research comparison of India's UPI and Brazil's Pix finished in about three minutes with seven primary sources, and its PDF, Word and Markdown downloads were valid files; the evidence check, Ask and community voices were run on the same report.",
+    },
+    {
+      label: "Voice",
+      body: "In a live test, Gemini Live's first reply audio started 0.87 s after the end of speech, with the token minted in 0.5 s and the session ready in 1.4 s. With Live blocked, push-to-talk answered a spoken question aloud in 5.3 s.",
     },
     {
       label: "Tested",
-      body: "65 backend tests on mocked provider responses and temporary databases, including Postgres run through PGlite, the downloads and the OpenAI access word, plus a Playwright suite of four runs across desktop and mobile.",
+      body: "140 backend tests on mocked provider responses and temporary databases, including Postgres run through PGlite, Live token minting, the TTS fallback, the usage counters and the OpenAI access word, plus a Playwright suite of eight runs across desktop and mobile.",
     },
     {
       label: "Honest scope",
-      body: "Its validation record does not yet include a full research run, a download or the OpenAI unlock on the live site, and no CRM is connected. It is a single-workspace, self-hosted product, not a multi-tenant SaaS; its README lists what a hosted service would still need, from per-user isolation to enforced budgets.",
+      body: "OpenAI, the CRM export and Reddit's official API are covered only by tests with mocked responses, and Refresh and Build on earlier research have not been run live. The voice assistant has not yet been tried by a person on a real microphone and speakers, or in Safari. It is a single-workspace, self-hosted product, not a multi-tenant SaaS; its README lists what a hosted service would still need, from per-user isolation to enforced budgets.",
     },
   ],
   tech: [
@@ -1546,6 +1571,9 @@ const octo: CaseStudy = {
     "Express 5",
     "OpenAI Agents API",
     "Google Antigravity (Gemini Interactions)",
+    "Gemini Live API",
+    "Gemini TTS",
+    "Web Audio API (AudioWorklet)",
     "SQLite (Node built-in)",
     "Postgres on Vercel (Neon)",
     "Zod",
@@ -1555,11 +1583,15 @@ const octo: CaseStudy = {
   questions: [
     {
       q: "How do you stop an AI research agent from inventing companies or sources?",
-      a: "Make the evidence rules part of the task and check the output before showing it. In Octo, a research workspace built by Harshith Nayaka L, every material claim needs a dated source URL, unknown values must stay unknown, and the agents are told never to invent a company, decision maker, price, citation or financial figure; retrieved pages are treated as data, not instructions. Structured output is validated before any company record appears. Octo's tests run on mocked provider responses, and a full live research run is not yet in its validation record.",
+      a: "Make the evidence rules part of the task and check the output before showing it. In Octo, a research workspace built by Harshith Nayaka L, every material claim needs a dated source URL, unknown values must stay unknown, and the agents are told never to invent a company, decision maker, price, citation or financial figure; retrieved pages are treated as data, not instructions. Structured output is validated before any company record appears, and an evidence check then opens every cited page to mark each claim supported, partly supported, not found or uncited; a page it cannot read is labelled Could not check rather than counted as support.",
+    },
+    {
+      q: "How do you add a voice assistant to a web app without exposing the API key?",
+      a: "Mint a short-lived, locked token on the server. Octo, a research workspace built by Harshith Nayaka L, streams speech from the browser to Gemini Live with a single-use token the server mints for each session; the token locks the model, voice, instructions and tools, must open a session within two minutes and expires after thirty, so the Gemini key never reaches the browser. If Live is unavailable, push-to-talk sends the recording to the server, which answers with one Gemini call and speaks the reply with Gemini TTS.",
     },
   ],
   metaDescription:
-    "Multi-agent research workspace on the OpenAI Agents API: specialist agents, live web search, cited reports and company records, with no duplicate paid runs.",
+    "Multi-agent research workspace on the OpenAI Agents API: specialist agents, cited reports checked against their sources, and a Gemini Live voice assistant.",
   shot: {
     src: "/shots/octo.8ae82050.webp",
     small: "/shots/octo-640.f65fcbbc.webp",

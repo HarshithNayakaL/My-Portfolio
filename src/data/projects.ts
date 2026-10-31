@@ -32,8 +32,8 @@ export const projects: Project[] = [
     title: "Octo",
     kicker: "Multi-agent research workspace",
     outcome:
-      "A research director agent hands questions to specialist agents with live web search and returns cited reports and company records \u2014 built so a lost response can never start a second paid session.",
-    tags: ["OpenAI Agents API", "Multi-agent", "Cited research", "Serverless"],
+      "Multi-agent research on the live web with cited reports it checks itself, and a Gemini Live voice assistant that sets up research but never starts it.",
+    tags: ["OpenAI Agents API", "Multi-agent", "Voice AI", "Cited research"],
     links: [
       { label: "Live site", href: "https://octo-agents.vercel.app/" },
       { label: "GitHub", href: "https://github.com/HarshithNayakaL/octo" },
