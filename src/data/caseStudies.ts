@@ -1593,11 +1593,11 @@ const octo: CaseStudy = {
   metaDescription:
     "Multi-agent research workspace on the OpenAI Agents API: specialist agents, cited reports checked against their sources, and a Gemini Live voice assistant.",
   shot: {
-    src: "/shots/octo.8ae82050.webp",
-    small: "/shots/octo-640.f65fcbbc.webp",
-    width: 1079,
-    height: 1466,
-    alt: "Octo's workspace overview: a sidebar with New research, All research, Reports, Ongoing research and Connections; the heading 'Research, with a wider lens'; a diagram of a research director above market, competitor, pricing and regulation agents feeding one final report; cards for the market intelligence, sales research and ongoing research workflows; activity counts; and a research table listing a completed demo run on the Indian EV charging market.",
+    src: "/shots/octo.505b1391.webp",
+    small: "/shots/octo-640.da986adc.webp",
+    width: 1080,
+    height: 2268,
+    alt: "Octo's live workspace overview: a sidebar with New research, All research, Reports, Ongoing research and Connections; the heading 'Research, with a wider lens'; a diagram of a research director above context, evidence, analysis and implications agents feeding one final report; nine cards on what a chat window can't do, from asking before it researches and checking its own citations to hearing what real people say; cards for the open, market intelligence, sales and ongoing research workflows; activity counts; a research table with a completed live Gemini run comparing UPI and Pix, marked with an evidence score of 50; and the Talk to Octo voice button in the bottom-right corner.",
   },
   links: [
     { label: "Live site", href: "https://octo-agents.vercel.app/" },
