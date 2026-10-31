@@ -34,9 +34,11 @@ export const cars: EraCar[] = [
 
 export const byId = (id: string) => cars.find((c) => c.id === id) ?? cars[0];
 
+// Rossi on the 2009 Fiat Yamaha M1, so he and Stoner's 2008 Ducati are from
+// the same seasons.
 export const rossi = {
-  ride: { src: "/era/rossi-bike.webp", ratio: 480 / 235 },
-  wheelie: { src: "/era/rossi-wheelie.webp", ratio: 480 / 372 },
+  ride: { src: "/era/rossi-bike.webp", ratio: 192 / 102 },
+  wheelie: { src: "/era/rossi-wheelie.webp", ratio: 184 / 115 },
 };
 
 // Stoner's Ducati with the #1 plate, as in 2008, the Laguna Seca year.

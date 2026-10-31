@@ -11,13 +11,15 @@ import "./rossi.css";
  * the same line, closing into his slipstream and dropping back again, the
  * gap swinging between about 0 and 80px.
  *
- * The two Rossi sprites aren't drawn at the same scale. At these widths their
- * tyres come out the same size and the rear wheel sits the same distance
- * from the left edge, so swapping one for the other, left and bottom
- * aligned, keeps the rear wheel planted.
+ * The two Rossi sprites aren't drawn at the same scale (the wheelie is a
+ * little smaller). At these widths their tyres come out the same size as
+ * Stoner's, about 26px, and the wheelie's rear axle sits WHEELIE_SHIFT px
+ * further from its left edge than the ride's, so pulling it back by that
+ * much keeps the rear wheel planted when one is swapped for the other.
  */
-const RIDE_W = 130;
-const WHEELIE_W = 100;
+const RIDE_W = 96;
+const WHEELIE_W = 92;
+const WHEELIE_SHIFT = 2;
 const SPEED = 190; // px per second
 // Wide enough that his tyres come out the size of Rossi's.
 const STONER_W = 106;
@@ -106,7 +108,15 @@ export default function RossiRide() {
         />
       </div>
       <div ref={bike} className="era-rossi-bike" style={{ transform: `translateX(${-RIDE_W - 40}px)` }}>
-        <img src={img.src} alt="" width={w} height={Math.round(w / img.ratio)} loading="lazy" decoding="async" style={{ width: w }} />
+        <img
+          src={img.src}
+          alt=""
+          width={w}
+          height={Math.round(w / img.ratio)}
+          loading="lazy"
+          decoding="async"
+          style={{ width: w, position: "relative", left: wheelie ? -WHEELIE_SHIFT : 0 }}
+        />
       </div>
     </div>
   );
