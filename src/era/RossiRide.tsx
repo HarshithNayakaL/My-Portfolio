@@ -20,6 +20,9 @@ import "./rossi.css";
 const RIDE_W = 96;
 const WHEELIE_W = 92;
 const WHEELIE_SHIFT = 2;
+// Off while the owner picks the 2009 wheelie art; the sizing above is for the
+// current candidate and will need re-measuring against the one chosen.
+const WHEELIES = false;
 const SPEED = 190; // px per second
 // Wide enough that his tyres come out the size of Rossi's.
 const STONER_W = 106;
@@ -49,7 +52,7 @@ export default function RossiRide() {
     let phase = Math.random() * Math.PI * 2;
     const newPass = () => {
       const w = box.clientWidth;
-      const n = Math.random() < 0.5 ? 1 : 2;
+      const n = !WHEELIES ? 0 : Math.random() < 0.5 ? 1 : 2;
       plan = [];
       let from = w * 0.12;
       for (let i = 0; i < n; i++) {

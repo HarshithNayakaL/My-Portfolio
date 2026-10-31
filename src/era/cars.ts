@@ -37,7 +37,7 @@ export const byId = (id: string) => cars.find((c) => c.id === id) ?? cars[0];
 // Rossi on the 2009 Fiat Yamaha M1, so he and Stoner's 2008 Ducati are from
 // the same seasons.
 export const rossi = {
-  ride: { src: "/era/rossi-bike.webp", ratio: 192 / 102 },
+  ride: { src: "/era/rossi-bike.webp", ratio: 192 / 101 },
   wheelie: { src: "/era/rossi-wheelie.webp", ratio: 184 / 115 },
 };
 

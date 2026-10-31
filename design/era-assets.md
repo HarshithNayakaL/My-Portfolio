@@ -27,9 +27,20 @@ car faces left.
 | `car-escort.webp` | 21 | |
 | `camera-sony-silver.webp` | 02 | |
 | `camera-sony-purple.webp` | 12 | |
-| `rossi-bike.webp` | 31 | `31_yamaha_rossi_2009.png`, the 2009 Fiat Yamaha, period-correct beside Stoner's 2008 Ducati; cut like 30 |
-| `rossi-wheelie.webp` | 32 | `32_yamaha_rossi_2009_wheelie.png`, same canvas as 31 but drawn a little smaller; cut like 30 |
-| `stoner-bike.webp` | 30 | `30_ducati_stoner_no1.png`, cut at 1.5% with holes filled (dilate 7, fill, erode 7): its tyres are near-black, so a corner floodfill ate into them |
+| `rossi-bike.webp` | 31 | `31_yamaha_rossi_2009.png`, the 2009 Fiat Yamaha, period-correct beside Stoner's 2008 Ducati. Cut as below |
+| `rossi-wheelie.webp` | 32 | `32_yamaha_rossi_2009_wheelie.png`, a candidate; wheelies are off while the owner picks the art |
+| `stoner-bike.webp` | 30 | `30_ducati_stoner_no1.png`. Cut as below |
+
+The two bikes are cut differently from the cars. Their tyre treads are pure
+black inside a lighter outline, and the background reaches between the tyres
+and the bodywork, so neither a floodfill nor hole-filling works on its own:
+a floodfill at 1-2% leaks through gaps in the outline into the tread, and
+closing the mask (dilate 7, erode 7) bridged the real gaps into black
+blocks. The cut that works: threshold the brightest channel at 0.8%, drop
+specks under 400px, remove only the black connected to the image edge, draw
+each wheel disc opaque (6px inside the tyre, at measured centres) because a
+wheel's black interior touches the gap behind it, then close with a 2.5px
+disk to smooth the tyre edges without bridging anything real.
 
 Not used: 01 (the four rally cars again, as one grid), 13 (Rossi on the later
 Monster Yamaha, replaced by 31 and 32), 33 (a steeper 2009 wheelie), 19 (the Razr), 20 (the
