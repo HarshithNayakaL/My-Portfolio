@@ -8,8 +8,11 @@ import "./rossi.css";
  * again. The bike is drawn facing right, so it never needs mirroring.
  *
  * Stoner chases him on the Ducati, Laguna Seca 2008 style: right behind on
- * the same line, closing into his slipstream and dropping back again, the
- * gap swinging between about 0 and 80px.
+ * the same line, easing into his slipstream and back out, the gap between
+ * 16 and 36px. It used to swing from -2 to 80px every 4.5s: the bikes
+ * overlapped at the closest point, and Stoner's speed surged and dropped by
+ * a third around Rossi's, so they never looked like one race pace. Over a
+ * 9s cycle the swing moves Stoner at most 4% faster or slower than Rossi.
  *
  * Rossi is sized to stand as tall as Stoner, about 58px. Matching their
  * tyres instead left him visibly smaller: the Yamaha art draws bigger wheels
@@ -77,9 +80,9 @@ export default function RossiRide() {
         }
       } else {
         x += SPEED * dt;
-        phase += dt * ((Math.PI * 2) / 4.5);
+        phase += dt * ((Math.PI * 2) / 9);
       }
-      const gap = 40 + 42 * Math.sin(phase);
+      const gap = 26 + 10 * Math.sin(phase);
       const sx = x - STONER_W - gap;
       // The pass is over once the chaser is off the far edge too.
       if (!restAt && sx > w + 40) restAt = t + 1500 + Math.random() * 2500;
