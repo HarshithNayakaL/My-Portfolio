@@ -4,7 +4,7 @@
 cleaned versions the page uses: black backgrounds removed (pure black flooded
 from the corners at 1% tolerance; more ate into dark liveries), trimmed to the
 subject, two-up images split, then saved as WebP at twice the size each is
-drawn (cars 280px wide, helmets 136, cameras 340, Rossi 192 riding and 184 in the wheelie, Stoner 230). Every
+drawn (cars 280px wide, helmets 136, cameras 340, Rossi 220 riding and 184 in the wheelie, Stoner 230). Every
 car faces left.
 
 ## In `public/era/`

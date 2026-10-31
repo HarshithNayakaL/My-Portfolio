@@ -11,20 +11,21 @@ import "./rossi.css";
  * the same line, closing into his slipstream and dropping back again, the
  * gap swinging between about 0 and 80px.
  *
- * The two Rossi sprites aren't drawn at the same scale (the wheelie is a
- * little smaller). At these widths their tyres come out the same size as
- * Stoner's, about 26px, and the wheelie's rear axle sits WHEELIE_SHIFT px
- * further from its left edge than the ride's, so pulling it back by that
- * much keeps the rear wheel planted when one is swapped for the other.
+ * Rossi is sized to stand as tall as Stoner, about 58px. Matching their
+ * tyres instead left him visibly smaller: the Yamaha art draws bigger wheels
+ * for the size of the bike, so equal tyres meant a shorter, lower bike.
+ *
+ * The wheelie sprite is a candidate and drawn at a different scale; its
+ * width and WHEELIE_SHIFT (how far its rear axle sits further in than the
+ * ride's, so the rear wheel stays planted on the swap) need re-measuring
+ * against whichever art is chosen.
  */
-const RIDE_W = 96;
+const RIDE_W = 110;
 const WHEELIE_W = 92;
 const WHEELIE_SHIFT = 2;
-// Off while the owner picks the 2009 wheelie art; the sizing above is for the
-// current candidate and will need re-measuring against the one chosen.
+// Off while the owner picks the 2009 wheelie art.
 const WHEELIES = false;
 const SPEED = 190; // px per second
-// Wide enough that his tyres come out the size of Rossi's.
 const STONER_W = 106;
 
 export default function RossiRide() {
