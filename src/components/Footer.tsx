@@ -75,7 +75,7 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t border-line bg-surface/30">
-      <div className="shell py-14 md:py-16">
+      <div className="shell pt-14 pb-24 md:pt-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.25fr_repeat(4,1fr)] lg:gap-10">
           {/* Brand */}
           <div className="max-w-xs">

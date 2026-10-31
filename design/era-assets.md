@@ -4,7 +4,7 @@
 cleaned versions the page uses: black backgrounds removed (pure black flooded
 from the corners at 1% tolerance; more ate into dark liveries), trimmed to the
 subject, two-up images split, then saved as WebP at twice the size each is
-drawn (cars 280px wide, helmets 136, cameras 340, Rossi 220 riding and 184 in the wheelie, Stoner 230). Every
+drawn (cars 280px wide, helmets 136, cameras 340, Rossi 220 riding and 202 in the wheelie, Stoner 230 and 212). Every
 car faces left.
 
 ## In `public/era/`
@@ -28,7 +28,8 @@ car faces left.
 | `camera-sony-silver.webp` | 02 | |
 | `camera-sony-purple.webp` | 12 | |
 | `rossi-bike.webp` | 31 | `31_yamaha_rossi_2009.png`, the 2009 Fiat Yamaha, period-correct beside Stoner's 2008 Ducati. Cut as below |
-| `rossi-wheelie.webp` | 32 | `32_yamaha_rossi_2009_wheelie.png`, a candidate; wheelies are off while the owner picks the art |
+| `rossi-wheelie.webp` | 33 | `33_yamaha_rossi_2009_wheelie_steep.png`, paired with 34: same canvas and angle. Cut as below, plus the halo step |
+| `stoner-wheelie.webp` | 34 | `34_ducati_stoner_wheelie.png`. Cut as below, plus the halo step |
 | `stoner-bike.webp` | 30 | `30_ducati_stoner_no1.png`. Cut as below |
 
 The two bikes are cut differently from the cars. Their tyre treads are pure
@@ -42,8 +43,14 @@ each wheel disc opaque (6px inside the tyre, at measured centres) because a
 wheel's black interior touches the gap behind it, then close with a 2.5px
 disk to smooth the tyre edges without bridging anything real.
 
+The wheelies (33, 34) also carry a faint dark ring about 10px outside the
+tyres, a glow in the art that the threshold keeps. The halo step: open the
+mask with a 2.5px disk and drop pieces under 5000px, which cuts the rings
+loose, then keep the full mask only within 4px of that opened shape, so
+the outline survives intact and the rings, further out, do not.
+
 Not used: 01 (the four rally cars again, as one grid), 13 (Rossi on the later
-Monster Yamaha, replaced by 31 and 32), 33 (a steeper 2009 wheelie), 19 (the Razr), 20 (the
+Monster Yamaha, replaced by 31 and 33), 32 (a shallower 2009 wheelie), 19 (the Razr), 20 (the
 Canon), 04, 06, 09, 10, 22,
 23, 25 (the cameras again), 27, 28 (the Razr again).
 

@@ -3,7 +3,9 @@
 
    No strip, no road line: the layer sits over the footer's bottom padding
    and his tyres run on the bottom edge of the page itself, so he rides
-   where the screen ends instead of in a box added beneath it. */
+   where the screen ends instead of in a box added beneath it. The footer's
+   bottom padding (pb-24, 86px at the desktop's 90% root) is sized for a
+   bike on its back wheel, about 80px tall, so a wheelie clears the text. */
 .era-rossi {
   position: absolute;
   left: 0;

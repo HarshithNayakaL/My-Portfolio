@@ -38,8 +38,11 @@ export const byId = (id: string) => cars.find((c) => c.id === id) ?? cars[0];
 // the same seasons.
 export const rossi = {
   ride: { src: "/era/rossi-bike.webp", ratio: 220 / 115 },
-  wheelie: { src: "/era/rossi-wheelie.webp", ratio: 184 / 115 },
+  wheelie: { src: "/era/rossi-wheelie.webp", ratio: 202 / 160 },
 };
 
 // Stoner's Ducati with the #1 plate, as in 2008, the Laguna Seca year.
-export const stoner = { src: "/era/stoner-bike.webp", ratio: 230 / 127 };
+export const stoner = {
+  ride: { src: "/era/stoner-bike.webp", ratio: 230 / 127 },
+  wheelie: { src: "/era/stoner-wheelie.webp", ratio: 212 / 155 },
+};

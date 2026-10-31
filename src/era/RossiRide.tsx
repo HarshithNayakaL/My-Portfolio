@@ -3,9 +3,10 @@ import { rossi, stoner } from "./cars";
 import "./rossi.css";
 
 /**
- * Rossi riding along the very bottom of the footer, left to right, and pulling a
- * wheelie or two on the way across before he rides off and comes round
- * again. The bike is drawn facing right, so it never needs mirroring.
+ * Rossi riding along the very bottom of the footer, left to right, with
+ * Stoner chasing him, before both ride off and come round again. On a pass
+ * one or the other pulls a wheelie, never both at once. The bikes are drawn
+ * facing right, so they never need mirroring.
  *
  * Stoner chases him on the Ducati, Laguna Seca 2008 style: right behind on
  * the same line, easing into his slipstream and back out, the gap between
@@ -18,28 +19,51 @@ import "./rossi.css";
  * tyres instead left him visibly smaller: the Yamaha art draws bigger wheels
  * for the size of the bike, so equal tyres meant a shorter, lower bike.
  *
- * The wheelie sprite is a candidate and drawn at a different scale; its
- * width and WHEELIE_SHIFT (how far its rear axle sits further in than the
- * ride's, so the rear wheel stays planted on the swap) need re-measuring
- * against whichever art is chosen.
+ * Each wheelie is drawn at a slightly different scale from its rider's
+ * riding sprite, so its width is set from the tyres to keep the rider the
+ * same size, and `shift` is how much further in from the left edge its rear
+ * axle sits. Pulling it back by that much, bottom aligned, keeps the rear
+ * wheel planted when one sprite is swapped for the other.
  */
-const RIDE_W = 110;
-const WHEELIE_W = 92;
-const WHEELIE_SHIFT = 2;
-// Off while the owner picks the 2009 wheelie art.
-const WHEELIES = false;
+const SIZE = {
+  rossi: { ride: { w: 110, shift: 0 }, wheelie: { w: 101, shift: 3 } },
+  stoner: { ride: { w: 106, shift: 0 }, wheelie: { w: 106, shift: 4 } },
+};
+const ART = { rossi, stoner };
+type Rider = keyof typeof SIZE;
 const SPEED = 190; // px per second
-const STONER_W = 106;
+const RIDE_W = SIZE.rossi.ride.w;
+const STONER_W = SIZE.stoner.ride.w;
+
+function Bike({ who, up }: { who: Rider; up: boolean }) {
+  const pose = up ? "wheelie" : "ride";
+  const { w, shift } = SIZE[who][pose];
+  const img = ART[who][pose];
+  return (
+    <img
+      src={img.src}
+      alt=""
+      width={w}
+      height={Math.round(w / img.ratio)}
+      loading="lazy"
+      decoding="async"
+      style={{ width: w, position: "relative", left: -shift }}
+    />
+  );
+}
 
 export default function RossiRide() {
   const strip = useRef<HTMLDivElement>(null);
   const bike = useRef<HTMLDivElement>(null);
   const chaser = useRef<HTMLDivElement>(null);
-  const [wheelie, setWheelie] = useState(false);
+  const [up, setUp] = useState<Rider | null>(null);
 
   useEffect(() => {
     const box = strip.current;
     if (!box) return;
+    // Loaded ahead, or the first wheelie of a visit swaps to an image that
+    // isn't there yet and the bike blinks out.
+    for (const art of [rossi.wheelie, stoner.wheelie]) new Image().src = art.src;
     // Not tied to prefers-reduced-motion, for the reason Onee isn't (see
     // OneeCompanion): Windows sets it when animation effects are turned off
     // for speed, and the owner's machine is set that way. A display setting is
@@ -48,21 +72,25 @@ export default function RossiRide() {
     let last = 0;
     let x = -RIDE_W - 40;
     let restAt = 0; // while off the right edge, the time to come round again
-    // Where on this pass the wheelies start, as x positions, and how long
-    // each lasts in px of travel.
-    let plan: { at: number; len: number }[] = [];
-    let on = false;
+    // The wheelies on this pass: who, where Rossi is when it starts (Stoner's
+    // are pushed on by about his distance behind, so he is on screen), and
+    // how long it lasts in px of travel.
+    let plan: { who: Rider; at: number; len: number }[] = [];
+    let on: Rider | null = null;
     // Where in his closing and dropping back the chase is, in radians.
     let phase = Math.random() * Math.PI * 2;
     const newPass = () => {
       const w = box.clientWidth;
-      const n = !WHEELIES ? 0 : Math.random() < 0.5 ? 1 : 2;
+      const n = Math.random() < 0.5 ? 1 : 2;
+      // Two on a pass are one each, in either order.
+      const first: Rider = Math.random() < 0.5 ? "rossi" : "stoner";
       plan = [];
       let from = w * 0.12;
       for (let i = 0; i < n; i++) {
-        const at = from + Math.random() * (w * (n === 1 ? 0.55 : 0.3));
+        const who: Rider = i === 0 ? first : first === "rossi" ? "stoner" : "rossi";
+        const at = from + Math.random() * (w * (n === 1 ? 0.55 : 0.3)) + (who === "stoner" ? STONER_W + 30 : 0);
         const len = SPEED * (1.1 + Math.random() * 0.8);
-        plan.push({ at, len });
+        plan.push({ who, at, len });
         from = at + len + w * 0.08;
       }
     };
@@ -86,10 +114,10 @@ export default function RossiRide() {
       const sx = x - STONER_W - gap;
       // The pass is over once the chaser is off the far edge too.
       if (!restAt && sx > w + 40) restAt = t + 1500 + Math.random() * 2500;
-      const up = plan.some((p) => x >= p.at && x < p.at + p.len);
-      if (up !== on) {
-        on = up;
-        setWheelie(up);
+      const now = plan.find((p) => x >= p.at && x < p.at + p.len)?.who ?? null;
+      if (now !== on) {
+        on = now;
+        setUp(now);
       }
       if (bike.current) bike.current.style.transform = `translateX(${x}px)`;
       if (chaser.current) chaser.current.style.transform = `translateX(${sx}px)`;
@@ -99,31 +127,13 @@ export default function RossiRide() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const img = wheelie ? rossi.wheelie : rossi.ride;
-  const w = wheelie ? WHEELIE_W : RIDE_W;
   return (
     <div ref={strip} aria-hidden className="era-rossi">
       <div ref={chaser} className="era-rossi-bike" style={{ transform: `translateX(${-RIDE_W - STONER_W - 160}px)` }}>
-        <img
-          src={stoner.src}
-          alt=""
-          width={STONER_W}
-          height={Math.round(STONER_W / stoner.ratio)}
-          loading="lazy"
-          decoding="async"
-          style={{ width: STONER_W }}
-        />
+        <Bike who="stoner" up={up === "stoner"} />
       </div>
       <div ref={bike} className="era-rossi-bike" style={{ transform: `translateX(${-RIDE_W - 40}px)` }}>
-        <img
-          src={img.src}
-          alt=""
-          width={w}
-          height={Math.round(w / img.ratio)}
-          loading="lazy"
-          decoding="async"
-          style={{ width: w, position: "relative", left: wheelie ? -WHEELIE_SHIFT : 0 }}
-        />
+        <Bike who="rossi" up={up === "rossi"} />
       </div>
     </div>
   );
