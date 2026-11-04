@@ -1,15 +1,17 @@
-# Harshith — Portfolio
+# Harshith Nayaka L — portfolio site
 
-AI Engineer portfolio. One scrolling page (profile, About, Work, What I build,
-Experience, Stack, Agent skills, GitHub activity, Questions, Contact) plus
-per-project case-study routes and legal pages, in an early-2000s motorsport
-design: F1 helmets on display, a period digicam, a period car stereo,
-cars crossing the screen. Light canvas with a dark mode, Instrument Serif
-headings over Inter body and labels. The previous design is archived on the
-`classic-design` branch.
+Source for [harshith-nayaka-l-portfolio.vercel.app](https://harshith-nayaka-l-portfolio.vercel.app),
+the portfolio of Harshith Nayaka L, an AI Engineer in Bengaluru who builds AI
+agents, RAG pipelines and LLM applications. It holds a case study for each
+project, guides drawn from them, and his profile, experience and published
+research. One scrolling page plus case-study, guide and legal routes.
 
 The site is also built to be read by machines: every page is prerendered to
 static HTML, has a markdown twin, and is mirrored by a read-only JSON API.
+
+The visual design and the rules that keep it consistent are in
+[AGENTS.md](AGENTS.md); the previous design is archived on the
+`classic-design` branch.
 
 ## Stack
 
