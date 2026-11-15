@@ -40,8 +40,11 @@ export const routeSeo: Record<string, RouteSeo> = {
     // is, /contact how to hire him; only this page claims the role and city.
     // It keeps the exact phrase the previous title ranked for.
     title: `${NAME} — AI Engineer in Bengaluru | AI Agents, RAG & n8n Automation`,
+    // "Portfolio" leads, because it is the noun every people-list query turns
+    // on and the title cannot carry it without crowding out the role-and-city
+    // phrase this page already ranks for.
     description:
-      `${NAME}, AI Engineer in Bengaluru (Bangalore): AI agents, RAG pipelines, n8n automation and LLM apps, built end to end. Available for freelance work.`,
+      `Portfolio of ${NAME}, AI Engineer in Bengaluru (Bangalore): AI agents, RAG pipelines, n8n automation and LLM apps. Available for freelance work.`,
     canonical: abs("/"),
     ogType: "profile",
   },

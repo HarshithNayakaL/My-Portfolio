@@ -48,10 +48,18 @@ export const profileDocs: Record<string, Doc> = {
     // same query (see src/data/seo.ts); it now answers the name question and
     // leaves the role query to the homepage. Role, city and specialties are
     // still stated in the body, where an answer engine quotes them from.
+    //
+    // It also carries the word "portfolio", which nothing on this site used to
+    // say. Every people-list answer engines build is assembled from pages that
+    // name the thing they are — "<Name>'s Portfolio", "Portfolio of <Name>, an
+    // AI Engineer" — and a survey of the pages being cited for
+    // "AI engineer Bangalore portfolio" found the noun in the title of all of
+    // them. This page claims it; the homepage keeps the role-and-city query, so
+    // the two still answer different questions and do not compete again.
     h1: `About ${NAME}`,
-    h1Split: [`About ${NAME}`, "Background, stack, published research and the questions people ask"],
-    searchTitle: `About ${NAME} — Background, Stack and Published Research`,
-    description: `Who ${NAME} is: his role at DemandNXT, what he has built since 2022, his stack, his co-authored IJRTMR paper, and answers to common questions.`,
+    h1Split: [`About ${NAME}`, "Portfolio, background, stack, published research and the questions people ask"],
+    searchTitle: `${NAME} — AI Engineer Portfolio and Background`,
+    description: `The portfolio and background of ${NAME}: his role at DemandNXT, what he has built since 2022, his stack, and his co-authored IJRTMR paper.`,
     intro: identitySentence,
     sections: [
       {
