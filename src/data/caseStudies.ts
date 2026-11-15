@@ -692,7 +692,7 @@ const novaAi: CaseStudy = {
     "Chat app that scores every turn for difficulty and routes it across three model tiers, showing the lane, the reasoning and the cost on each answer.",
   links: [
     { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
-    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
+    { label: "View on GitHub", href: "https://github.com/HarshithNayakaL/nova" },
   ],
 };
 

@@ -129,7 +129,7 @@ export const projects: Project[] = [
     tags: ["Model routing", "Cost tiering", "Arbiter model", "Serverless"],
     links: [
       { label: "Live app", href: "https://custom-gpt-silk.vercel.app/" },
-      { label: "GitHub", href: "https://github.com/HarshithNayakaL/CUSTOM-GPT" },
+      { label: "GitHub", href: "https://github.com/HarshithNayakaL/nova" },
     ],
     hasCaseStudy: true,
   },
