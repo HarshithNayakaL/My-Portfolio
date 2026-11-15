@@ -8,7 +8,7 @@
 // makes the class of mistake fail the build instead of reaching production.
 // It reads only dist/, so it checks what ships, not what the source intended.
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
@@ -23,8 +23,15 @@ const walk = (dir) =>
     const p = join(dir, name);
     return statSync(p).isDirectory() ? walk(p) : [p];
   });
-const files = walk(DIST).filter((f) => !f.includes(`${DIST}/assets/`));
-const rel = (f) => f.slice(DIST.length);
+/** Every path test in this file is written in URL form — "/index.html",
+ *  "/assets/", and the routes `rel` produces. On Windows `join` hands back
+ *  backslashes instead, so none of those tests match: the page map comes out
+ *  empty and the whole check passes by having examined nothing. Normalising
+ *  the separator once, here, is what keeps paths and routes in one alphabet. */
+const posix = (p) => p.split(sep).join("/");
+const DIST_URL = posix(DIST);
+const files = walk(DIST).map(posix).filter((f) => !f.includes(`${DIST_URL}/assets/`));
+const rel = (f) => f.slice(DIST_URL.length);
 const read = (f) => readFileSync(f, "utf8");
 const unescape = (s) =>
   s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'");

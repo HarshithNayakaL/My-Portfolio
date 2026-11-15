@@ -18,15 +18,21 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
 
+/** A dynamic import takes a URL, and a bare Windows path is not one: the drive
+ *  letter parses as an unsupported scheme and the import throws before the
+ *  build reaches the API. Routed through file:// it runs the same on Windows
+ *  as on Linux. */
+const mod = (p) => pathToFileURL(join(ROOT, p)).href;
+
 const {
   caseStudies, guides, projects, faqs, agentSkills, ORIGIN, NAME, EMAIL, GITHUB, LINKEDIN, SITE_REPO,
   facts, availability, headlineRole, identitySentence, stack, stackSentence, profileQA,
-} = await import(join(ROOT, "dist-ssr/entry-server.js"));
+} = await import(mod("dist-ssr/entry-server.js"));
 
 const abs = (p) => `${ORIGIN}${p}`;
 const API = "/api/v1";
@@ -917,7 +923,7 @@ let MCP_TOOLS, DOCS_MCP_TOOLS, MCP_ICONS, MCP_VERSIONS, A2A_SKILLS, A2A_VERSIONS
 // and if the live endpoint is down too the section renders nothing rather than
 // a graph of zeroes that would read as a year of no work.
 {
-  const { GITHUB_USER, fetchContributions } = await import(join(ROOT, "api/_contributions.mjs"));
+  const { GITHUB_USER, fetchContributions } = await import(mod("api/_contributions.mjs"));
   const user = GITHUB.replace(/\/+$/, "").split("/").pop();
   if (user !== GITHUB_USER) {
     throw new Error(

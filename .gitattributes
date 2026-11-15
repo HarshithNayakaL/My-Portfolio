@@ -1,0 +1,18 @@
+# The CSP in vercel.json pins a sha256 of the inline theme script in
+# index.html, and a hash is over bytes: checked out with CRLF, that same script
+# hashes differently, every prerendered page fails the CSP rule in
+# check-site.mjs, and the build stops. Nothing is wrong with the site when that
+# happens — only with the line endings in the working copy. Pinning LF keeps a
+# Windows clone building the same bytes as the deployment does.
+* text=auto eol=lf
+
+# Binary, so Git neither converts nor diffs them. The screenshot hashes in
+# public/shots/ are content hashes for the same reason as above.
+*.webp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary

@@ -16,10 +16,16 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DIST = join(ROOT, "dist");
+
+/** A dynamic import takes a URL, and a bare Windows path is not one: the drive
+ *  letter parses as an unsupported scheme and the import throws before the
+ *  build reaches prerendering. Routed through file:// it runs the same on
+ *  Windows as on Linux. */
+const mod = (p) => pathToFileURL(join(ROOT, p)).href;
 
 const {
   render,
@@ -46,7 +52,7 @@ const {
   identitySentence,
   legalDocs,
   LEGAL_UPDATED,
-} = await import(join(ROOT, "dist-ssr/entry-server.js"));
+} = await import(mod("dist-ssr/entry-server.js"));
 
 let template = await readFile(join(DIST, "index.html"), "utf8");
 
