@@ -12,6 +12,7 @@
     "build:client": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "tsc -b --noEmit",
+    "dates": "node scripts/update-page-dates.mjs",
     "indexnow": "node scripts/indexnow.mjs",
     "verify:llms": "node scripts/check-llms-txt.mjs",
     "verify:onee": "node scripts/check-onee-moods.mjs",

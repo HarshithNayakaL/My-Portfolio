@@ -125,7 +125,7 @@ for (const [route, s] of pages) {
   }
 }
 
-// ---- structured data: parses, no placeholders, references resolve, FAQ visible
+// ---- structured data: parses, no placeholders, references resolve, FAQ and skills visible
 const ldBlocks = (s) => [...s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
 const collect = (o, refs, ids) => {
   if (Array.isArray(o)) return o.forEach((v) => collect(v, refs, ids));
@@ -154,6 +154,13 @@ for (const [route, s] of pages) {
     collect(ld, refs, ids);
     for (const r of refs) if (!ids.has(r) && !homeIds.has(r)) fail("dangling @id", `${route} -> ${r}`);
     for (const node of ld["@graph"] ?? [ld]) {
+      // Google: "Don't mark up content that is not visible to readers of the
+      // page." The skills list once named 34 topics, 24 of them in wording the
+      // page never used ("Agent context isolation", "API rate-limit
+      // engineering"), so it was a claim only machines could read.
+      for (const k of node?.knowsAbout ?? []) {
+        if (!text.includes(typeof k === "string" ? k : k.name)) fail("knowsAbout not visible", `${route}: ${k}`);
+      }
       if (node?.["@type"] !== "FAQPage") continue;
       for (const q of node.mainEntity) {
         if (!text.includes(q.name)) fail("FAQ schema not visible", `${route}: ${q.name}`);

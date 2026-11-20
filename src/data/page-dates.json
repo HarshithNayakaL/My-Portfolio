@@ -1,0 +1,74 @@
+{
+  "/work/craftconnect": {
+    "modified": "2026-10-10T20:41:31Z",
+    "fingerprint": "d65176aed18d3bac"
+  },
+  "/work/creative-ops-pipeline": {
+    "modified": "2026-09-23T04:34:49Z",
+    "fingerprint": "fb28197dfd8f39c1"
+  },
+  "/work/brandforge": {
+    "modified": "2026-10-10T19:27:37Z",
+    "fingerprint": "d4b50336ac400e8b"
+  },
+  "/work/brand-audit-platform": {
+    "modified": "2026-09-28T03:47:33Z",
+    "fingerprint": "d0f2a1969dd5da4f"
+  },
+  "/work/nova-ai": {
+    "modified": "2026-11-15T08:27:12Z",
+    "fingerprint": "c3500dcd6cb9dce8"
+  },
+  "/work/ai-notes": {
+    "modified": "2026-10-11T09:40:15Z",
+    "fingerprint": "dec5016a702b29bc"
+  },
+  "/work/maestro": {
+    "modified": "2026-10-29T08:15:51Z",
+    "fingerprint": "b4e2332b665b83ef"
+  },
+  "/work/cannon": {
+    "modified": "2026-10-14T03:27:25Z",
+    "fingerprint": "59086347f86c0796"
+  },
+  "/work/replydesk": {
+    "modified": "2026-10-14T03:27:25Z",
+    "fingerprint": "c624c64c7015a3ad"
+  },
+  "/work/spectra": {
+    "modified": "2026-10-10T20:41:31Z",
+    "fingerprint": "5dcdf624bb5bcd26"
+  },
+  "/work/personal-os-mcp": {
+    "modified": "2026-10-30T05:51:46Z",
+    "fingerprint": "72e500b625e6f176"
+  },
+  "/work/octo": {
+    "modified": "2026-10-31T04:53:36Z",
+    "fingerprint": "979efb05157c5c0c"
+  },
+  "/work/airtable-ai-company-briefs": {
+    "modified": "2026-10-04T16:52:10Z",
+    "fingerprint": "bad10466b3b80f5f"
+  },
+  "/work/youtube-scraper-google-sheets": {
+    "modified": "2026-10-04T16:52:10Z",
+    "fingerprint": "d2b6829664a15f24"
+  },
+  "/work/slack-weekly-report-bot": {
+    "modified": "2026-10-04T16:52:10Z",
+    "fingerprint": "7d47094152ececba"
+  },
+  "/guides/production-ready-llm-agents": {
+    "modified": "2026-10-29T10:04:21Z",
+    "fingerprint": "4f12cb897e8883eb"
+  },
+  "/guides/grounded-llm-answers": {
+    "modified": "2026-10-29T10:04:21Z",
+    "fingerprint": "7c574fc99ffb7a6a"
+  },
+  "/guides/running-llms-locally": {
+    "modified": "2026-10-29T10:04:21Z",
+    "fingerprint": "b6de577bdb5257ec"
+  }
+}

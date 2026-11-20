@@ -57,7 +57,7 @@ reason to hand-edit the output.
 
 ## Guards
 
-Four of these fail the build outright. The other three are scripts you run; they
+Five of these fail the build outright. The other three are scripts you run; they
 exist because each one caught something that had already shipped. If one fires,
 fix the cause — do not weaken the check.
 
@@ -80,7 +80,8 @@ fix the cause — do not weaken the check.
   and reads only `dist/`. It fails on a broken internal link, a canonical or
   sitemap mismatch, a duplicate title or description, a page without exactly
   one `<h1>`, JSON-LD that does not parse, keeps a `__PLACEHOLDER__`, points
-  at an `@id` nothing defines, or has FAQ text not visible on the page, a
+  at an `@id` nothing defines, or has FAQ text or a `knowsAbout` skill not
+  visible on the page (Google: don't mark up what readers can't see), a
   wrong project count, a missing markdown twin, and stale facts: the old job
   title used as current, "Author of" for the co-authored paper, the retired
   BlogSpace, and any project attributed to the employer; "full stack" in
@@ -94,6 +95,16 @@ fix the cause — do not weaken the check.
   sitemap `lastmod`, markdown-twin date and JSON-LD `dateModified` disagree
   (all four come from `scripts/content-dates.mjs`). Each rule is a bug
   that shipped once. If it fires, fix the content, not the rule.
+- **Per-page dates.** Each case study and guide has its own last-modified
+  date in `src/data/page-dates.json`, next to a fingerprint of the source
+  block it is built from (its `const ...: CaseStudy` in `caseStudies.ts`, its
+  object in `guides.ts`). The build fails when a block changes and its date
+  does not: run `npm run dates` and commit the file. Dates are not read from
+  git at build time because Vercel's checkout is shallow; as one shared date,
+  fixing a single link re-dated all eighteen pages, and Google uses `lastmod`
+  only when it is "consistently and verifiably accurate". Other pages share
+  their group's date (`SOURCE_GROUPS`), which leaves out chrome like the
+  footer.
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
   llms.txt v2 spec. Point it at a Vercel deployment (production or a preview
   URL), not `npm run preview`: that server doesn't run `middleware.ts` or the
@@ -188,7 +199,8 @@ If you change routes, you change all of these — check each one:
 - `/<route>/index.md` — markdown twin, with YAML frontmatter. Routes are
   `/`, `/about`, `/contact`, `/work/<slug>`, `/guides/<slug>` and
   `/legal/<doc>`; a new route type also needs `PAGE_ROUTE` in `middleware.ts`
-  and a group in `scripts/content-dates.mjs`
+  and a group in `scripts/content-dates.mjs`. A new case study or guide needs
+  `npm run dates`
 - Guides are also MCP resources: `GUIDE_PAGES` in `middleware.ts`, which
   `scripts/build-api.mjs` checks against `src/data/guides.ts`
 - `Accept: text/markdown`, `?mode=agent`, and answer-engine user agents all

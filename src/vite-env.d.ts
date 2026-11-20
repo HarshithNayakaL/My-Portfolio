@@ -46,6 +46,8 @@ declare module "react" {
 declare global {
   /** Injected by vite.config.ts from scripts/content-dates.mjs. */
   const __CONTENT_DATES__: Record<"home" | "work" | "guides" | "legal" | "profile", string>;
+  /** Per-route dates for case studies and guides, from src/data/page-dates.json. */
+  const __PAGE_DATES__: Record<string, string>;
 
   interface WebMcpToolDescriptor {
     name: string;

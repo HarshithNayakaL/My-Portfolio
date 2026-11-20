@@ -11,5 +11,6 @@ export const groupFor = (path: string): ContentGroup =>
 
 /** ISO 8601 UTC ("2026-09-26T08:18:15Z") of the page's last real content
  *  change. Injected at build time, identical in the server and client bundles,
- *  and used by the prerender for dateModified, the sitemap and the twins. */
-export const contentDate = (path: string): string => __CONTENT_DATES__[groupFor(path)];
+ *  and used by the prerender for dateModified, the sitemap and the twins.
+ *  Case studies and guides have one each; other pages share their group's. */
+export const contentDate = (path: string): string => __PAGE_DATES__[path] ?? __CONTENT_DATES__[groupFor(path)];
