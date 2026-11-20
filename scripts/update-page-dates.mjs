@@ -1,7 +1,8 @@
-// Stamps src/data/page-dates.json: for every case study or guide whose source
-// text changed since it was last stamped, sets its date to now. With
-// --from-git, dates every page from the last commit that touched its block
-// instead (needs full history: `git fetch --unshallow`). See content-dates.mjs.
+// Stamps src/data/page-dates.json: for every page group, case study or guide
+// whose source text changed since it was last stamped, sets its date to now.
+// With --from-git, dates every entry from the last commit that touched its
+// files or block instead (needs full history: `git fetch --unshallow`). See
+// content-dates.mjs.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -18,10 +19,12 @@ const escape = (s) => s.replace(/[.*^$[\]\\/]/g, "\\$&");
 const stored = existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {};
 const next = {};
 const changed = [];
-for (const [route, { text, file, start }] of Object.entries(pageSources())) {
+for (const [route, { text, file, start, files }] of Object.entries(pageSources())) {
   const print = fingerprint(text);
   let modified = stored[route]?.fingerprint === print && !fromGit ? stored[route].modified : null;
-  if (!modified && fromGit) {
+  if (!modified && fromGit && files) {
+    modified = iso(execFileSync("git", ["log", "-1", "--format=%cI", "--", ...files], { cwd: ROOT, encoding: "utf8" }).trim());
+  } else if (!modified && fromGit) {
     const end = file.endsWith("caseStudies.ts") ? "^};" : "^  },";
     const out = execFileSync(
       "git",

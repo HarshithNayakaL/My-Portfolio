@@ -1,4 +1,24 @@
 {
+  "group:home": {
+    "modified": "2026-11-20T03:09:18Z",
+    "fingerprint": "8f0692c19a3860c2"
+  },
+  "group:work": {
+    "modified": "2026-11-15T08:27:12Z",
+    "fingerprint": "f83745c4413508a1"
+  },
+  "group:guides": {
+    "modified": "2026-11-15T08:27:12Z",
+    "fingerprint": "dd655207359eeddd"
+  },
+  "group:legal": {
+    "modified": "2026-10-12T03:21:37Z",
+    "fingerprint": "b9eab21200aaf9b3"
+  },
+  "group:profile": {
+    "modified": "2026-11-15T07:48:33Z",
+    "fingerprint": "1e968a5fca030872"
+  },
   "/work/craftconnect": {
     "modified": "2026-10-10T20:41:31Z",
     "fingerprint": "d65176aed18d3bac"

@@ -1,15 +1,20 @@
-// When each group of pages last really changed, from git.
+// When each page last really changed.
 //
-// Computed once, in vite.config.ts, and injected into both bundles as
-// __CONTENT_DATES__, so the date a page shows in its footer, the dateModified
-// in its structured data, its sitemap <lastmod> and its markdown twin's
-// last-updated are one value. They used to be three: the sitemap and twin
-// read git, while the Article and ProfilePage schema stamped the build time,
-// so every deploy told Google every page had just changed.
+// Read once, in vite.config.ts, and injected into both bundles as
+// __CONTENT_DATES__ (per group) and __PAGE_DATES__ (per case study and guide),
+// so the date a page shows in its footer, the dateModified in its structured
+// data, its sitemap <lastmod> and its markdown twin's last-updated are one
+// value. They used to be three: the sitemap and twin read git, while the
+// Article and ProfilePage schema stamped the build time, so every deploy told
+// Google every page had just changed.
 //
-// A page's date is the newest commit to any file whose text reaches it. Pages
-// in a group share their sources, so they share a date.
-import { execFileSync } from "node:child_process";
+// Then they were read from git at build time, which Vercel's shallow checkout
+// gets wrong: a file untouched in the last few commits came back with the
+// oldest commit the clone held, so the legal pages, last edited 12 October,
+// went live as 31 October. Now every date is stamped into
+// src/data/page-dates.json beside a fingerprint of the source text it covers,
+// and the build only reads that file. If the text changes and the date does
+// not, the build fails; `npm run dates` stamps it.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -30,43 +35,23 @@ export const SOURCE_GROUPS = {
   profile: [...SHARED, "src/pages/Profile.tsx", "src/data/profileQA.ts"],
 };
 
-const iso = (d) => new Date(d).toISOString().replace(/\.\d{3}Z$/, "Z");
-
-export function contentDates() {
-  const now = iso(Date.now());
-  return Object.fromEntries(
-    Object.entries(SOURCE_GROUPS).map(([group, files]) => {
-      try {
-        const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", ...files], {
-          cwd: ROOT,
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "ignore"],
-        }).trim();
-        // No git, or no history for these paths in a shallow clone: fall back
-        // to the build time rather than failing the build.
-        return [group, out ? iso(out) : now];
-      } catch {
-        return [group, now];
-      }
-    }),
-  );
-}
-
 // Case studies and guides each get their own date. As a group, one link fixed
 // in Nova's case study moved the date on all eighteen pages, and Google uses
 // lastmod only "if it's consistently and verifiably accurate"; it also lists
 // changing dates "to make them seem fresh" as a warning sign.
 //
-// Their dates live in src/data/page-dates.json beside a fingerprint of the
-// source text each page is built from, not in git: Vercel's checkout is
-// shallow, and history that stops short of a page's last edit would date it
-// to whatever commit the clone happens to start at. If a page's text changes
-// and its date does not, the build fails; `npm run dates` stamps it.
+// Every other page shares its group's date: the newest change to any file
+// whose text reaches it.
 export const PAGE_DATES_FILE = "src/data/page-dates.json";
 
-/** The source text each case-study and guide page is built from, by route. */
+/** The source text each dated entry covers: `group:<name>` for a page group,
+ *  the route for a case study or guide. */
 export function pageSources() {
   const out = {};
+  for (const [group, files] of Object.entries(SOURCE_GROUPS)) {
+    const text = files.map((f) => `${f}\n${readFileSync(`${ROOT}${f}`, "utf8")}`).join("\n");
+    out[`group:${group}`] = { text, files };
+  }
   const studies = readFileSync(`${ROOT}src/data/caseStudies.ts`, "utf8");
   for (const m of studies.matchAll(/^const \w+: CaseStudy = \{\n  slug: "([^"]+)"[\s\S]*?^\};$/gm)) {
     out[`/work/${m[1]}`] = { text: m[0], file: "src/data/caseStudies.ts", start: m[0].split("\n")[0] };
@@ -80,8 +65,8 @@ export function pageSources() {
 
 export const fingerprint = (text) => createHash("sha256").update(text.replace(/[ \t]+$/gm, "")).digest("hex").slice(0, 16);
 
-/** Last-modified date per case-study and guide route; throws if any is stale. */
-export function pageDates() {
+/** Every stamped date, checked against the current text; throws if any is stale. */
+function stampedDates() {
   const stored = JSON.parse(readFileSync(`${ROOT}${PAGE_DATES_FILE}`, "utf8"));
   const stale = [];
   const dates = {};
@@ -94,4 +79,15 @@ export function pageDates() {
     throw new Error(`${PAGE_DATES_FILE} is out of date for ${stale.join(", ")}: run \`npm run dates\` and commit it.`);
   }
   return dates;
+}
+
+/** Last-modified date per page group. */
+export function contentDates() {
+  const all = stampedDates();
+  return Object.fromEntries(Object.keys(SOURCE_GROUPS).map((g) => [g, all[`group:${g}`]]));
+}
+
+/** Last-modified date per case-study and guide route. */
+export function pageDates() {
+  return Object.fromEntries(Object.entries(stampedDates()).filter(([k]) => !k.startsWith("group:")));
 }

@@ -95,16 +95,17 @@ fix the cause — do not weaken the check.
   sitemap `lastmod`, markdown-twin date and JSON-LD `dateModified` disagree
   (all four come from `scripts/content-dates.mjs`). Each rule is a bug
   that shipped once. If it fires, fix the content, not the rule.
-- **Per-page dates.** Each case study and guide has its own last-modified
-  date in `src/data/page-dates.json`, next to a fingerprint of the source
-  block it is built from (its `const ...: CaseStudy` in `caseStudies.ts`, its
-  object in `guides.ts`). The build fails when a block changes and its date
-  does not: run `npm run dates` and commit the file. Dates are not read from
-  git at build time because Vercel's checkout is shallow; as one shared date,
-  fixing a single link re-dated all eighteen pages, and Google uses `lastmod`
-  only when it is "consistently and verifiably accurate". Other pages share
-  their group's date (`SOURCE_GROUPS`), which leaves out chrome like the
-  footer.
+- **Stamped dates.** Every last-modified date lives in
+  `src/data/page-dates.json`, next to a fingerprint of the source text it
+  covers: one per case study and guide (its `const ...: CaseStudy` block in
+  `caseStudies.ts`, its object in `guides.ts`), and one per page group in
+  `SOURCE_GROUPS` (which leaves out chrome like the footer). The build fails
+  when that text changes and its date does not: run `npm run dates` and
+  commit the file. Nothing reads git at build time: Vercel's checkout is
+  shallow, and `git log` there dated the legal pages to the oldest commit the
+  clone held. As one shared date, fixing a single link re-dated all eighteen
+  case studies and guides, and Google uses `lastmod` only when it is
+  "consistently and verifiably accurate".
 - **llms.txt conformance.** `npm run verify:llms` checks the file against the
   llms.txt v2 spec. Point it at a Vercel deployment (production or a preview
   URL), not `npm run preview`: that server doesn't run `middleware.ts` or the
